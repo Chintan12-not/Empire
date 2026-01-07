@@ -12,25 +12,27 @@
 
   <header class="nav">
     <div class="nav-left">
-      <img src="images/logo.jpg" alt="E'MPIRE Logo" class="logo-img">
+      <img src="images/logo.png" alt="E'MPIRE Logo" class="logo-img">
       <span class="brand">E'MPIRE</span>
       <button id="menuToggle" class="icon-btn" onclick="toggleMenu()">☰</button>
     </div>
-    <div class="nav-right">
-      <button id="cartBtn" class="icon-btn" onclick="toggleCart()">🛒 <span id="cartCount">0</span></button>
+
+    <div class="nav-right nav-actions">
+      <button id="cartBtn" class="icon-btn" onclick="toggleCart()">
+        🛒 <span id="cartCount">0</span>
+      </button>
     </div>
 
     <nav id="mobileMenu" class="mobile-menu-overlay">
-        <a href="#home" onclick="toggleMenu()">Home</a>
-        <a href="#featured" onclick="toggleMenu()">Bestsellers</a>
-        <a href="#accords" onclick="toggleMenu()">The Art</a>
-        <a href="shipping.html">Shipping</a>
-        <a href="#contact" onclick="toggleMenu()">Contact</a>
+      <a href="#home" onclick="toggleMenu()">Home</a>
+      <a href="#featured" onclick="toggleMenu()">Bestsellers</a>
+      <a href="shipping.html" onclick="toggleMenu()">Shipping</a>
+      <a href="#contact" onclick="toggleMenu()">Contact</a>
     </nav>
   </header>
 
   <div id="cartSidebar" class="cart-sidebar">
-    <div class="cart-sidebar-header">
+    <div class="cart-sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
       <h3>Selection</h3>
       <button class="icon-btn" onclick="toggleCart()">✕</button>
     </div>
@@ -46,16 +48,18 @@
     </div>
   </div>
 
-  <section id="home" class="hero">
-    <video playsinline autoplay muted loop id="heroVideo">
-      <source src="video/hero.mp4" type="video/mp4">
+  <section class="hero" id="home">
+    <video autoplay muted loop playsinline id="heroVideo">
+        <source src="video/video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
     </video>
+
     <div class="hero-inner reveal-hidden">
-      <h1>THE E'MPIRE COLLECTION</h1>
-      <p class="subtitle">Experience scents crafted for modern royalty.</p>
-      <div class="hero-cta">
-        <a href="#featured" class="btn primary">Explore Boutique</a>
-      </div>
+        <h1 class="gold-text">E'MPIRE</h1>
+        <p class="subtitle">Experience Noble Fragrances</p>
+        <div class="hero-cta">
+            <a href="#featured" class="btn primary">Explore Collection</a>
+        </div>
     </div>
   </section>
 
@@ -63,42 +67,67 @@
     <div class="container">
       <h2 class="section-title reveal-hidden">Bestsellers</h2>
       <div class="product-scroll">
+        
         <article class="product-card reveal-hidden">
-          <div class="product-media"><img src="images/Smoked Whisky.jpg" alt="Smoked Whisky"></div>
+          <div class="product-media" onclick="viewProduct('whisky')" style="cursor: pointer;">
+            <img src="images/Smoked Whisky.jpg" alt="Smoked Whisky">
+          </div>
           <div class="product-body">
             <h3>Smoked Whisky</h3>
             <div class="scent-notes">Bourbon • Oak • Tobacco</div>
             <div class="price">₹4,899</div>
-            <button class="btn small primary" onclick="addToCart('Smoked Whisky', 4899)">Add to Cart</button>
+            <div class="card-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn small primary" onclick="addToCart('Smoked Whisky', 4899)">Add to Cart</button>
+                <button class="btn small ghost" onclick="viewProduct('whisky')">Details</button>
+            </div>
           </div>
         </article>
+
         <article class="product-card reveal-hidden">
-          <div class="product-media"><img src="images/Ocean Aura.jpg" alt="Ocean Aura"></div>
+          <div class="product-media" onclick="viewProduct('ocean')" style="cursor: pointer;">
+            <img src="images/Ocean Aura.jpg" alt="Ocean Aura">
+          </div>
           <div class="product-body">
             <h3>Ocean Aura</h3>
             <div class="scent-notes">Sea Salt • Bergamot • Driftwood</div>
             <div class="price">₹3,950</div>
-            <button class="btn small primary" onclick="addToCart('Ocean Aura', 3950)">Add to Cart</button>
+            <div class="card-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn small primary" onclick="addToCart('Ocean Aura', 3950)">Add to Cart</button>
+                <button class="btn small ghost" onclick="viewProduct('ocean')">Details</button>
+            </div>
           </div>
         </article>
+
         <article class="product-card reveal-hidden">
-          <div class="product-media"><img src="images/Blush ELIXIR.jpg" alt="Blush ELIXIR"></div>
+          <div class="product-media" onclick="viewProduct('blush')" style="cursor: pointer;">
+            <img src="images/Blush ELIXIR.jpg" alt="Blush ELIXIR">
+          </div>
           <div class="product-body">
             <h3>Blush ELIXIR</h3>
             <div class="scent-notes">Peony • Pink Pepper • White Musk</div>
             <div class="price">₹4,250</div>
-            <button class="btn small primary" onclick="addToCart('Blush ELIXIR', 4250)">Add to Cart</button>
+            <div class="card-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn small primary" onclick="addToCart('Blush ELIXIR', 4250)">Add to Cart</button>
+                <button class="btn small ghost" onclick="viewProduct('blush')">Details</button>
+            </div>
           </div>
         </article>
+
         <article class="product-card reveal-hidden">
-          <div class="product-media"><img src="images/p1.jpg" alt="Royal Oud"></div>
+          <div class="product-media" onclick="viewProduct('oud')" style="cursor: pointer;">
+            <img src="images/p1.jpg" alt="Royal Oud">
+          </div>
           <div class="product-body">
             <h3>Royal Oud</h3>
             <div class="scent-notes">Oud • Saffron • Amber</div>
             <div class="price">₹4,199</div>
-            <button class="btn small primary" onclick="addToCart('Royal Oud', 4199)">Add to Cart</button>
+            <div class="card-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn small primary" onclick="addToCart('Royal Oud', 4199)">Add to Cart</button>
+                <button class="btn small ghost" onclick="viewProduct('oud')">Details</button>
+            </div>
           </div>
         </article>
+
       </div>
     </div>
   </section>
