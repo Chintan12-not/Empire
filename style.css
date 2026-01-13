@@ -81,7 +81,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--border-rgba);
-    transform: none !important; /* Prevents scroll reveal interference */
+    transform: none !important;
 }
 
 .nav-left {
@@ -136,6 +136,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 
 .logo-img { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; }
 .icon-btn { background: none; border: none; color: var(--gold-main); font-size: 24px; cursor: pointer; }
+#menuToggle { display: none; } /* Default hidden on desktop */
 
 /* === MOBILE MENU SIDEBAR === */
 .mobile-menu-overlay {
@@ -250,7 +251,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 .neesh-style {
     font-family: 'Inter', sans-serif;
     text-align: center;
-    padding: 40px 25px 50px; /* Reduced and balanced spacing */
+    padding: 40px 25px 50px;
 }
 
 .product-scroll { 
@@ -294,7 +295,6 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 
 .product-card:hover .product-media img { transform: scale(1.04); }
 
-/* === PRICE BLOCK STYLES === */
 .price-block {
     display: flex;
     gap: 10px;
@@ -321,7 +321,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 /* === PRODUCT DETAIL PAGE === */
 .luxury-detail-grid {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr; /* Balanced image and text ratio */
+    grid-template-columns: 1.1fr 0.9fr;
     gap: 70px;
     padding: 140px 0 80px;
     align-items: center;
@@ -465,7 +465,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     font-size: 14px;
 }
 
-/* === AUTH MODAL & BOX === */
+/* === AUTH MODAL === */
 .auth-modal {
     position: fixed;
     inset: 0;
@@ -475,7 +475,6 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     justify-content: center;
     z-index: 3000;
 }
-
 .auth-modal.active { display: flex; }
 
 .auth-box {
@@ -497,75 +496,40 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     border-radius: 6px;
 }
 
-.auth-box input:focus {
-    border-color: var(--gold-main);
-    outline: none;
-}
+.auth-box input:focus { border-color: var(--gold-main); outline: none; }
 
-.auth-box .btn {
-    letter-spacing: 2px;
-}
-
-/* === E'MPIRE LUXURY FOOTER === */
+/* === FOOTER === */
 .empire-footer {
-  background: #000;
-  border-top: 1px solid rgba(212,175,55,0.2);
-  padding: 70px 0 30px;
-  color: #ccc;
-  margin-top: 50px;
+    background: #000;
+    border-top: 1px solid rgba(212,175,55,0.2);
+    padding: 70px 0 30px;
+    color: #ccc;
+    margin-top: 50px;
 }
 
 .footer-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 40px;
-  display: grid;
-  grid-template-columns: 2fr 2fr 1.5fr;
-  gap: 50px;
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: 2fr 2fr 1.5fr;
+    gap: 50px;
 }
 
-.footer-brand img {
-  width: 80px;
-  margin-bottom: 15px;
-}
-
-.footer-brand h3 {
-  font-family: 'Cinzel', serif;
-  letter-spacing: 3px;
-  color: var(--gold-main);
-  margin-bottom: 10px;
-}
-
-.footer-brand p {
-  font-size: 14px;
-  line-height: 1.8;
-  color: #aaa;
-}
-
+.footer-brand img { width: 80px; margin-bottom: 15px; }
+.footer-brand h3 { font-family: 'Cinzel', serif; letter-spacing: 3px; color: var(--gold-main); margin-bottom: 10px; }
+.footer-brand p { font-size: 14px; line-height: 1.8; color: #aaa; }
 .footer-contact p { font-size: 14px; line-height: 1.8; }
-.footer-contact .address { margin-top: 10px; color: #999; }
-
-.footer-links a {
-  display: block;
-  text-decoration: none;
-  color: #ccc;
-  margin-bottom: 10px;
-  font-size: 14px;
-  transition: 0.3s;
-}
-
-.footer-links a:hover {
-  color: var(--gold-main);
-  transform: translateX(3px);
-}
+.footer-links a { display: block; text-decoration: none; color: #ccc; margin-bottom: 10px; font-size: 14px; transition: 0.3s; }
+.footer-links a:hover { color: var(--gold-main); transform: translateX(3px); }
 
 .footer-bottom {
-  text-align: center;
-  margin-top: 50px;
-  padding-top: 20px;
-  border-top: 1px solid #222;
-  font-size: 12px;
-  color: #777;
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #222;
+    font-size: 12px;
+    color: #777;
 }
 
 /* === WHATSAPP FLOAT === */
@@ -587,34 +551,65 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     transition: transform 0.3s ease;
     text-decoration: none;
 }
-.whatsapp-float:hover { transform: scale(1.1); }
 
-/* === MOBILE OPTIMIZATION === */
+/* ===================================================
+   FULL MOBILE RESPONSIVE SYSTEM (MERGED)
+   =================================================== */
+
+/* ---------- TABLETS & BELOW ---------- */
 @media (max-width: 992px) {
-    .checkout-layout, 
-    .luxury-detail-grid { grid-template-columns: 1fr; }
+    .container, .footer-container { padding: 0 20px; }
+    .checkout-layout, .luxury-detail-grid { grid-template-columns: 1fr; gap: 40px; }
+    .luxury-image { max-width: 100%; margin: 0 auto; }
+    .luxury-info { max-width: 100%; }
 }
 
+/* ---------- PHONES ---------- */
 @media (max-width: 768px) {
-    .container, .footer-container { padding: 0 18px; }
-    .nav { height: 70px; padding: 0 16px; top: 39px; } 
+    .nav { height: 70px; padding: 0 16px; top: 39px; }
     .brand { font-size: 18px; }
     .nav-actions { display: none; }
-    
+    #menuToggle { display: inline-block; }
+
     .hero { height: 85vh; text-align: center; }
     .hero-inner { padding: 0 20px; }
-    
-    .product-card { padding: 10px; flex: 0 0 240px; }
+    .hero-inner h1 { font-size: clamp(36px, 10vw, 56px); }
+
+    .product-card { padding: 14px; flex: 0 0 240px; }
+    .product-media { border-radius: 10px; }
+
+    .luxury-info { padding: 24px; }
     .notes-row { grid-template-columns: 1fr; }
 
     .cart-sidebar { width: 100%; right: -100%; }
     .cart-sidebar.active { right: 0; }
 
-    .footer-container { grid-template-columns: 1fr; text-align: center; }
+    .auth-box { width: 90%; max-width: 360px; }
+
+    .footer-container { grid-template-columns: 1fr; text-align: center; gap: 30px; }
     .footer-brand img { margin: 0 auto 15px; }
+
+    .whatsapp-float {
+        left: 15px;
+        bottom: 15px;
+        width: 46px;
+        height: 46px;
+        font-size: 22px;
+    }
 }
 
+/* ---------- SMALL PHONES (iPhone SE / Android mini) ---------- */
 @media (max-width: 480px) {
-    .auth-box { width: 90%; }
+    body { font-size: 14px; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 18px; }
+
+    .btn { padding: 10px 16px; font-size: 13px; }
+    .luxury-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .luxury-actions button { flex: 1; }
+
+    .cart-item { font-size: 13px; }
+    .top-offer-bar { font-size: 11px; padding: 8px 6px; }
     .mobile-menu-overlay { width: 80%; }
 }

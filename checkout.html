@@ -160,6 +160,24 @@
 
         .full-width { width: 100%; margin-top: 25px; font-weight: 700; letter-spacing: 2px; }
 
+        /* New alignment style */
+        .terms-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin-top: 20px; 
+        }
+        .terms-row input { width: auto; margin: 0; cursor: pointer; }
+        .terms-row label { 
+            margin: 0; 
+            text-transform: none; 
+            color: #888; 
+            font-size: 0.8rem; 
+            letter-spacing: normal;
+            cursor: pointer;
+        }
+        .terms-row a { color: var(--gold); text-decoration: underline; }
+
         @media (max-width: 900px) {
             .checkout-layout { grid-template-columns: 1fr; }
             .nav { width: 100%; box-sizing: border-box; }
@@ -232,10 +250,11 @@
                             </div>
                         </div>
                         
-                        <div style="margin-top: 20px;">
+                        <div class="terms-row">
                             <input type="checkbox" id="terms" required>
-                            <label for="terms" style="display: inline; text-transform: none; color: #888; font-size: 0.8rem;">
-                                I agree to the <a href="terms.html" target="_blank" style="color: var(--gold); text-decoration: underline;">Terms & Conditions</a>.
+                            <label for="terms">
+                                I agree to the 
+                                <a href="terms.html" target="_blank">Terms & Conditions</a>.
                             </label>
                         </div>
                     </form>
@@ -383,7 +402,7 @@
                 const finalTotalNum = Number(finalTotalStr);
 
                 try {
-                    // 1. Save to Supabase (Removed .select() for RLS compatibility)
+                    // 1. Save to Supabase
                     const { error } = await supabaseCheckout
                         .from("orders")
                         .insert([{
