@@ -613,3 +613,60 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     .top-offer-bar { font-size: 11px; padding: 8px 6px; }
     .mobile-menu-overlay { width: 80%; }
 }
+/* ===================================================
+   ADMIN PANEL — MOBILE RESPONSIVE SUPPORT
+   =================================================== */
+
+@media (max-width: 768px) {
+
+    body {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    /* Stats cards stack vertically */
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    /* Table handling on mobile */
+    table {
+        font-size: 12px;
+        min-width: 600px; /* allows horizontal scroll */
+    }
+
+    th, td {
+        padding: 8px;
+        white-space: nowrap;
+    }
+
+    /* Action buttons stack */
+    .btn {
+        display: block;
+        width: 100%;
+        margin: 4px 0;
+        font-size: 12px;
+    }
+}
+
+/* EXTRA SMALL PHONES */
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 18px;
+    }
+
+    .badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+}
