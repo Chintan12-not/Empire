@@ -1,41 +1,512 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Checkout — E'MPIRE</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Secure Checkout — E'MPIRE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(15, 15, 15, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, #111 0%, #000 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            position: fixed;
+            top: 0; width: 90%;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+        }
+
+        .gold-text { color: var(--gold); font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 2px; }
+
+        .btn {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn.primary { background: var(--gold); color: black; border-radius: 2px; }
+        .btn.ghost { border: 1px solid var(--gold); color: var(--gold); background: transparent; }
+        .btn.small { padding: 8px 16px; font-size: 0.8rem; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 6px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--gold);
+        }
+
+        .checkout-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .modern-form .form-group { margin-bottom: 25px; }
+        .modern-form label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-size: 0.75rem; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            color: #888; 
+        }
+        
+        .modern-form input, .modern-form textarea {
+            width: 100%;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .modern-form input:focus { border-color: var(--gold); outline: none; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+
+        .delivery-toggle { display: flex; gap: 15px; margin-bottom: 30px; }
+        .toggle-option {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #333;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+        .toggle-option.active { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .toggle-option input { opacity: 0; position: absolute; }
+
+        .summary-card {
+            position: sticky;
+            top: 120px;
+            background: #0f0f0f;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 30px;
+        }
+
+        .checkout-item-mini {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .discount-box { display: flex; gap: 10px; margin: 25px 0; }
+        .discount-box input { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 10px; }
+
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 300; }
+        .total-row.final { 
+            font-size: 1.4rem; 
+            font-family: 'Cinzel', serif; 
+            color: var(--gold); 
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+
+        .full-width { width: 100%; margin-top: 25px; font-weight: 700; letter-spacing: 2px; }
+
+        @media (max-width: 900px) {
+            .checkout-layout { grid-template-columns: 1fr; }
+            .nav { width: 100%; box-sizing: border-box; }
+        }
+    </style>
 </head>
+
 <body>
-  <header class="nav">
-    <div class="nav-left"><span class="brand">E'MPIRE</span></div>
-    <div class="nav-right"><a href="index.html" class="btn ghost">← Back to Boutique</a></div>
-  </header>
+    <header class="nav">
+        <div class="nav-left">
+            <img src="images/logo.png" alt="E'MPIRE Logo" class="logo-img">
+            <span class="brand gold-text">E'MPIRE</span>
+        </div>
+        <div class="nav-right">
+            <a href="index.html" class="btn ghost small">← Return to Boutique</a>
+        </div>
+    </header>
 
-  <main class="container section">
-    <div class="checkout-grid" style="display: grid; grid-template-columns: 1fr 350px; gap: 40px; margin-top: 40px;">
-      <div class="checkout-form-container">
-        <h3>Shipping & Payment</h3>
-        <form class="contact-form">
-          <input type="text" placeholder="Full Name" required>
-          <input type="tel" placeholder="Phone" required>
-          <textarea placeholder="Address" required></textarea>
-          <div class="payment-options" style="margin: 20px 0;">
-            <label><input type="radio" name="pay" checked> UPI (GPay/PhonePe)</label><br>
-            <label><input type="radio" name="pay"> Card</label>
-          </div>
-          <button class="btn primary full-width">Place Order</button>
-        </form>
-      </div>
+    <main class="container" style="margin-top: 150px; padding-bottom: 100px;">
+        <h1 class="section-title">SECURE CHECKOUT</h1>
+        
+        <div class="checkout-layout">
+            <div class="checkout-main">
+                <section class="checkout-section">
+                    <h3 style="font-family: 'Cinzel', serif; margin-bottom: 30px;">1. Shipping Information</h3>
+                    
+                    <div class="delivery-toggle">
+                        <label class="toggle-option active" id="deliveryTab">
+                            <input type="radio" name="method" value="delivery" checked> 
+                            <div>🚚 Delivery</div>
+                        </label>
+                        <label class="toggle-option" id="pickupTab">
+                            <input type="radio" name="method" value="pickup"> 
+                            <div>📦 Pick up</div>
+                        </label>
+                    </div>
 
-      <div class="order-summary-card" style="background: #111; padding: 25px; border: 1px solid #333; border-radius: 12px;">
-        <h3>Summary</h3>
-        <div id="checkoutItems" style="margin-bottom: 20px;"></div>
-        <hr style="border: 0; border-top: 1px solid #222; margin-bottom: 20px;">
-        <div class="cart-total">Total: <span id="finalTotal" style="color: var(--gold-main); font-weight: bold;">₹0</span></div>
-      </div>
-    </div>
-  </main>
+                    <form id="checkoutForm" class="modern-form">
+                        <div class="form-group">
+                            <label>Full name *</label>
+                            <input type="text" id="fullName" placeholder="Alexander Hamilton" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email address *</label>
+                            <input type="email" id="email" placeholder="client@empire-boutique.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone number *</label>
+                            <input type="tel" id="phone" placeholder="+91 00000 00000" required>
+                        </div>
+                        
+                        <div id="addressFields">
+                            <div class="form-group">
+                                <label>Address *</label>
+                                <textarea id="address" placeholder="Street, Building, Apartment" rows="3" required></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>City</label>
+                                    <input type="text" id="city" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>State</label>
+                                    <input type="text" id="state" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>ZIP Code</label>
+                                    <input type="text" id="zip" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms" style="display: inline; text-transform: none; color: #888; font-size: 0.8rem;">
+                                I agree to the <a href="terms.html" target="_blank" style="color: var(--gold); text-decoration: underline;">Terms & Conditions</a>.
+                            </label>
+                        </div>
+                    </form>
+                </section>
+            </div>
 
-  <script src="script.js"></script>
+            <aside class="checkout-sidebar">
+                <div class="summary-card">
+                    <h3 style="font-family: 'Cinzel', serif; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0;">Order Summary</h3>
+                    
+                    <div id="checkoutItems"></div>
+
+                    <div class="discount-box">
+                        <input type="text" id="discountCode" placeholder="GIFT CARD OR CODE">
+                        <button type="button" class="btn ghost small" onclick="applyDiscount()">Apply</button>
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="total-row"><span>Subtotal</span><span id="subtotalValue">₹0</span></div>
+                        <div class="total-row"><span>Shipping</span><span style="color: #2ecc71;">COMPLIMENTARY</span></div>
+                        <div class="total-row final"><span>Total</span><span id="finalTotal">₹0</span></div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to Payment</button>
+                    
+                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 30px; opacity: 0.6; font-size: 0.7rem;">
+                        <span style="font-size: 1.2rem;">🔒</span> 
+                        <div>
+                            <strong>ENCRYPTED SECURE CHECKOUT</strong><br>
+                            PCI-DSS Compliant Infrastructure.
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Initialize Supabase
+        const supabaseCheckout = supabase.createClient(
+          "https://wolxccbehsbafyirgvgp.supabase.co",
+          "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L"
+        );
+
+        let discountApplied = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCheckout();
+            setupToggles();
+            setupForm();
+        });
+
+        function renderCheckout() {
+            const container = document.getElementById('checkoutItems');
+            const totalEl = document.getElementById('finalTotal');
+            const subtotalEl = document.getElementById('subtotalValue');
+            
+            let cart = JSON.parse(localStorage.getItem('empire_cart')) || [];
+            
+            if (cart.length === 0) {
+                container.innerHTML = "<p style='padding: 30px 0; opacity: 0.5; text-align: center;'>Boutique bag is empty.</p>";
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="checkout-item-mini">
+                    <div>
+                        <div style="font-weight: 600; text-transform: uppercase; font-size: 0.9rem;">${item.name}</div>
+                        <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">QTY: ${item.qty}</div>
+                    </div>
+                    <div style="font-family: 'Inter';">₹${(item.price * item.qty).toLocaleString()}</div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            totalEl.innerText = `₹${total.toLocaleString()}`;
+            subtotalEl.innerText = `₹${total.toLocaleString()}`;
+        }
+
+        function applyDiscount() {
+            const code = document.getElementById("discountCode").value.trim().toUpperCase();
+            const subtotalEl = document.getElementById("subtotalValue");
+            const totalEl = document.getElementById("finalTotal");
+
+            let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
+            let subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+            if (code === "EMPIRE26" && !discountApplied) {
+                const discountedTotal = Math.round(subtotal * 0.3); // 70% off means you pay 30%
+                subtotalEl.innerText = `₹${subtotal.toLocaleString()}`;
+                totalEl.innerText = `₹${discountedTotal.toLocaleString()}`;
+                discountApplied = true;
+                alert("🎉 70% Joining Family discount applied!");
+            } else if (discountApplied) {
+                alert("Discount already applied.");
+            } else {
+                alert("Invalid discount code.");
+            }
+        }
+
+        function setupToggles() {
+            const options = document.querySelectorAll('.toggle-option');
+            const addressSection = document.getElementById('addressFields');
+
+            options.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    options.forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    const val = this.querySelector('input').value;
+                    
+                    if(val === 'pickup') {
+                        addressSection.style.display = 'none';
+                        document.querySelectorAll('#addressFields input, #addressFields textarea').forEach(el => el.required = false);
+                    } else {
+                        addressSection.style.display = 'block';
+                        document.querySelectorAll('#addressFields input, #addressFields textarea').forEach(el => el.required = true);
+                    }
+                });
+            });
+        }
+
+        function setupForm() {
+            const form = document.getElementById('checkoutForm');
+            const submitBtn = document.getElementById('submitBtn');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const cart = JSON.parse(localStorage.getItem('empire_cart')) || [];
+                if (cart.length === 0) {
+                    alert("Your boutique bag is empty!");
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = "PROCESSING...";
+
+                const name = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const finalTotalStr = document.getElementById('finalTotal').innerText.replace('₹', '').replace(/,/g, '');
+                const finalTotalNum = Number(finalTotalStr);
+
+                try {
+                    // 1. Save to Supabase (Removed .select() for RLS compatibility)
+                    const { error } = await supabaseCheckout
+                        .from("orders")
+                        .insert([{
+                            customer_name: name,
+                            phone,
+                            email,
+                            items: cart,
+                            total_amount: finalTotalNum,
+                            status: "pending"
+                        }]);
+
+                    if (error) {
+                        console.error("SUPABASE ERROR:", error);
+                        alert("Order failed: " + error.message);
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = "Proceed to Payment";
+                        return;
+                    }
+
+                    // 2. Generate Invoice PDF
+                    await generateInvoice({
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        cart: cart,
+                        finalTotal: finalTotalNum
+                    });
+
+                    // 3. Success Feedback
+                    alert("Order placed successfully! Your invoice is downloading.");
+                    localStorage.removeItem("empire_cart");
+                    window.location.href = "index.html"; 
+
+                } catch (err) {
+                    console.error("JS ERROR:", err);
+                    alert("Error processing order: " + err.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Proceed to Payment";
+                }
+            });
+        }
+
+        async function generateInvoice(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF("p", "mm", "a4");
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.text("E’MPIRE BOUTIQUE", 20, 20);
+
+            doc.setFontSize(14);
+            doc.text("INVOICE", pageWidth - 20, 20, { align: "right" });
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.text("House No. 1, Block 12", 20, 28);
+            doc.text("Spring Field Colony, Sector 31", 20, 33);
+            doc.text("Faridabad - 121003, Haryana", 20, 38);
+            doc.text("Phone: 9911261347", 20, 43);
+
+            const invoiceNo = "EB-" + Math.floor(1000 + Math.random() * 9000);
+            const date = new Date().toLocaleDateString("en-IN");
+
+            doc.rect(pageWidth - 90, 26, 70, 28);
+            doc.text("Invoice #", pageWidth - 88, 32);
+            doc.text(invoiceNo, pageWidth - 40, 32);
+            doc.text("Date", pageWidth - 88, 40);
+            doc.text(date, pageWidth - 40, 40);
+
+            doc.setFont("helvetica", "bold");
+            doc.rect(20, 55, 80, 8);
+            doc.text("BILL TO", 22, 61);
+
+            doc.setFont("helvetica", "normal");
+            doc.text(data.name, 22, 70);
+            doc.text(data.email || "", 22, 76);
+            doc.text(data.phone || "", 22, 82);
+
+            let startY = 110;
+            doc.setFont("helvetica", "bold");
+            doc.rect(20, startY, pageWidth - 40, 8);
+            doc.text("DESCRIPTION", 22, startY + 6);
+            doc.text("QTY", pageWidth - 90, startY + 6);
+            doc.text("UNIT PRICE", pageWidth - 65, startY + 6);
+            doc.text("AMOUNT", pageWidth - 30, startY + 6, { align: "right" });
+
+            doc.setFont("helvetica", "normal");
+            let y = startY + 14;
+            let subtotal = 0;
+
+            data.cart.forEach(item => {
+                const amount = item.price * item.qty;
+                subtotal += amount;
+                doc.text(item.name, 22, y);
+                doc.text(String(item.qty), pageWidth - 90, y);
+                doc.text(`₹${item.price.toLocaleString()}`, pageWidth - 65, y);
+                doc.text(`₹${amount.toLocaleString()}`, pageWidth - 30, y, { align: "right" });
+                y += 8;
+            });
+
+            doc.line(20, y + 2, pageWidth - 20, y + 2);
+            
+            if (discountApplied) {
+                doc.setFont("helvetica", "normal");
+                doc.text("SUBTOTAL", pageWidth - 65, y + 10);
+                doc.text(`₹${subtotal.toLocaleString()}`, pageWidth - 30, y + 10, { align: "right" });
+                doc.text("DISCOUNT (70%)", pageWidth - 65, y + 18);
+                doc.text(`- ₹${(subtotal - data.finalTotal).toLocaleString()}`, pageWidth - 30, y + 18, { align: "right" });
+                y += 16;
+            }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("GRAND TOTAL", pageWidth - 65, y + 12);
+            doc.text(`₹${data.finalTotal.toLocaleString()}`, pageWidth - 30, y + 12, { align: "right" });
+
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "normal");
+            doc.text("Thank you for your business!", pageWidth / 2, 285, { align: "center" });
+
+            doc.save(`EMPIRE_Invoice_${invoiceNo}.pdf`);
+        }
+    </script>
 </body>
 </html>
