@@ -136,7 +136,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 
 .logo-img { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; }
 .icon-btn { background: none; border: none; color: var(--gold-main); font-size: 24px; cursor: pointer; }
-#menuToggle { display: none; } /* Default hidden on desktop */
+#menuToggle { display: none; } 
 
 /* === MOBILE MENU SIDEBAR === */
 .mobile-menu-overlay {
@@ -318,21 +318,25 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     margin-top: 5px;
 }
 
-/* === PRODUCT DETAIL PAGE === */
+/* === PRODUCT DETAIL PAGE (Updated for Stability) === */
 .luxury-detail-grid {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     gap: 70px;
     padding: 140px 0 80px;
-    align-items: center;
+    align-items: flex-start; /* Fixed: Prevents vertical shift */
 }
 
 .luxury-image {
     max-width: 520px;
+    width: 100%; /* Fixed: Size stability */
 }
 
 .luxury-image img {
     width: 100%;
+    height: auto;
+    max-height: 620px; /* Fixed: Prevents overflow */
+    object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 0 40px rgba(0,0,0,0.6);
 }
@@ -342,6 +346,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     border: 1px solid rgba(212,175,55,0.2);
     padding: 40px;
     max-width: 620px;
+    min-height: 600px; /* Fixed: Prevents reflow jumps */
 }
 
 .luxury-title { letter-spacing: 3px; margin-bottom: 10px; }
@@ -552,19 +557,14 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     text-decoration: none;
 }
 
-/* ===================================================
-   FULL MOBILE RESPONSIVE SYSTEM (MERGED)
-   =================================================== */
-
-/* ---------- TABLETS & BELOW ---------- */
+/* === RESPONSIVE SYSTEM === */
 @media (max-width: 992px) {
     .container, .footer-container { padding: 0 20px; }
     .checkout-layout, .luxury-detail-grid { grid-template-columns: 1fr; gap: 40px; }
     .luxury-image { max-width: 100%; margin: 0 auto; }
-    .luxury-info { max-width: 100%; }
+    .luxury-info { max-width: 100%; min-height: auto; }
 }
 
-/* ---------- PHONES ---------- */
 @media (max-width: 768px) {
     .nav { height: 70px; padding: 0 16px; top: 39px; }
     .brand { font-size: 18px; }
@@ -596,77 +596,16 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
         height: 46px;
         font-size: 22px;
     }
+
+    /* Admin Mobile Support */
+    table { font-size: 12px; min-width: 600px; }
+    .grid { grid-template-columns: 1fr; gap: 15px; }
 }
 
-/* ---------- SMALL PHONES (iPhone SE / Android mini) ---------- */
 @media (max-width: 480px) {
     body { font-size: 14px; }
     h1 { font-size: 28px; }
-    h2 { font-size: 22px; }
-    h3 { font-size: 18px; }
-
     .btn { padding: 10px 16px; font-size: 13px; }
-    .luxury-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-    .luxury-actions button { flex: 1; }
-
-    .cart-item { font-size: 13px; }
     .top-offer-bar { font-size: 11px; padding: 8px 6px; }
     .mobile-menu-overlay { width: 80%; }
-}
-/* ===================================================
-   ADMIN PANEL — MOBILE RESPONSIVE SUPPORT
-   =================================================== */
-
-@media (max-width: 768px) {
-
-    body {
-        padding: 15px;
-    }
-
-    h1 {
-        font-size: 20px;
-        text-align: center;
-    }
-
-    /* Stats cards stack vertically */
-    .grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .card {
-        padding: 16px;
-    }
-
-    /* Table handling on mobile */
-    table {
-        font-size: 12px;
-        min-width: 600px; /* allows horizontal scroll */
-    }
-
-    th, td {
-        padding: 8px;
-        white-space: nowrap;
-    }
-
-    /* Action buttons stack */
-    .btn {
-        display: block;
-        width: 100%;
-        margin: 4px 0;
-        font-size: 12px;
-    }
-}
-
-/* EXTRA SMALL PHONES */
-@media (max-width: 480px) {
-
-    h1 {
-        font-size: 18px;
-    }
-
-    .badge {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
 }

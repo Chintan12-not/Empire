@@ -82,7 +82,7 @@
         <div class="container">
             <h2 class="section-title reveal-hidden">The Collection</h2>
             
-            <div class=" " style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 50px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 50px;">
                 
                 <article class="product-card reveal-hidden">
                     <div class="product-media" onclick="viewProduct('whisky')">
@@ -184,17 +184,27 @@
     <section id="contact" class="section contact">
         <div class="container contact-grid reveal-hidden">
             <div class="contact-info">
-                <h2 class="gold-text">Contact Concierge</h2>
+                <h2 class="gold-text">Contact Us</h2>
                 <p>Inquire about our bespoke fragrance services.</p>
             </div>
-            <form class="contact-form" onsubmit="submitContact(event)">
+
+            <form id="contactForm" class="contact-form">
+                <input type="hidden" name="_subject" value="New Contact Enquiry - E'MPIRE">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="text" name="_honey" style="display:none">
+
                 <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
-                    <input type="text" placeholder="Name" required style="padding:15px; background:#111; border:1px solid #333; color:white;">
-                    <input type="email" placeholder="Email" required style="padding:15px; background:#111; border:1px solid #333; color:white;">
+                    <input type="text" name="Name" placeholder="Name" required style="padding:15px; background:#111; border:1px solid #333; color:white;">
+                    <input type="email" name="Email" placeholder="Email" required style="padding:15px; background:#111; border:1px solid #333; color:white;">
                 </div>
-                <textarea placeholder="Your Message" required style="width:100%; padding:15px; background:#111; border:1px solid #333; color:white; height:100px; margin-bottom:15px;"></textarea>
-                <button type="submit" class="btn primary">Send Message</button>
+
+                <textarea name="Message" placeholder="Your Message" required style="width:100%; padding:15px; background:#111; border:1px solid #333; color:white; height:100px; margin-bottom:15px;"></textarea>
+
+                <button type="button" class="btn primary" onclick="submitContactForm()">Send Message</button>
             </form>
+            <p id="contactSuccess" style="display:none; margin-top:20px; color:#d4af37; font-size:14px; letter-spacing:1px;">
+                Thank you for contacting us.</p>
         </div>
     </section>
 
@@ -227,11 +237,15 @@
 
     <footer class="empire-footer">
         <div class="footer-container">
-      
           <div class="footer-brand">
             <img src="images/logo.png" alt="E'MPIRE Logo">
             <h3>E'MPIRE</h3>
             <p>Luxury fragrances crafted for elegance and lasting presence.</p>
+            <div class="social-links" style="margin-top:20px; display:flex; gap:15px;">
+                <a href="https://instagram.com/YOUR_HANDLE" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://facebook.com/YOUR_PAGE" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="https://wa.me/919911261347" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            </div>
           </div>
       
           <div class="footer-contact">
@@ -253,13 +267,13 @@
             <a href="terms.html">Terms & Conditions</a>
             <a href="#contact">Contact</a>
           </div>
-      
         </div>
       
         <div class="footer-bottom">
           <p>© 2026 E'MPIRE PERFUMES. All rights reserved.</p>
         </div>
     </footer>
+
     <a href="https://wa.me/919911261347" target="_blank" class="whatsapp-float">
         <i class="fab fa-whatsapp"></i>
     </a>
