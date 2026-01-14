@@ -293,6 +293,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     
     <script>
         const supabaseCheckout = supabase.createClient(
@@ -377,6 +378,80 @@
             });
         }
 
+        async function startPayment(finalAmount, orderData) {
+            try {
+                const res = await fetch(
+                    "https://wolxccbehsbafyirgvgp.supabase.co/functions/v1/create-razorpay-order",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ amount: finalAmount }),
+                    }
+                );
+
+                const razorpayOrder = await res.json();
+
+                if (!razorpayOrder.id) {
+                    alert("Payment initialization failed");
+                    document.getElementById('submitBtn').disabled = false;
+                    document.getElementById('submitBtn').innerText = "Proceed to Payment";
+                    return;
+                }
+
+                const options = {
+                    key: "rzp_test_S3pCfoSiWy4tFv", // Replace with your actual public key
+                    amount: razorpayOrder.amount,
+                    currency: "INR",
+                    name: "E'MPIRE",
+                    description: "Luxury Fragrance Purchase",
+                    order_id: razorpayOrder.id,
+                    theme: { color: "#d4af37" },
+
+                    handler: async function (response) {
+                        try {
+                            // Insert order into Supabase upon successful payment
+                            await supabaseCheckout.from("orders").insert([{
+                                ...orderData,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                status: "paid"
+                            }]);
+
+                            // Generate Invoice before redirection
+                            await generateInvoice({
+                                ...orderData,
+                                name: orderData.customer_name,
+                                finalTotal: orderData.total_amount,
+                                cart: orderData.items
+                            });
+
+                            alert("Payment successful! Your invoice is downloading.");
+                            localStorage.removeItem("empire_cart");
+                            window.location.href = "index.html";
+                        } catch (err) {
+                            console.error("DB Error:", err);
+                            alert("Payment successful but order recording failed. Please contact support.");
+                        }
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            document.getElementById('submitBtn').disabled = false;
+                            document.getElementById('submitBtn').innerText = "Proceed to Payment";
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (err) {
+                console.error("Payment Start Error:", err);
+                alert("System error. Please try again later.");
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').innerText = "Proceed to Payment";
+            }
+        }
+
         function setupForm() {
             const form = document.getElementById('checkoutForm');
             const submitBtn = document.getElementById('submitBtn');
@@ -387,7 +462,6 @@
                 const { data: { user } } = await supabaseCheckout.auth.getUser();
                 if (!user) {
                     alert("Please sign in or create an account to continue.");
-                    window.location.href = "index.html";
                     return;
                 }
                 
@@ -398,7 +472,7 @@
                 }
 
                 submitBtn.disabled = true;
-                submitBtn.innerText = "PROCESSING...";
+                submitBtn.innerText = "INITIALIZING SECURE PAYMENT...";
 
                 const name = document.getElementById('fullName').value;
                 const email = document.getElementById('email').value;
@@ -406,40 +480,14 @@
                 const finalTotalStr = document.getElementById('finalTotal').innerText.replace('₹', '').replace(/,/g, '');
                 const finalTotalNum = Number(finalTotalStr);
 
-                try {
-                    const { error } = await supabaseCheckout
-                        .from("orders")
-                        .insert([{
-                            customer_name: name,
-                            phone,
-                            email,
-                            items: cart,
-                            total_amount: finalTotalNum,
-                            status: "pending"
-                        }]);
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    await generateInvoice({
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        cart: cart,
-                        finalTotal: finalTotalNum
-                    });
-
-                    alert("Order placed successfully! Your invoice is downloading.");
-                    localStorage.removeItem("empire_cart");
-                    window.location.href = "index.html"; 
-
-                } catch (err) {
-                    console.error("ORDER ERROR:", err);
-                    alert("Error processing order: " + err.message);
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Proceed to Payment";
-                }
+                // Start the Razorpay flow
+                startPayment(finalTotalNum, {
+                    customer_name: name,
+                    phone: phone,
+                    email: email,
+                    items: cart,
+                    total_amount: finalTotalNum
+                });
             });
         }
 
@@ -448,13 +496,10 @@
             const doc = new jsPDF("p", "mm", "a4");
             const pageWidth = doc.internal.pageSize.getWidth();
 
-            // STEP 1 — COURIER FONT FOR PERFECT ALIGNMENT
             doc.setFont("courier", "normal");
-
             const invoiceNo = "EB-" + Date.now().toString().slice(-6);
             const today = new Date().toLocaleDateString("en-GB");
 
-            // Header
             doc.setFontSize(18);
             doc.setFont("courier", "bold");
             doc.text("E’MPIRE BOUTIQUE", 20, 20);
@@ -479,7 +524,6 @@
             doc.text(data.email || "", 22, 76);
             doc.text(data.phone || "", 22, 82);
 
-            // STEP 2 — FIXED COLUMN POSITIONS
             let startY = 110;
             const colQty = pageWidth - 95;
             const colUnit = pageWidth - 65;
@@ -492,7 +536,6 @@
             doc.text("UNIT PRICE", colUnit, startY + 6);
             doc.text("AMOUNT", colAmount, startY + 6, { align: "right" });
 
-            // STEP 3 — ITEM ROWS
             doc.setFont("courier", "normal");
             let y = startY + 14;
             let subtotal = 0;
@@ -517,7 +560,6 @@
                 y += 16;
             }
 
-            // STEP 4 & 5 — GRAND TOTAL & SPACING
             y += 6;
             doc.setFont("courier", "bold");
             doc.setFontSize(12);
