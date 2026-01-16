@@ -192,10 +192,6 @@
                             <input type="radio" name="method" value="delivery" checked> 
                             <div>🚚 Delivery</div>
                         </label>
-                        <label class="toggle-option">
-                            <input type="radio" name="method" value="pickup"> 
-                            <div>📦 Pick up</div>
-                        </label>
                     </div>
 
                     <form id="checkoutForm" class="modern-form">
@@ -259,7 +255,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCheckout();
-            setupToggles();
             setupForm();
         });
 
@@ -303,23 +298,8 @@
             }
         }
 
-        function setupToggles() {
-            const options = document.querySelectorAll('.toggle-option');
-            const addressSection = document.getElementById('addressFields');
-            options.forEach(opt => {
-                opt.addEventListener('click', function() {
-                    options.forEach(o => o.classList.remove('active'));
-                    this.classList.add('active');
-                    const isPickup = this.querySelector('input').value === 'pickup';
-                    addressSection.style.display = isPickup ? 'none' : 'block';
-                    document.querySelectorAll('#addressFields input, #addressFields textarea').forEach(el => el.required = !isPickup);
-                });
-            });
-        }
-
         async function startPayment(finalAmount, orderData) {
             try {
-                // 1️⃣ Create order via Cloudflare Worker
                 const res = await fetch(
                     "https://empire-razorpay.empire-official2026.workers.dev",
                     {
@@ -340,9 +320,8 @@
                     return;
                 }
 
-                // 2️⃣ Open Razorpay Checkout
                 const options = {
-                    key: "rzp_test_S4Wx9FE0iQTiSn", // ✅ Replace with your Razorpay Public Key
+                    key: "rzp_test_S4Wx9FE0iQTiSn",
                     amount: order.amount,
                     currency: "INR",
                     name: "E'MPIRE",
@@ -354,15 +333,43 @@
                         contact: orderData.phone,
                     },
                     theme: { color: "#d4af37" },
-                    handler: function (response) {
-                        console.log("Payment Success:", response);
-                        alert("Order Successful 👑");
-                        localStorage.removeItem("empire_cart");
-                        window.location.href = "index.html";
+                    handler: async function (response) {
+                        try {
+                            // Wait for the email trigger to finish before moving to the next page
+                            await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    order_id: response.razorpay_order_id,
+                                    payment_id: response.razorpay_payment_id,
+                                    total: finalAmount,
+                                    customer: {
+                                        name: document.getElementById("fullName").value,
+                                        email: document.getElementById("email").value,
+                                        phone: document.getElementById("phone").value,
+                                        address: document.getElementById("address").value,
+                                        city: document.getElementById("city").value,
+                                        state: document.getElementById("state").value,
+                                        zip: document.getElementById("zip").value
+                                    },
+                                    items: JSON.parse(localStorage.getItem("empire_cart")) || []
+                                })
+                            });
+
+                            console.log("Payment Success & Notification Sent");
+                            alert("Order Successful 👑");
+                            localStorage.removeItem("empire_cart");
+                            window.location.href = "index.html";
+                        } catch (emailErr) {
+                            console.error("Email notification error:", emailErr);
+                            // Still redirect since payment succeeded, but warn user
+                            alert("Payment successful! (Confirmation email may be delayed)");
+                            localStorage.removeItem("empire_cart");
+                            window.location.href = "index.html";
+                        }
                     },
                     modal: {
                         ondismiss: function() {
-                            // User closed the popup, just reset the button without error alerts
                             resetSubmitBtn();
                         }
                     }
@@ -370,7 +377,6 @@
 
                 const rzp = new Razorpay(options);
 
-                // Optional: Handle explicit payment failure (e.g., card declined)
                 rzp.on("payment.failed", function (response) {
                     console.error("Payment failed", response.error);
                     alert("Payment failed: " + response.error.description);

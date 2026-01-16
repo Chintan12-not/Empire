@@ -145,8 +145,20 @@ async function signIn() {
     closeAuth();
 }
 
+/**
+ * UPDATED: Instant Close Auth Modal
+ */
 function closeAuth() {
-    document.getElementById("authModal")?.classList.remove("active");
+    const modal = document.getElementById("authModal");
+    if (!modal) return;
+
+    modal.classList.remove("active");
+    modal.style.display = "none";
+
+    // force reflow reset (removes lag on reopen)
+    requestAnimationFrame(() => {
+        modal.style.display = "";
+    });
 }
 
 async function signInWithGoogle() {
@@ -173,7 +185,6 @@ function saveCart() {
 }
 
 function addToCart(name, price, qty = 1) {
-    // Optional: add if (!requireAuth()) return; here to prevent guest additions
     const item = cart.find(i => i.name === name);
     item ? (item.qty += qty) : cart.push({ name, price, qty });
     saveCart();
@@ -272,7 +283,7 @@ function renderNotFound(container) {
 
 async function placeOrder() {
     if (!supabaseClient) return alert("Connection error");
-    if (!requireAuth()) return; // Uses helper to show modal if logged out
+    if (!requireAuth()) return; 
     if (cart.length === 0) return alert("Cart is empty");
 
     const name = document.getElementById("checkoutName")?.value || "Customer";
@@ -333,7 +344,7 @@ function initContactForm() {
         const formData = new FormData(form);
 
         try {
-            const response = await fetch("https://formsubmit.co/ajax/chintanmaheshwari714@gmail.com", {
+            const response = await fetch("https://formsubmit.co/ajax/empire.official2026@gmail.com", {
                 method: "POST",
                 body: formData
             });
