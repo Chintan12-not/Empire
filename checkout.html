@@ -35,7 +35,8 @@
             align-items: center;
             padding: 20px 5%;
             position: fixed;
-            top: 0; width: 90%;
+            top: 0; width: 100%;
+            box-sizing: border-box;
             z-index: 1000;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
@@ -47,11 +48,7 @@
             gap: 15px;
         }
 
-        .logo-img {
-            height: 40px;
-            width: auto;
-        }
-
+        .logo-img { height: 40px; width: auto; }
         .gold-text { color: var(--gold); font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 2px; }
 
         .btn {
@@ -160,26 +157,13 @@
 
         .full-width { width: 100%; margin-top: 25px; font-weight: 700; letter-spacing: 2px; }
 
-        .terms-row { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            margin-top: 20px; 
-        }
+        .terms-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
         .terms-row input { width: auto; margin: 0; cursor: pointer; }
-        .terms-row label { 
-            margin: 0; 
-            text-transform: none; 
-            color: #888; 
-            font-size: 0.8rem; 
-            letter-spacing: normal;
-            cursor: pointer;
-        }
+        .terms-row label { margin: 0; text-transform: none; color: #888; font-size: 0.8rem; cursor: pointer; }
         .terms-row a { color: var(--gold); text-decoration: underline; }
 
         @media (max-width: 900px) {
             .checkout-layout { grid-template-columns: 1fr; }
-            .nav { width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -204,11 +188,11 @@
                     <h3 style="font-family: 'Cinzel', serif; margin-bottom: 30px;">1. Shipping Information</h3>
                     
                     <div class="delivery-toggle">
-                        <label class="toggle-option active" id="deliveryTab">
+                        <label class="toggle-option active">
                             <input type="radio" name="method" value="delivery" checked> 
                             <div>🚚 Delivery</div>
                         </label>
-                        <label class="toggle-option" id="pickupTab">
+                        <label class="toggle-option">
                             <input type="radio" name="method" value="pickup"> 
                             <div>📦 Pick up</div>
                         </label>
@@ -234,27 +218,15 @@
                                 <textarea id="address" placeholder="Street, Building, Apartment" rows="3" required></textarea>
                             </div>
                             <div class="form-row">
-                                <div class="form-group">
-                                    <label>City</label>
-                                    <input type="text" id="city" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>State</label>
-                                    <input type="text" id="state" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>ZIP Code</label>
-                                    <input type="text" id="zip" required>
-                                </div>
+                                <div class="form-group"><label>City</label><input type="text" id="city" required></div>
+                                <div class="form-group"><label>State</label><input type="text" id="state" required></div>
+                                <div class="form-group"><label>ZIP Code</label><input type="text" id="zip" required></div>
                             </div>
                         </div>
                         
                         <div class="terms-row">
                             <input type="checkbox" id="terms" required>
-                            <label for="terms">
-                                I agree to the 
-                                <a href="terms.html" target="_blank">Terms & Conditions</a>.
-                            </label>
+                            <label for="terms">I agree to the <a href="terms.html" target="_blank">Terms & Conditions</a>.</label>
                         </div>
                     </form>
                 </section>
@@ -263,44 +235,26 @@
             <aside class="checkout-sidebar">
                 <div class="summary-card">
                     <h3 style="font-family: 'Cinzel', serif; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0;">Order Summary</h3>
-                    
                     <div id="checkoutItems"></div>
-
                     <div class="discount-box">
                         <input type="text" id="discountCode" placeholder="GIFT CARD OR CODE">
                         <button type="button" class="btn ghost small" onclick="applyDiscount()">Apply</button>
                     </div>
-
                     <div class="summary-totals">
                         <div class="total-row"><span>Subtotal</span><span id="subtotalValue">₹0</span></div>
                         <div class="total-row"><span>Shipping</span><span style="color: #2ecc71;">COMPLIMENTARY</span></div>
                         <div class="total-row final"><span>Total</span><span id="finalTotal">₹0</span></div>
                     </div>
-
                     <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to Payment</button>
-                    
-                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 30px; opacity: 0.6; font-size: 0.7rem;">
-                        <span style="font-size: 1.2rem;">🔒</span> 
-                        <div>
-                            <strong>ENCRYPTED SECURE CHECKOUT</strong><br>
-                            PCI-DSS Compliant Infrastructure.
-                        </div>
-                    </div>
                 </div>
             </aside>
         </div>
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     
     <script>
-        const supabaseCheckout = supabase.createClient(
-          "https://wolxccbehsbafyirgvgp.supabase.co",
-          "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L"
-        );
-
         let discountApplied = false;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -313,7 +267,6 @@
             const container = document.getElementById('checkoutItems');
             const totalEl = document.getElementById('finalTotal');
             const subtotalEl = document.getElementById('subtotalValue');
-            
             let cart = JSON.parse(localStorage.getItem('empire_cart')) || [];
             
             if (cart.length === 0) {
@@ -327,7 +280,7 @@
                         <div style="font-weight: 600; text-transform: uppercase; font-size: 0.9rem;">${item.name}</div>
                         <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">QTY: ${item.qty}</div>
                     </div>
-                    <div style="font-family: 'Inter';">₹${(item.price * item.qty).toLocaleString()}</div>
+                    <div>₹${(item.price * item.qty).toLocaleString()}</div>
                 </div>
             `).join('');
 
@@ -338,243 +291,130 @@
 
         function applyDiscount() {
             const code = document.getElementById("discountCode").value.trim().toUpperCase();
-            const subtotalEl = document.getElementById("subtotalValue");
             const totalEl = document.getElementById("finalTotal");
-
             let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
             let subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
             if (code === "EMPIRE26" && !discountApplied) {
                 const discountedTotal = Math.round(subtotal * 0.3);
-                subtotalEl.innerText = `₹${subtotal.toLocaleString()}`;
                 totalEl.innerText = `₹${discountedTotal.toLocaleString()}`;
                 discountApplied = true;
-                alert("🎉 70% Joining Family discount applied!");
-            } else if (discountApplied) {
-                alert("Discount already applied.");
-            } else {
-                alert("Invalid discount code.");
+                alert("🎉 70% Family discount applied!");
             }
         }
 
         function setupToggles() {
             const options = document.querySelectorAll('.toggle-option');
             const addressSection = document.getElementById('addressFields');
-
             options.forEach(opt => {
                 opt.addEventListener('click', function() {
                     options.forEach(o => o.classList.remove('active'));
                     this.classList.add('active');
-                    const val = this.querySelector('input').value;
-                    
-                    if(val === 'pickup') {
-                        addressSection.style.display = 'none';
-                        document.querySelectorAll('#addressFields input, #addressFields textarea').forEach(el => el.required = false);
-                    } else {
-                        addressSection.style.display = 'block';
-                        document.querySelectorAll('#addressFields input, #addressFields textarea').forEach(el => el.required = true);
-                    }
+                    const isPickup = this.querySelector('input').value === 'pickup';
+                    addressSection.style.display = isPickup ? 'none' : 'block';
+                    document.querySelectorAll('#addressFields input, #addressFields textarea').forEach(el => el.required = !isPickup);
                 });
             });
         }
 
         async function startPayment(finalAmount, orderData) {
             try {
+                // 1️⃣ Create order via Cloudflare Worker
                 const res = await fetch(
-                    "https://wolxccbehsbafyirgvgp.supabase.co/functions/v1/create-razorpay-order",
+                    "https://empire-razorpay.empire-official2026.workers.dev",
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ amount: finalAmount }),
+                        body: JSON.stringify({
+                            amount: finalAmount,
+                            receipt: "empire_checkout"
+                        }),
                     }
                 );
 
-                const razorpayOrder = await res.json();
-                
-                // --- DEBUG BLOCK START ---
-                console.log("Razorpay response:", razorpayOrder);
-                if (!razorpayOrder.id) {
-                    alert(
-                        "Payment init failed:\n" +
-                        JSON.stringify(razorpayOrder, null, 2)
-                    );
-                    document.getElementById('submitBtn').disabled = false;
-                    document.getElementById('submitBtn').innerText = "Proceed to Payment";
+                const order = await res.json();
+
+                if (!order?.id) {
+                    alert("Failed to create Razorpay order");
+                    resetSubmitBtn();
                     return;
                 }
-                // --- DEBUG BLOCK END ---
 
+                // 2️⃣ Open Razorpay Checkout
                 const options = {
-                    key: "rzp_test_S3pCfoSiWy4tFv", 
-                    amount: razorpayOrder.amount,
+                    key: "rzp_test_S4Wx9FE0iQTiSn", // ✅ Replace with your Razorpay Public Key
+                    amount: order.amount,
                     currency: "INR",
                     name: "E'MPIRE",
                     description: "Luxury Fragrance Purchase",
-                    order_id: razorpayOrder.id,
+                    order_id: order.id,
+                    prefill: {
+                        name: orderData.customer_name,
+                        email: orderData.email,
+                        contact: orderData.phone,
+                    },
                     theme: { color: "#d4af37" },
-
-                    handler: async function (response) {
-                        try {
-                            await supabaseCheckout.from("orders").insert([{
-                                ...orderData,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                status: "paid"
-                            }]);
-
-                            await generateInvoice({
-                                ...orderData,
-                                name: orderData.customer_name,
-                                finalTotal: orderData.total_amount,
-                                cart: orderData.items
-                            });
-
-                            alert("Payment successful! Your invoice is downloading.");
-                            localStorage.removeItem("empire_cart");
-                            window.location.href = "index.html";
-                        } catch (err) {
-                            console.error("DB Error:", err);
-                            alert("Payment successful but order recording failed. Please contact support.");
-                        }
+                    handler: function (response) {
+                        console.log("Payment Success:", response);
+                        alert("Order Successful 👑");
+                        localStorage.removeItem("empire_cart");
+                        window.location.href = "index.html";
                     },
                     modal: {
                         ondismiss: function() {
-                            document.getElementById('submitBtn').disabled = false;
-                            document.getElementById('submitBtn').innerText = "Proceed to Payment";
+                            // User closed the popup, just reset the button without error alerts
+                            resetSubmitBtn();
                         }
                     }
                 };
 
                 const rzp = new Razorpay(options);
+
+                // Optional: Handle explicit payment failure (e.g., card declined)
+                rzp.on("payment.failed", function (response) {
+                    console.error("Payment failed", response.error);
+                    alert("Payment failed: " + response.error.description);
+                    resetSubmitBtn();
+                });
+
                 rzp.open();
 
             } catch (err) {
-                console.error("Payment Start Error:", err);
-                alert("System error. Please try again later.");
-                document.getElementById('submitBtn').disabled = false;
-                document.getElementById('submitBtn').innerText = "Proceed to Payment";
+                console.error(err);
+                alert("Payment system error");
+                resetSubmitBtn();
             }
+        }
+
+        function resetSubmitBtn() {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = false;
+            btn.innerText = "Proceed to Payment";
         }
 
         function setupForm() {
             const form = document.getElementById('checkoutForm');
-            const submitBtn = document.getElementById('submitBtn');
-
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const { data: { user } } = await supabaseCheckout.auth.getUser();
-                if (!user) {
-                    alert("Please sign in or create an account to continue.");
-                    return;
-                }
-                
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = true;
+                btn.innerText = "INITIALIZING...";
+
+                const finalTotalNum = Number(
+                    document.getElementById('finalTotal').innerText.replace(/[₹,]/g, '')
+                );
+
                 const cart = JSON.parse(localStorage.getItem('empire_cart')) || [];
-                if (cart.length === 0) {
-                    alert("Your boutique bag is empty!");
-                    return;
-                }
 
-                submitBtn.disabled = true;
-                submitBtn.innerText = "INITIALIZING SECURE PAYMENT...";
-
-                const name = document.getElementById('fullName').value;
-                const email = document.getElementById('email').value;
-                const phone = document.getElementById('phone').value;
-                const finalTotalStr = document.getElementById('finalTotal').innerText.replace('₹', '').replace(/,/g, '');
-                const finalTotalNum = Number(finalTotalStr);
-
-                // --- DATA TYPE FIX ---
-                startPayment(Number(finalTotalNum), {
-                    customer_name: name,
-                    phone: phone,
-                    email: email,
+                startPayment(finalTotalNum, {
+                    customer_name: document.getElementById('fullName').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
                     items: cart,
                     total_amount: finalTotalNum
                 });
             });
-        }
-
-        async function generateInvoice(data) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF("p", "mm", "a4");
-            const pageWidth = doc.internal.pageSize.getWidth();
-
-            doc.setFont("courier", "normal");
-            const invoiceNo = "EB-" + Date.now().toString().slice(-6);
-            const today = new Date().toLocaleDateString("en-GB");
-
-            doc.setFontSize(18);
-            doc.setFont("courier", "bold");
-            doc.text("E’MPIRE BOUTIQUE", 20, 20);
-
-            doc.setFontSize(12);
-            doc.setFont("courier", "normal");
-            doc.text(`Invoice #: ${invoiceNo}`, pageWidth - 20, 28, { align: "right" });
-            doc.text(`Date: ${today}`, pageWidth - 20, 34, { align: "right" });
-
-            doc.setFontSize(9);
-            doc.text("House No. 1, Block 12", 20, 28);
-            doc.text("Spring Field Colony, Sector 31", 20, 33);
-            doc.text("Faridabad - 121003, Haryana", 20, 38);
-            doc.text("Phone: 9911261347", 20, 43);
-
-            doc.setFont("courier", "bold");
-            doc.rect(20, 55, 80, 8);
-            doc.text("BILL TO", 22, 61);
-
-            doc.setFont("courier", "normal");
-            doc.text(data.name, 22, 70);
-            doc.text(data.email || "", 22, 76);
-            doc.text(data.phone || "", 22, 82);
-
-            let startY = 110;
-            const colQty = pageWidth - 95;
-            const colUnit = pageWidth - 65;
-            const colAmount = pageWidth - 20;
-
-            doc.setFont("courier", "bold");
-            doc.rect(20, startY, pageWidth - 40, 8);
-            doc.text("DESCRIPTION", 22, startY + 6);
-            doc.text("QTY", colQty, startY + 6);
-            doc.text("UNIT PRICE", colUnit, startY + 6);
-            doc.text("AMOUNT", colAmount, startY + 6, { align: "right" });
-
-            doc.setFont("courier", "normal");
-            let y = startY + 14;
-            let subtotal = 0;
-
-            data.cart.forEach(item => {
-                const amount = item.price * item.qty;
-                subtotal += amount;
-                doc.text(item.name, 22, y);
-                doc.text(String(item.qty), colQty, y);
-                doc.text(`₹ ${item.price.toLocaleString("en-IN")}`, colUnit, y);
-                doc.text(`₹ ${amount.toLocaleString("en-IN")}`, colAmount, y, { align: "right" });
-                y += 8;
-            });
-
-            doc.line(20, y + 2, pageWidth - 20, y + 2);
-            
-            if (discountApplied) {
-                doc.text("SUBTOTAL", colUnit, y + 10);
-                doc.text(`₹ ${subtotal.toLocaleString("en-IN")}`, colAmount, y + 10, { align: "right" });
-                doc.text("DISCOUNT (70%)", colUnit, y + 18);
-                doc.text(`- ₹ ${(subtotal - data.finalTotal).toLocaleString("en-IN")}`, colAmount, y + 18, { align: "right" });
-                y += 16;
-            }
-
-            y += 6;
-            doc.setFont("courier", "bold");
-            doc.setFontSize(12);
-            doc.text("GRAND TOTAL", colUnit, y + 12);
-            doc.text(`₹ ${data.finalTotal.toLocaleString("en-IN")}`, colAmount, y + 12, { align: "right" });
-
-            doc.setFontSize(8);
-            doc.setFont("courier", "normal");
-            doc.text("Thank you for your business!", pageWidth / 2, 285, { align: "center" });
-
-            doc.save(`EMPIRE_Invoice_${invoiceNo}.pdf`);
         }
     </script>
 </body>
