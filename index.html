@@ -99,6 +99,7 @@
                         <div class="button-group" style="display: flex; gap: 10px; margin-top: 15px;">
                             <button class="btn primary small" style="flex: 1;" onclick="addToCart('Smoked Whisky', 2800)">Add to Cart</button>
                             <button class="btn ghost small" style="flex: 1;" onclick="location.href='checkout.html'">Buy Now</button>
+                            <button class="btn ghost small" onclick="shareProduct('Smoked Whisky')">Share</button>
                         </div>
                     </div>
                 </article>
@@ -118,6 +119,7 @@
                         <div class="button-group" style="display: flex; gap: 10px; margin-top: 15px;">
                             <button class="btn primary small" style="flex: 1;" onclick="addToCart('Ocean Aura', 2800)">Add to Cart</button>
                             <button class="btn ghost small" style="flex: 1;" onclick="location.href='checkout.html'">Buy Now</button>
+                            <button class="btn ghost small" onclick="shareProduct('Ocean Aura')">Share</button>
                         </div>
                     </div>
                 </article>
@@ -137,24 +139,48 @@
                         <div class="button-group" style="display: flex; gap: 10px; margin-top: 15px;">
                             <button class="btn primary small" style="flex: 1;" onclick="addToCart('Blush ELIXIR', 2800)">Add to Cart</button>
                             <button class="btn ghost small" style="flex: 1;" onclick="location.href='checkout.html'">Buy Now</button>
+                            <button class="btn ghost small" onclick="shareProduct('Blush ELIXIR')">Share</button>
                         </div>
                     </div>
                 </article>
+
+                <article class="product-card reveal-hidden">
+                    <div class="product-media slider" onclick="viewProduct('fruityforest')">
+                        <img src="images/Fruity Forest 1.jpg" class="slide active">
+                        <img src="images/Fruity Forest 2.jpg" class="slide">
+                        <img src="images/Fruity Forest 3.jpg" class="slide">
+                    </div>
+                    <div class="product-body neesh-style">
+                        <h3 class="product-name">Fruity Forest</h3>
+                        <div class="product-meta">50 ml • Eau De Parfum</div>
+                        <p class="product-desc">Fresh, vibrant and effortlessly elegant — a modern fruity-floral fragrance.</p>
+                        <div class="price-block">
+                            <span class="new-price">₹2800</span>
+                        </div>
+                        <div class="discount-text">70% OFF WITH CODE: EMPIRE26</div>
+                        <div class="button-group" style="display:flex; gap:10px; margin-top:15px;">
+                            <button class="btn primary small" style="flex:1;" onclick="addToCart('Fruity Forest', 2800)">Add to Cart</button>
+                            <button class="btn ghost small" style="flex:1;" onclick="location.href='checkout.html'">Buy Now</button>
+                            <button class="btn ghost small" onclick="shareProduct('Fruity Forest')">Share</button>
+                        </div>
+                    </div>
+                </article>
+
             </div>
 
             <h2 class="section-title reveal-hidden" style="margin-top: 60px; font-size: 1.5rem; opacity: 0.7;">Future Essences</h2>
             <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
-                <div class="product-card reveal-hidden" style="opacity: 0.6; border: 1px dashed #d4af37;">
-                    <div style="height: 250px; display: flex; align-items: center; justify-content: center; background: #050505; color: #d4af37; font-family: 'Cinzel';">COMING SOON</div>
+                <div class="product-card reveal-hidden coming-soon">
+                    <div class="coming-soon-box">COMING SOON</div>
                 </div>
-                <div class="product-card reveal-hidden" style="opacity: 0.6; border: 1px dashed #d4af37;">
-                    <div style="height: 250px; display: flex; align-items: center; justify-content: center; background: #050505; color: #d4af37; font-family: 'Cinzel';">COMING SOON</div>
+                <div class="product-card reveal-hidden coming-soon">
+                    <div class="coming-soon-box">COMING SOON</div>
                 </div>
-                <div class="product-card reveal-hidden" style="opacity: 0.6; border: 1px dashed #d4af37;">
-                    <div style="height: 250px; display: flex; align-items: center; justify-content: center; background: #050505; color: #d4af37; font-family: 'Cinzel';">COMING SOON</div>
+                <div class="product-card reveal-hidden coming-soon">
+                    <div class="coming-soon-box">COMING SOON</div>
                 </div>
-                <div class="product-card reveal-hidden" style="opacity: 0.6; border: 1px dashed #d4af37;">
-                    <div style="height: 250px; display: flex; align-items: center; justify-content: center; background: #050505; color: #d4af37; font-family: 'Cinzel';">COMING SOON</div>
+                <div class="product-card reveal-hidden coming-soon">
+                    <div class="coming-soon-box">COMING SOON</div>
                 </div>
             </div>
         </div>
@@ -219,6 +245,12 @@
             <div style="display: flex; gap: 10px; margin-top: 10px;">
                 <button class="btn primary" onclick="signUp()" style="flex:1;">Sign Up</button>
                 <button class="btn ghost" onclick="signIn()" style="flex:1;">Sign In</button>
+            </div>
+
+            <div style="margin: 20px 0; text-align:center;">
+                <button class="btn ghost small" onclick="forgotPassword()" style="border:none;">
+                    Forgot password?
+                </button>
             </div>
 
             <div style="margin: 20px 0; display: flex; align-items: center; color: #444;">

@@ -251,7 +251,16 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     
     <script>
-        let discountApplied = false;
+        let appliedMainCoupon = false;
+        let appliedReferral = null;
+        const referralCodes = [
+          "ANTY07",
+          "AMRIT09",
+          "KRISHV19",
+          "AVNI26",
+          "SANJEEVNI26",
+          "VEDU18"
+        ];
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCheckout();
@@ -286,16 +295,34 @@
 
         function applyDiscount() {
             const code = document.getElementById("discountCode").value.trim().toUpperCase();
-            const totalEl = document.getElementById("finalTotal");
             let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
-            let subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            let subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
 
-            if (code === "EMPIRE26" && !discountApplied) {
-                const discountedTotal = Math.round(subtotal * 0.3);
-                totalEl.innerText = `₹${discountedTotal.toLocaleString()}`;
-                discountApplied = true;
-                alert("🎉 70% Family discount applied!");
+            if (!subtotal) return;
+
+            let discount = 0;
+
+            // Recalculate based on what is already applied plus the new code
+            if (code === "EMPIRE26" && !appliedMainCoupon) {
+                appliedMainCoupon = true;
             }
+            else if (referralCodes.includes(code) && !appliedReferral) {
+                appliedReferral = code;
+                localStorage.setItem("applied_referral", code);
+            }
+            else {
+                alert("Invalid or already applied code");
+                return;
+            }
+
+            // Calculate total discount from both sources
+            if (appliedMainCoupon) discount += 0.70;
+            if (appliedReferral) discount += 0.025;
+
+            const final = Math.round(subtotal * (1 - discount));
+            document.getElementById("finalTotal").innerText = `₹${final.toLocaleString()}`;
+
+            alert("Discount applied successfully 🎉");
         }
 
         async function startPayment(finalAmount, orderData) {
@@ -335,7 +362,6 @@
                     theme: { color: "#d4af37" },
                     handler: async function (response) {
                         try {
-                            // Wait for the email trigger to finish before moving to the next page
                             await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -356,13 +382,10 @@
                                 })
                             });
 
-                            console.log("Payment Success & Notification Sent");
                             alert("Order Successful 👑");
                             localStorage.removeItem("empire_cart");
                             window.location.href = "index.html";
                         } catch (emailErr) {
-                            console.error("Email notification error:", emailErr);
-                            // Still redirect since payment succeeded, but warn user
                             alert("Payment successful! (Confirmation email may be delayed)");
                             localStorage.removeItem("empire_cart");
                             window.location.href = "index.html";
@@ -376,17 +399,9 @@
                 };
 
                 const rzp = new Razorpay(options);
-
-                rzp.on("payment.failed", function (response) {
-                    console.error("Payment failed", response.error);
-                    alert("Payment failed: " + response.error.description);
-                    resetSubmitBtn();
-                });
-
                 rzp.open();
 
             } catch (err) {
-                console.error(err);
                 alert("Payment system error");
                 resetSubmitBtn();
             }

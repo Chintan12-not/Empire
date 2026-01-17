@@ -52,6 +52,18 @@ const productDatabase = {
         top: "Pink Berries • Lychee • Mandarin Blossom",
         heart: "Rose Petals • Peony • Jasmine",
         base: "White Musk • Vanilla • Sandalwood"
+    },
+    fruityforest: {
+        id: "fruityforest",
+        name: "Fruity Forest",
+        price: 2800,
+        originalPrice: 2800,
+        img: "images/Fruity Forest 1.jpg",
+        tagline: "Fresh • Fruity • Floral • Elegant • Modern",
+        description: `A fresh, vibrant fragrance that captures the feeling of effortless elegance and modern femininity. \n\nIt opens with a juicy burst of crisp green fruits and sparkling berries, creating an instantly uplifting and playful impression. As the scent unfolds, soft floral notes bloom gently, adding a delicate and feminine heart. \n\nThe fragrance settles into a clean, smooth base of musks and woods, leaving a light yet lasting trail that feels fresh, confident, and refined. \n\nPerfect for everyday wear — bright, youthful, and irresistibly easy to love.`,
+        top: "Green Pear • Juicy Berries • Pink Pepper",
+        heart: "Peony • Honeysuckle • Soft Floral Accord",
+        base: "White Musk • Cedarwood • Light Woods"
     }
 };
 
@@ -73,7 +85,6 @@ window.addEventListener("DOMContentLoaded", () => {
     initScrollReveal();
     setupWhatsApp();
 
-    // Force Login Modal if user is not logged in
     setTimeout(() => {
         if (!currentUser) {
             document.getElementById("authModal")?.classList.add("active");
@@ -145,20 +156,22 @@ async function signIn() {
     closeAuth();
 }
 
-/**
- * UPDATED: Instant Close Auth Modal
- */
+async function forgotPassword() {
+    const email = document.getElementById("authEmail").value;
+    if (!email) return alert("Enter your email first");
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/index.html"
+    });
+
+    if (error) return alert(error.message);
+    alert("Password reset email sent 📧");
+}
+
 function closeAuth() {
     const modal = document.getElementById("authModal");
     if (!modal) return;
-
     modal.classList.remove("active");
-    modal.style.display = "none";
-
-    // force reflow reset (removes lag on reopen)
-    requestAnimationFrame(() => {
-        modal.style.display = "";
-    });
 }
 
 async function signInWithGoogle() {
@@ -206,14 +219,37 @@ function updateCartUI() {
         return;
     }
 
-    container.innerHTML = cart.map(item => `
-        <div class="cart-item">
-            <span>${item.name} × ${item.qty}</span>
+    container.innerHTML = cart.map((item, index) => `
+        <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 10px;">
+            <div>
+                <strong style="display: block; color: #d4af37;">${item.name}</strong>
+                <div style="margin-top:6px; display: flex; align-items: center; gap: 10px;">
+                    <button class="btn ghost" style="padding: 2px 8px;" onclick="changeQty(${index}, -1)">−</button>
+                    <span>${item.qty}</span>
+                    <button class="btn ghost" style="padding: 2px 8px;" onclick="changeQty(${index}, 1)">+</button>
+                    <button class="btn ghost" style="padding: 2px 8px; color: #ff4444;" onclick="removeItem(${index})">🗑</button>
+                </div>
+            </div>
             <strong>₹${(item.price * item.qty).toLocaleString()}</strong>
         </div>
     `).join("");
 
     if (totalEl) totalEl.innerText = "₹" + cart.reduce((s, i) => s + i.price * i.qty, 0).toLocaleString();
+}
+
+function changeQty(index, delta) {
+    cart[index].qty += delta;
+    if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+    }
+    saveCart();
+    updateCartUI();
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    saveCart();
+    updateCartUI();
 }
 
 function toggleCart(force) {
@@ -255,12 +291,17 @@ function renderProductDetail(productId) {
                         <div style="margin-bottom: 10px;"><strong>Base: </strong>${product.base}</div>
                     </div>
                 </div>
-                <div class="luxury-actions" style="margin-top: 2rem;">
-                    <button class="btn ghost" onclick="updateDetailQty(-1)">−</button>
-                    <span id="detailQty" style="margin: 0 15px; font-weight: bold;">1</span>
-                    <button class="btn ghost" onclick="updateDetailQty(1)">+</button>
-                    <button class="btn primary" style="margin-left: 20px;" onclick="addToCart('${product.name}', ${product.price}, parseInt(document.getElementById('detailQty').innerText))">
+                <div class="luxury-actions" style="margin-top: 2rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center;">
+                        <button class="btn ghost" onclick="updateDetailQty(-1)">−</button>
+                        <span id="detailQty" style="margin: 0 15px; font-weight: bold;">1</span>
+                        <button class="btn ghost" onclick="updateDetailQty(1)">+</button>
+                    </div>
+                    <button class="btn primary" onclick="addToCart('${product.name}', ${product.price}, parseInt(document.getElementById('detailQty').innerText))">
                         Add to Cart
+                    </button>
+                    <button class="btn ghost" onclick="shareProduct('${product.name}')">
+                        <span style="font-size: 1.2rem;">➦</span> Share
                     </button>
                 </div>
             </div>
@@ -298,6 +339,7 @@ async function placeOrder() {
             email: currentUser.email,
             items: cart,
             total_amount: total,
+            referral_code: localStorage.getItem("applied_referral") || null,
             status: "pending"
         }]);
 
@@ -316,6 +358,29 @@ async function placeOrder() {
 // ==================================================
 // 9. UTILITIES & CONTACT FORM
 // ==================================================
+
+function shareProduct(name) {
+    // Generate a slug from name for the ID (e.g., "Smoked Whisky" -> "whisky")
+    const productId = name.toLowerCase().replace(/\s/g, "").replace("smoked", "");
+    const url = window.location.origin + "/product-detail.html?id=" + productId;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: "E'MPIRE Perfumes",
+            text: `Check out ${name} by E'MPIRE — a signature luxury fragrance.`,
+            url: url
+        }).catch(() => console.log("Share cancelled"));
+    } else {
+        // Fallback for desktop browsers
+        const tempInput = document.createElement("input");
+        document.body.appendChild(tempInput);
+        tempInput.value = url;
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert("Link copied to clipboard! ✨");
+    }
+}
 
 function initScrollReveal() {
     const observer = new IntersectionObserver(entries => {
@@ -365,15 +430,6 @@ function initContactForm() {
     });
 }
 
-function submitContactForm() {
-    const form = document.getElementById("contactForm");
-    if (form) form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-}
-
-// ==================================================
-// 10. AUTH HELPERS
-// ==================================================
-
 function requireAuth() {
     if (!currentUser) {
         document.getElementById("authModal")?.classList.add("active");
@@ -381,3 +437,19 @@ function requireAuth() {
     }
     return true;
 }
+
+// ==================================================
+// 10. IMAGE SLIDER LOGIC
+// ==================================================
+
+document.querySelectorAll(".slider").forEach(slider => {
+    const slides = slider.querySelectorAll(".slide");
+    if (slides.length === 0) return;
+    let index = 0;
+
+    setInterval(() => {
+        slides[index].classList.remove("active");
+        index = (index + 1) % slides.length;
+        slides[index].classList.add("active");
+    }, 2500);
+});
