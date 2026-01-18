@@ -295,13 +295,21 @@
                 return;
             }
 
-            let discount = 0;
-            if (appliedMainCoupon) discount += 0.70;
-            if (appliedReferral) discount += 0.02;
-
-            const final = Math.round(subtotal * (1 - discount)) + SHIPPING_CHARGE;
+            // REPLACED PART START
+            let discountedSubtotal = subtotal;
+            // Apply joining coupon first (70%)
+            if (appliedMainCoupon) {
+                discountedSubtotal = discountedSubtotal * 0.30;
+            }
+            // Apply referral coupon next (2%)
+            if (appliedReferral) {
+                discountedSubtotal = discountedSubtotal * 0.98;
+            }
+            const final = Math.round(discountedSubtotal) + SHIPPING_CHARGE;
             finalPayableAmount = final;
             document.getElementById("finalTotal").innerText = `₹${final.toLocaleString("en-IN")}`;
+            // REPLACED PART END
+
             alert("Discount applied successfully 🎉");
         }
 
@@ -340,9 +348,8 @@
                                 address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
                                 total_amount: finalPayableAmount,
                                 referral_code: localStorage.getItem("applied_referral")
-  ? localStorage.getItem("applied_referral").trim().toUpperCase()
-  : null,
-
+                                    ? localStorage.getItem("applied_referral").trim().toUpperCase()
+                                    : null,
                                 status: "paid",
                                 user_id: user ? user.id : null,
                                 razorpay_order_id: response.razorpay_order_id

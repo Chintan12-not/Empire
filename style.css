@@ -805,3 +805,122 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     .top-offer-bar { font-size: 11px; padding: 8px 6px; }
     .mobile-menu-overlay { width: 80%; }
 }
+/* =====================================================
+   FINAL MOBILE POLISH – PHONE FIRST FIX
+   (Does NOT affect desktop)
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+  /* NAV BAR FIX */
+  .nav {
+    height: 60px;
+    padding: 0 14px;
+  }
+
+  .brand {
+    font-size: 15px;
+    letter-spacing: 1.5px;
+  }
+
+  .icon-btn,
+  #menuToggle {
+    font-size: 22px;
+  }
+
+  #authBtn {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  /* HERO SECTION FIX */
+  .hero {
+    min-height: 100vh;
+    justify-content: center;
+  }
+
+  .hero-inner {
+    padding: 0 18px;
+    text-align: center;
+  }
+
+  .hero-inner h1 {
+    font-size: 38px;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+  }
+
+  .hero-inner .subtitle {
+    font-size: 14px;
+    margin-bottom: 22px;
+  }
+
+  .hero-cta .btn {
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  /* PRODUCT GRID FIX */
+  .product-card {
+    padding: 18px;
+  }
+
+  .product-name {
+    font-size: 17px;
+  }
+
+  .product-desc {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .price-block {
+    margin-top: 8px;
+  }
+
+  /* BUTTON STACK FIX */
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group .btn {
+    width: 100%;
+  }
+
+  /* COMING SOON CARDS */
+  .coming-soon-box {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  /* MOBILE MENU FIX */
+  .mobile-menu-overlay {
+    width: 75%;
+    padding: 40px 20px;
+  }
+
+  .mobile-menu-overlay a {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .hero-inner h1 {
+    font-size: 34px;
+  }
+
+  .hero-inner .subtitle {
+    font-size: 13px;
+  }
+
+  .btn {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .mobile-menu-overlay {
+    width: 85%;
+  }
+}
