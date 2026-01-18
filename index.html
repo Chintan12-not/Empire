@@ -20,7 +20,6 @@
         <div class="nav-left">
             <img src="images/logo.png" alt="E'MPIRE Logo" class="logo-img">
             <span class="brand">E'MPIRE</span>
-            <button id="menuToggle" class="icon-btn" onclick="toggleMenu()" aria-label="Toggle Menu">☰</button>
         </div>
 
         <div class="nav-right nav-actions">
@@ -30,20 +29,23 @@
                     <i class="fa fa-search"></i>
                 </button>
             </div>
+            
+            <button id="menuToggle" class="icon-btn" onclick="toggleMenu()" aria-label="Toggle Menu">☰</button>
             <button id="authBtn" class="btn ghost" onclick="openAuth()">Login</button>
+            
             <button id="cartBtn" class="icon-btn" onclick="toggleCart()">
                 🛒 <span id="cartCount">0</span>
             </button>
         </div>
 
         <nav id="mobileMenu" class="mobile-menu-overlay">
-            <button class="menu-close" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #d4af37; font-size: 2rem; cursor: pointer;">✕</button>
-            
-            <a href="#home" onclick="toggleMenu()">Home</a>
-            <a href="#featured" onclick="toggleMenu()">Collection</a>
-            <a href="#about" onclick="toggleMenu()">The Founders</a>
-            <a href="#contact" onclick="toggleMenu()">Contact</a>
-        </nav>
+    <button class="menu-close" onclick="toggleMenu()">✕</button>
+
+    <a href="#home" onclick="toggleMenu()">Home</a>
+    <a href="#featured" onclick="toggleMenu()">Collection</a>
+    <a href="#about" onclick="toggleMenu()">Founders</a>
+    <a href="my-orders.html" onclick="toggleMenu()">My Orders</a>
+</nav>
     </header>
 
     <div id="cartSidebar" class="cart-sidebar">
@@ -155,33 +157,44 @@
                         <div class="product-meta">50 ml • Eau De Parfum</div>
                         <p class="product-desc">Fresh, vibrant and effortlessly elegant — a modern fruity-floral fragrance.</p>
                         <div class="price-block">
-                            <span class="new-price">₹2800</span>
+                            <span class="new-price">₹4200</span>
                         </div>
                         <div class="discount-text">70% OFF WITH CODE: EMPIRE26</div>
                         <div class="button-group" style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn primary small" style="flex:1;" onclick="addToCart('Fruity Forest', 2800)">Add to Cart</button>
+                            <button class="btn primary small" style="flex:1;" onclick="addToCart('Fruity Forest', 4200)">Add to Cart</button>
                             <button class="btn ghost small" style="flex:1;" onclick="location.href='checkout.html'">Buy Now</button>
                             <button class="btn ghost small" onclick="shareProduct('Fruity Forest')">Share</button>
                         </div>
                     </div>
                 </article>
 
-            </div>
+                <article class="product-card coming-soon reveal-hidden">
+                    <div class="product-media coming-soon-box">
+                        COMING SOON
+                    </div>
+                    <div class="product-body neesh-style">
+                    
+                    </div>
+                </article>
 
-            <h2 class="section-title reveal-hidden" style="margin-top: 60px; font-size: 1.5rem; opacity: 0.7;">Future Essences</h2>
-            <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
-                <div class="product-card reveal-hidden coming-soon">
-                    <div class="coming-soon-box">COMING SOON</div>
-                </div>
-                <div class="product-card reveal-hidden coming-soon">
-                    <div class="coming-soon-box">COMING SOON</div>
-                </div>
-                <div class="product-card reveal-hidden coming-soon">
-                    <div class="coming-soon-box">COMING SOON</div>
-                </div>
-                <div class="product-card reveal-hidden coming-soon">
-                    <div class="coming-soon-box">COMING SOON</div>
-                </div>
+                <article class="product-card coming-soon reveal-hidden">
+                    <div class="product-media coming-soon-box">
+                        COMING SOON
+                    </div>
+                    <div class="product-body neesh-style">
+                       
+                    </div>
+                </article>
+
+                <article class="product-card coming-soon reveal-hidden">
+                    <div class="product-media coming-soon-box">
+                        COMING SOON
+                    </div>
+                    <div class="product-body neesh-style">
+                      
+                    </div>
+                </article>
+
             </div>
         </div>
     </section>
@@ -214,10 +227,17 @@
                 <p>Inquire about our bespoke fragrance services.</p>
             </div>
 
-            <form id="contactForm" class="contact-form">
+            <form 
+              id="contactForm"
+              class="contact-form"
+              action="https://formsubmit.co/empire.official2026@gmail.com"
+              method="POST"
+            >
                 <input type="hidden" name="_subject" value="New Contact Enquiry - E'MPIRE">
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_next" value="https://yourwebsite.com/thank-you.html">
+                <input type="hidden" name="_autoresponse" value="Thank you for contacting E'MPIRE. We’ll get back to you shortly!">
                 <input type="text" name="_honey" style="display:none">
 
                 <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
@@ -227,7 +247,7 @@
 
                 <textarea name="Message" placeholder="Your Message" required style="width:100%; padding:15px; background:#111; border:1px solid #333; color:white; height:100px; margin-bottom:15px;"></textarea>
 
-                <button type="button" class="btn primary" onclick="submitContactForm()">Send Message</button>
+                <button type="submit" class="btn primary">Send Message</button>
             </form>
             <p id="contactSuccess" style="display:none; margin-top:20px; color:#d4af37; font-size:14px; letter-spacing:1px;">
                 Thank you for contacting us.</p>
@@ -274,8 +294,7 @@
             <h3>E'MPIRE</h3>
             <p>Luxury fragrances crafted for elegance and lasting presence.</p>
             <div class="social-links" style="margin-top:20px; display:flex; gap:15px;">
-                <a href="https://instagram.com/YOUR_HANDLE" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://facebook.com/YOUR_PAGE" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.instagram.com/empireperfumes.official?igsh=MTRrZTNyMWVicGM3Mg==" target="_blank"><i class="fab fa-instagram"></i></a>
                 <a href="https://wa.me/919911261347" target="_blank"><i class="fab fa-whatsapp"></i></a>
             </div>
           </div>

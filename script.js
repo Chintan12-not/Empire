@@ -56,8 +56,8 @@ const productDatabase = {
     fruityforest: {
         id: "fruityforest",
         name: "Fruity Forest",
-        price: 2800,
-        originalPrice: 2800,
+        price: 4200,
+        originalPrice: 4200,
         img: "images/Fruity Forest 1.jpg",
         tagline: "Fresh • Fruity • Floral • Elegant • Modern",
         description: `A fresh, vibrant fragrance that captures the feeling of effortless elegance and modern femininity. \n\nIt opens with a juicy burst of crisp green fruits and sparkling berries, creating an instantly uplifting and playful impression. As the scent unfolds, soft floral notes bloom gently, adding a delicate and feminine heart. \n\nThe fragrance settles into a clean, smooth base of musks and woods, leaving a light yet lasting trail that feels fresh, confident, and refined. \n\nPerfect for everyday wear — bright, youthful, and irresistibly easy to love.`,
@@ -137,14 +137,26 @@ async function checkAuth() {
 
 function updateAuthUI() {
     const btn = document.getElementById("authBtn");
+    const menu = document.getElementById("mobileMenu");
+
     if (!btn) return;
+
     if (currentUser) {
-        const name = currentUser.user_metadata?.full_name || currentUser.email.split("@")[0];
+        const name =
+            currentUser.user_metadata?.full_name ||
+            currentUser.email.split("@")[0];
         btn.innerText = `Hi, ${name}`;
         btn.onclick = logout;
+
+        // Ensure My Orders is visible
+        menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "block");
     } else {
         btn.innerText = "Login";
-        btn.onclick = () => document.getElementById("authModal")?.classList.add("active");
+        btn.onclick = () =>
+            document.getElementById("authModal")?.classList.add("active");
+
+        // Hide My Orders for logged-out users
+        menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "none");
     }
 }
 
@@ -355,12 +367,31 @@ async function placeOrder() {
     toggleCart(false);
 }
 
+async function openOrders() {
+  if (!currentUser || !supabaseClient) return;
+
+  const { data, error } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("email", currentUser.email)
+    .order("created_at", { ascending: false });
+
+  if (error) return alert("Error fetching orders");
+
+  alert(
+    data.length
+      ? data.map(o =>
+          `Order ₹${o.total_amount} — ${o.status.toUpperCase()}`
+        ).join("\n")
+      : "No orders yet"
+  );
+}
+
 // ==================================================
 // 9. UTILITIES & CONTACT FORM
 // ==================================================
 
 function shareProduct(name) {
-    // Generate a slug from name for the ID (e.g., "Smoked Whisky" -> "whisky")
     const productId = name.toLowerCase().replace(/\s/g, "").replace("smoked", "");
     const url = window.location.origin + "/product-detail.html?id=" + productId;
     
@@ -371,7 +402,6 @@ function shareProduct(name) {
             url: url
         }).catch(() => console.log("Share cancelled"));
     } else {
-        // Fallback for desktop browsers
         const tempInput = document.createElement("input");
         document.body.appendChild(tempInput);
         tempInput.value = url;

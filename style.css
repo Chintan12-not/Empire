@@ -90,7 +90,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     gap: 20px;
 }
 
-.brand { 
+.brand {
     font-size: 22px; 
     letter-spacing: 3px; 
     margin: 0; 
@@ -101,6 +101,15 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 }
 
 .nav-actions {
+ #menuToggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
     display: flex;
     align-items: center;
     gap: 20px;

@@ -63,7 +63,7 @@
 
         .btn.primary { background: var(--gold); color: black; border-radius: 2px; }
         .btn.ghost { border: 1px solid var(--gold); color: var(--gold); background: transparent; }
-        .btn.small { padding: 8px 16px; font-size: 0.8rem; }
+        .btn.small { padding: 8px 166px; font-size: 0.8rem; padding: 8px 16px; }
         .btn:hover { opacity: 0.8; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -113,19 +113,6 @@
         .modern-form input:focus { border-color: var(--gold); outline: none; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
 
-        .delivery-toggle { display: flex; gap: 15px; margin-bottom: 30px; }
-        .toggle-option {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #333;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-            position: relative;
-        }
-        .toggle-option.active { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
-        .toggle-option input { opacity: 0; position: absolute; }
-
         .summary-card {
             position: sticky;
             top: 120px;
@@ -160,7 +147,6 @@
         .terms-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
         .terms-row input { width: auto; margin: 0; cursor: pointer; }
         .terms-row label { margin: 0; text-transform: none; color: #888; font-size: 0.8rem; cursor: pointer; }
-        .terms-row a { color: var(--gold); text-decoration: underline; }
 
         @media (max-width: 900px) {
             .checkout-layout { grid-template-columns: 1fr; }
@@ -187,13 +173,6 @@
                 <section class="checkout-section">
                     <h3 style="font-family: 'Cinzel', serif; margin-bottom: 30px;">1. Shipping Information</h3>
                     
-                    <div class="delivery-toggle">
-                        <label class="toggle-option active">
-                            <input type="radio" name="method" value="delivery" checked> 
-                            <div>🚚 Delivery</div>
-                        </label>
-                    </div>
-
                     <form id="checkoutForm" class="modern-form">
                         <div class="form-group">
                             <label>Full name *</label>
@@ -222,7 +201,7 @@
                         
                         <div class="terms-row">
                             <input type="checkbox" id="terms" required>
-                            <label for="terms">I agree to the <a href="terms.html" target="_blank">Terms & Conditions</a>.</label>
+                            <label for="terms">I agree to the <a href="terms.html" target="_blank" style="color:var(--gold)">Terms & Conditions</a>.</label>
                         </div>
                     </form>
                 </section>
@@ -238,7 +217,7 @@
                     </div>
                     <div class="summary-totals">
                         <div class="total-row"><span>Subtotal</span><span id="subtotalValue">₹0</span></div>
-                        <div class="total-row"><span>Shipping</span><span style="color: #2ecc71;">COMPLIMENTARY</span></div>
+                        <div class="total-row"><span>Shipping</span><span id="shippingValue">₹120</span></div>
                         <div class="total-row final"><span>Total</span><span id="finalTotal">₹0</span></div>
                     </div>
                     <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to Payment</button>
@@ -247,20 +226,23 @@
         </div>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
+        /* --- SUPABASE INITIALIZATION --- */
+        const SUPABASE_URL = "https://wolxccbehsbafyirgvgp.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Ensure session is active
+        supabaseClient.auth.getSession();
+
         let appliedMainCoupon = false;
         let appliedReferral = null;
-        const referralCodes = [
-          "ANTY07",
-          "AMRIT09",
-          "KRISHV19",
-          "AVNI26",
-          "SANJEEVNI26",
-          "VEDU18"
-        ];
+        let finalPayableAmount = 0;
+        const SHIPPING_CHARGE = 120;
+        const referralCodes = ["ANTY07", "AMRIT09", "KRISHV19", "AVNI26", "SANJEEVNI26", "VEDU18"];
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCheckout();
@@ -288,9 +270,12 @@
                 </div>
             `).join('');
 
-            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const total = subtotal + SHIPPING_CHARGE;
+            finalPayableAmount = total;
+            
+            subtotalEl.innerText = `₹${subtotal.toLocaleString()}`;
             totalEl.innerText = `₹${total.toLocaleString()}`;
-            subtotalEl.innerText = `₹${total.toLocaleString()}`;
         }
 
         function applyDiscount() {
@@ -300,52 +285,36 @@
 
             if (!subtotal) return;
 
-            let discount = 0;
-
-            // Recalculate based on what is already applied plus the new code
             if (code === "EMPIRE26" && !appliedMainCoupon) {
                 appliedMainCoupon = true;
-            }
-            else if (referralCodes.includes(code) && !appliedReferral) {
+            } else if (referralCodes.includes(code) && !appliedReferral) {
                 appliedReferral = code;
                 localStorage.setItem("applied_referral", code);
-            }
-            else {
+            } else {
                 alert("Invalid or already applied code");
                 return;
             }
 
-            // Calculate total discount from both sources
+            let discount = 0;
             if (appliedMainCoupon) discount += 0.70;
-            if (appliedReferral) discount += 0.025;
+            if (appliedReferral) discount += 0.02;
 
-            const final = Math.round(subtotal * (1 - discount));
-            document.getElementById("finalTotal").innerText = `₹${final.toLocaleString()}`;
-
+            const final = Math.round(subtotal * (1 - discount)) + SHIPPING_CHARGE;
+            finalPayableAmount = final;
+            document.getElementById("finalTotal").innerText = `₹${final.toLocaleString("en-IN")}`;
             alert("Discount applied successfully 🎉");
         }
 
         async function startPayment(finalAmount, orderData) {
             try {
-                const res = await fetch(
-                    "https://empire-razorpay.empire-official2026.workers.dev",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            amount: finalAmount,
-                            receipt: "empire_checkout"
-                        }),
-                    }
-                );
+                const res = await fetch("https://empire-razorpay.empire-official2026.workers.dev", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: finalAmount, receipt: "empire_checkout" }),
+                });
 
                 const order = await res.json();
-
-                if (!order?.id) {
-                    alert("Failed to create Razorpay order");
-                    resetSubmitBtn();
-                    return;
-                }
+                if (!order?.id) throw new Error("Order creation failed");
 
                 const options = {
                     key: "rzp_test_S4Wx9FE0iQTiSn",
@@ -362,6 +331,26 @@
                     theme: { color: "#d4af37" },
                     handler: async function (response) {
                         try {
+                            const { data: { user } } = await supabaseClient.auth.getUser();
+                            
+                            await supabaseClient.from("orders").insert([{
+                                customer_name: orderData.customer_name,
+                                email: orderData.email,
+                                phone: orderData.phone,
+                                address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
+                                total_amount: finalPayableAmount,
+                                referral_code: localStorage.getItem("applied_referral")
+  ? localStorage.getItem("applied_referral").trim().toUpperCase()
+  : null,
+
+                                status: "paid",
+                                user_id: user ? user.id : null,
+                                razorpay_order_id: response.razorpay_order_id
+                            }]);
+
+                            localStorage.setItem("last_order_phone", orderData.phone);
+
+                            // Send confirmation email
                             await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -369,33 +358,22 @@
                                     order_id: response.razorpay_order_id,
                                     payment_id: response.razorpay_payment_id,
                                     total: finalAmount,
-                                    customer: {
-                                        name: document.getElementById("fullName").value,
-                                        email: document.getElementById("email").value,
-                                        phone: document.getElementById("phone").value,
-                                        address: document.getElementById("address").value,
-                                        city: document.getElementById("city").value,
-                                        state: document.getElementById("state").value,
-                                        zip: document.getElementById("zip").value
-                                    },
-                                    items: JSON.parse(localStorage.getItem("empire_cart")) || []
+                                    customer: orderData,
+                                    items: JSON.parse(localStorage.getItem("empire_cart"))
                                 })
                             });
 
                             alert("Order Successful 👑");
                             localStorage.removeItem("empire_cart");
+                            localStorage.removeItem("applied_referral");
                             window.location.href = "index.html";
-                        } catch (emailErr) {
-                            alert("Payment successful! (Confirmation email may be delayed)");
-                            localStorage.removeItem("empire_cart");
+                        } catch (err) {
+                            console.error(err);
+                            alert("Payment successful! Redirecting...");
                             window.location.href = "index.html";
                         }
                     },
-                    modal: {
-                        ondismiss: function() {
-                            resetSubmitBtn();
-                        }
-                    }
+                    modal: { ondismiss: () => resetSubmitBtn() }
                 };
 
                 const rzp = new Razorpay(options);
@@ -417,24 +395,21 @@
             const form = document.getElementById('checkoutForm');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 const btn = document.getElementById('submitBtn');
                 btn.disabled = true;
                 btn.innerText = "INITIALIZING...";
 
-                const finalTotalNum = Number(
-                    document.getElementById('finalTotal').innerText.replace(/[₹,]/g, '')
-                );
-
-                const cart = JSON.parse(localStorage.getItem('empire_cart')) || [];
-
-                startPayment(finalTotalNum, {
+                const orderData = {
                     customer_name: document.getElementById('fullName').value,
-                    phone: document.getElementById('phone').value,
                     email: document.getElementById('email').value,
-                    items: cart,
-                    total_amount: finalTotalNum
-                });
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zip').value
+                };
+
+                startPayment(finalPayableAmount, orderData);
             });
         }
     </script>
