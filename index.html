@@ -39,13 +39,12 @@
         </div>
 
         <nav id="mobileMenu" class="mobile-menu-overlay">
-    <button class="menu-close" onclick="toggleMenu()">✕</button>
-
-    <a href="#home" onclick="toggleMenu()">Home</a>
-    <a href="#featured" onclick="toggleMenu()">Collection</a>
-    <a href="#about" onclick="toggleMenu()">Founders</a>
-    <a href="my-orders.html" onclick="toggleMenu()">My Orders</a>
-</nav>
+            <button class="menu-close" onclick="toggleMenu()">✕</button>
+            <a href="#home" onclick="toggleMenu()">Home</a>
+            <a href="#featured" onclick="toggleMenu()">Collection</a>
+            <a href="#about" onclick="toggleMenu()">Founders</a>
+            <a href="my-orders.html" onclick="toggleMenu()">My Orders</a>
+        </nav>
     </header>
 
     <div id="cartSidebar" class="cart-sidebar">
@@ -169,30 +168,18 @@
                 </article>
 
                 <article class="product-card coming-soon reveal-hidden">
-                    <div class="product-media coming-soon-box">
-                        COMING SOON
-                    </div>
-                    <div class="product-body neesh-style">
-                    
-                    </div>
+                    <div class="product-media coming-soon-box">COMING SOON</div>
+                    <div class="product-body neesh-style"></div>
                 </article>
 
                 <article class="product-card coming-soon reveal-hidden">
-                    <div class="product-media coming-soon-box">
-                        COMING SOON
-                    </div>
-                    <div class="product-body neesh-style">
-                       
-                    </div>
+                    <div class="product-media coming-soon-box">COMING SOON</div>
+                    <div class="product-body neesh-style"></div>
                 </article>
 
                 <article class="product-card coming-soon reveal-hidden">
-                    <div class="product-media coming-soon-box">
-                        COMING SOON
-                    </div>
-                    <div class="product-body neesh-style">
-                      
-                    </div>
+                    <div class="product-media coming-soon-box">COMING SOON</div>
+                    <div class="product-body neesh-style"></div>
                 </article>
 
             </div>
@@ -331,5 +318,54 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
+
+    <div id="promoPopup" style="
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.85);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:4000;
+    ">
+        <div class="promo-box" style="position:relative;">
+            <img src="images/Promo.jpeg"
+                 style="max-width:90vw;max-height:85vh;border-radius:12px;" />
+
+            <button onclick="closePromo()"
+                    style="
+                        position:absolute;
+                        top:-14px;
+                        right:-14px;
+                        width:36px;
+                        height:36px;
+                        border-radius:50%;
+                        border:none;
+                        background:#d4af37;
+                        color:#000;
+                        font-size:18px;
+                        cursor:pointer;
+                    ">
+                ✕
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function closePromo() {
+            const popup = document.getElementById("promoPopup");
+            if (!popup) return;
+
+            popup.classList.add("closing");
+
+            // Wait for animation to finish
+            setTimeout(() => {
+                popup.style.display = "none";
+
+                // Open login AFTER promo closes
+                document.getElementById("authModal")?.classList.add("active");
+            }, 350);
+        }
+    </script>
 </body>
 </html>

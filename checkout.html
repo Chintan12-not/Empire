@@ -211,10 +211,24 @@
                 <div class="summary-card">
                     <h3 style="font-family: 'Cinzel', serif; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0;">Order Summary</h3>
                     <div id="checkoutItems"></div>
+
+                    <div id="autoCoupon"
+                         style="display:flex;align-items:center;justify-content:space-between;
+                                padding:14px 16px;border:1px dashed #d4af37;
+                                border-radius:10px;margin:20px 0;cursor:pointer;"
+                         onclick="applyEmpireCoupon()">
+                        <div>
+                            <strong style="color:#d4af37;">Save 70% with "EMPIRE26"</strong><br>
+                            <span style="font-size:12px;color:#aaa;">Click apply to auto-apply coupon</span>
+                        </div>
+                        <button class="btn ghost small" type="button">Apply</button>
+                    </div>
+
                     <div class="discount-box">
                         <input type="text" id="discountCode" placeholder="GIFT CARD OR CODE">
                         <button type="button" class="btn ghost small" onclick="applyDiscount()">Apply</button>
                     </div>
+
                     <div class="summary-totals">
                         <div class="total-row"><span>Subtotal</span><span id="subtotalValue">₹0</span></div>
                         <div class="total-row"><span>Shipping</span><span id="shippingValue">₹120</span></div>
@@ -418,6 +432,15 @@
 
                 startPayment(finalPayableAmount, orderData);
             });
+        }
+
+        function applyEmpireCoupon() {
+            if (appliedMainCoupon) return;
+
+            const input = document.getElementById("discountCode");
+            input.value = "EMPIRE26";
+
+            applyDiscount(); // reuse existing logic
         }
     </script>
 </body>

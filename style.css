@@ -101,18 +101,25 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 }
 
 .nav-actions {
- #menuToggle {
-    display: inline-flex;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    #menuToggle {
+        display: flex;
+    }
+
+    .search-container {
+        display: none;
+    }
+}
     align-items: center;
     justify-content: center;
     font-size: 22px;
     margin-right: 10px;
     cursor: pointer;
-}
-
-    display: flex;
-    align-items: center;
-    gap: 20px;
 }
 
 .search-container {
@@ -145,7 +152,6 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 
 .logo-img { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; }
 .icon-btn { background: none; border: none; color: var(--gold-main); font-size: 24px; cursor: pointer; }
-#menuToggle { display: none; } 
 
 /* === MOBILE MENU SIDEBAR === */
 .mobile-menu-overlay {
@@ -343,7 +349,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     font-family: 'Cinzel', serif;
     letter-spacing: 2px;
     border-radius: 10px;
-    width: 100%; /* Ensures alignment with media containers */
+    width: 100%;
 }
 
 /* === PRODUCT DETAIL PAGE (Updated for Stability) === */
@@ -620,10 +626,9 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 }
 
 /* ================================
-   MOBILE OPTIMIZATION (2026 Edition)
+    MOBILE OPTIMIZATION (2026 Edition)
    ================================ */
 @media (max-width: 768px) {
-  /* STEP 1 - HEADER & NAV */
   .top-offer-bar {
     font-size: 11px;
     padding: 8px 10px;
@@ -631,8 +636,8 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
   }
 
   .nav {
-    padding: 0 16px;
-    height: 64px;
+    padding: 0 14px;
+    height: 60px;
     top: 39px;
   }
 
@@ -641,8 +646,8 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
   }
 
   .brand {
-    font-size: 16px;
-    letter-spacing: 2px;
+    font-size: 15px;
+    letter-spacing: 1.5px;
   }
 
   .logo-img {
@@ -660,171 +665,11 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
   }
 
   .nav-actions {
-    display: flex; /* Override base styles to keep icons visible */
+    display: flex; 
     gap: 12px;
   }
 
   .icon-btn {
-    font-size: 22px;
-  }
-
-  /* STEP 2 - HERO SECTION */
-  .hero {
-    height: 100vh;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .hero-inner {
-    padding: 0 20px;
-    max-width: 100%;
-  }
-
-  .hero-inner h1 {
-    font-size: 42px;
-    letter-spacing: 4px;
-  }
-
-  .hero-inner .subtitle {
-    font-size: 14px;
-    margin-top: 10px;
-  }
-
-  .hero-cta {
-    margin-top: 20px;
-  }
-
-  .hero-cta .btn {
-    width: 100%;
-    max-width: 260px;
-  }
-
-  /* STEP 3 - PRODUCT GRID & CARDS */
-  .container {
-    padding: 0 16px;
-  }
-
-  .product-card {
-    width: 100%;
-    padding: 16px;
-    flex: 0 0 100%; /* If inside scroll-snap or flex */
-  }
-
-  .product-media {
-    aspect-ratio: 3 / 4;
-  }
-
-  .product-name {
-    font-size: 18px;
-  }
-
-  .product-desc {
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  .button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .button-group .btn {
-    width: 100%;
-  }
-
-  /* STEP 4 - FUTURE ESSENCES */
-  .coming-soon-box {
-    aspect-ratio: 1 / 1;
-    font-size: 14px;
-    letter-spacing: 2px;
-  }
-
-  /* STEP 5 - CART SIDEBAR */
-  .cart-sidebar {
-    width: 100%;
-    right: -100%;
-  }
-
-  .cart-sidebar.active {
-    right: 0;
-  }
-
-  /* STEP 6 - PRODUCT DETAIL PAGE */
-  .luxury-detail-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding: 110px 0 40px;
-  }
-
-  .luxury-info {
-    padding: 24px;
-    max-width: 100%;
-    min-height: auto;
-  }
-
-  .notes-row {
-    grid-template-columns: 1fr;
-  }
-
-  /* STEP 7 - CHECKOUT PAGE */
-  .checkout-layout {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .summary-card {
-    position: static;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  /* FOOTER MOBILE */
-  .footer-container {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 30px;
-  }
-  .footer-brand img { margin: 0 auto 15px; }
-  
-  .whatsapp-float {
-    left: 15px;
-    bottom: 15px;
-    width: 46px;
-    height: 46px;
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 480px) {
-    body { font-size: 14px; }
-    h1 { font-size: 28px; }
-    .btn { padding: 10px 16px; font-size: 13px; }
-    .top-offer-bar { font-size: 11px; padding: 8px 6px; }
-    .mobile-menu-overlay { width: 80%; }
-}
-/* =====================================================
-   FINAL MOBILE POLISH – PHONE FIRST FIX
-   (Does NOT affect desktop)
-   ===================================================== */
-
-@media (max-width: 768px) {
-
-  /* NAV BAR FIX */
-  .nav {
-    height: 60px;
-    padding: 0 14px;
-  }
-
-  .brand {
-    font-size: 15px;
-    letter-spacing: 1.5px;
-  }
-
-  .icon-btn,
-  #menuToggle {
     font-size: 22px;
   }
 
@@ -833,15 +678,15 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     padding: 8px 12px;
   }
 
-  /* HERO SECTION FIX */
   .hero {
     min-height: 100vh;
     justify-content: center;
+    text-align: center;
   }
 
   .hero-inner {
     padding: 0 18px;
-    text-align: center;
+    max-width: 100%;
   }
 
   .hero-inner h1 {
@@ -861,9 +706,18 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     margin: 0 auto;
   }
 
-  /* PRODUCT GRID FIX */
+  .container {
+    padding: 0 16px;
+  }
+
   .product-card {
+    width: 100%;
     padding: 18px;
+    flex: 0 0 100%;
+  }
+
+  .product-media {
+    aspect-ratio: 3 / 4;
   }
 
   .product-name {
@@ -879,24 +733,77 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     margin-top: 8px;
   }
 
-  /* BUTTON STACK FIX */
   .button-group {
+    display: flex;
     flex-direction: column;
+    gap: 10px;
   }
 
   .button-group .btn {
     width: 100%;
   }
 
-  /* COMING SOON CARDS */
   .coming-soon-box {
+    aspect-ratio: 1 / 1;
     font-size: 14px;
     letter-spacing: 2px;
   }
 
-  /* MOBILE MENU FIX */
-  .mobile-menu-overlay {
-    width: 75%;
+  .cart-sidebar {
+    width: 100%;
+    right: -100%;
+  }
+
+  .cart-sidebar.active {
+    right: 0;
+  }
+
+  .luxury-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 110px 0 40px;
+  }
+
+  .luxury-info {
+    padding: 24px;
+    max-width: 100%;
+    min-height: auto;
+  }
+
+  .notes-row {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .summary-card {
+    position: static;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 30px;
+  }
+  .footer-brand img { margin: 0 auto 15px; }
+  
+  .whatsapp-float {
+    left: 15px;
+    bottom: 15px;
+    width: 46px;
+    height: 46px;
+    font-size: 22px;
+  }
+
+  .mobile-menu-overlay { 
+    width: 75%; 
     padding: 40px 20px;
   }
 
@@ -906,21 +813,54 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 }
 
 @media (max-width: 480px) {
+    body { font-size: 14px; }
+    .hero-inner h1 { font-size: 34px; }
+    .hero-inner .subtitle { font-size: 13px; }
+    .btn { padding: 10px 16px; font-size: 13px; }
+    .top-offer-bar { font-size: 11px; padding: 8px 6px; }
+    .mobile-menu-overlay { width: 85%; }
+}
 
-  .hero-inner h1 {
-    font-size: 34px;
-  }
+/* ================================
+   PROMO POPUP ANIMATIONS
+================================ */
+#promoPopup {
+    opacity: 0;
+    animation: promoFadeIn 0.45s ease forwards;
+}
 
-  .hero-inner .subtitle {
-    font-size: 13px;
-  }
+#promoPopup .promo-box {
+    transform: scale(0.88);
+    opacity: 0;
+    animation: promoZoomIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 0.05s;
+}
 
-  .btn {
-    font-size: 13px;
-    padding: 10px 16px;
-  }
+#promoPopup.closing {
+    animation: promoFadeOut 0.35s ease forwards;
+}
 
-  .mobile-menu-overlay {
-    width: 85%;
-  }
+#promoPopup.closing .promo-box {
+    animation: promoZoomOut 0.35s ease forwards;
+}
+
+/* --- KEYFRAMES --- */
+@keyframes promoFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes promoFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes promoZoomIn {
+    from { transform: scale(0.88); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes promoZoomOut {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(0.88); opacity: 0; }
 }

@@ -15,6 +15,26 @@
       font-family: 'Inter', sans-serif;
       margin: 0;
     }
+    .nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      box-sizing: border-box;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+    .brand {
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #d4af37;
+      font-size: 1.2rem;
+    }
     .orders-container {
       max-width: 900px;
       margin: 140px auto 60px;
@@ -26,15 +46,17 @@
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 20px;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
     .order-card:hover {
       border-color: rgba(212, 175, 55, 0.5);
+      transform: translateY(-2px);
     }
     .order-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      align-items: center;
+      margin-bottom: 15px;
       font-weight: 600;
     }
     .badge {
@@ -43,6 +65,7 @@
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     /* Status Colors */
     .paid { background: #27ae60; color: #fff; }
@@ -53,35 +76,20 @@
     .order-row {
       display: flex;
       justify-content: space-between;
-      margin-top: 8px;
+      margin-top: 10px;
       font-size: 14px;
       color: #ccc;
     }
     .gold-text {
       color: #d4af37;
       margin-bottom: 30px;
+      font-size: 2rem;
     }
     .empty {
       text-align: center;
       color: #888;
       margin-top: 60px;
-    }
-    .nav {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(10px);
-      z-index: 100;
-    }
-    .brand {
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: #d4af37;
+      font-style: italic;
     }
     .btn.ghost.small {
       border: 1px solid #d4af37;
@@ -90,6 +98,11 @@
       padding: 8px 16px;
       border-radius: 4px;
       font-size: 12px;
+      transition: all 0.3s ease;
+    }
+    .btn.ghost.small:hover {
+      background: #d4af37;
+      color: #000;
     }
   </style>
 </head>
@@ -97,9 +110,11 @@
 <body>
 
 <header class="nav">
-  <div class="nav-left">
+  <div class="nav-left" style="display:flex; align-items:center; gap:12px;">
+    <img src="images/logo.png" alt="E'MPIRE" style="height:36px;">
     <span class="brand">E'MPIRE</span>
   </div>
+  
   <div class="nav-right">
     <a href="index.html" class="btn ghost small">← Back</a>
   </div>
@@ -121,60 +136,62 @@
   async function loadMyOrders() {
     const container = document.getElementById("ordersList");
 
-    // 1. Get the current logged-in user
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    try {
+      // 1. Get the current logged-in user
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
-    // 2. Check if user is authenticated
-    if (!user) {
-      container.innerHTML = `<p class="empty">Please login to view your orders</p>`;
-      return;
-    }
+      // 2. Check if user is authenticated
+      if (!user) {
+        container.innerHTML = `<p class="empty">Please login to view your orders</p>`;
+        return;
+      }
 
-    // 3. Fetch orders matching the authenticated user's ID
-    const { data, error } = await supabaseClient
-      .from("orders")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      // 3. Fetch orders matching the authenticated user's ID
+      const { data, error } = await supabaseClient
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
-    if (error) {
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p class="empty">No orders yet</p>`;
+        return;
+      }
+
+      // 4. Render the orders
+      container.innerHTML = data.map(o => {
+        const statusClass = o.status ? o.status.toLowerCase() : 'confirmed';
+        const statusLabel = o.status || 'Processing';
+        
+        return `
+          <div class="order-card">
+            <div class="order-header">
+              <span>Order #${o.id.toString().slice(0, 8).toUpperCase()}</span>
+              <span class="badge ${statusClass}">${statusLabel}</span>
+            </div>
+            <div class="order-row">
+              <span>Total Amount</span>
+              <span style="color: #fff; font-weight: 700;">₹${(o.total_amount || 0).toLocaleString("en-IN")}</span>
+            </div>
+            <div class="order-row">
+              <span>Order Date</span>
+              <span>${new Date(o.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </div>
+            ${o.referral_code ? `
+            <div class="order-row">
+              <span>Referral Used</span>
+              <span style="color: #d4af37;">${o.referral_code}</span>
+            </div>` : ''}
+          </div>
+        `;
+      }).join("");
+
+    } catch (error) {
       console.error("Error fetching orders:", error);
       container.innerHTML = `<p class="empty">Error loading orders. Please try again.</p>`;
-      return;
     }
-
-    if (!data || data.length === 0) {
-      container.innerHTML = `<p class="empty">No orders yet</p>`;
-      return;
-    }
-
-    // 4. Render the orders
-    container.innerHTML = data.map(o => {
-      const statusClass = o.status ? o.status.toLowerCase() : 'confirmed';
-      const statusLabel = o.status || 'Processing';
-      
-      return `
-        <div class="order-card">
-          <div class="order-header">
-            <span>Order #${o.id.toString().slice(0, 6)}</span>
-            <span class="badge ${statusClass}">${statusLabel}</span>
-          </div>
-          <div class="order-row">
-            <span>Total</span>
-            <span>₹${(o.total_amount || 0).toLocaleString("en-IN")}</span>
-          </div>
-          <div class="order-row">
-            <span>Date</span>
-            <span>${new Date(o.created_at).toLocaleDateString()}</span>
-          </div>
-          ${o.referral_code ? `
-          <div class="order-row">
-            <span>Referral</span>
-            <span>${o.referral_code}</span>
-          </div>` : ''}
-        </div>
-      `;
-    }).join("");
   }
 
   // Initial load
