@@ -11,6 +11,7 @@ const supabaseClient = window.supabase
 
 let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
 let currentUser = null;
+let authInProgress = false; // Prevents multiple login popups
 
 // ==================================================
 // 2. LOCAL PRODUCT DATABASE
@@ -84,12 +85,6 @@ window.addEventListener("DOMContentLoaded", () => {
     updateCartUI();
     initScrollReveal();
     setupWhatsApp();
-
-    setTimeout(() => {
-        if (!currentUser) {
-            document.getElementById("authModal")?.classList.add("active");
-        }
-    }, 800);
 });
 
 // ==================================================
@@ -122,6 +117,16 @@ if (supabaseClient) {
         currentUser = session?.user || null;
         updateAuthUI();
 
+        if (event === "SIGNED_IN") {
+            authInProgress = false; // Reset lock
+            closeAuth();
+            
+            // Open promo logic here if applicable
+            if (typeof openPromoAfterLogin === "function") {
+                openPromoAfterLogin();
+            }
+        }
+
         if (event === "SIGNED_IN" && session?.user?.email === "chintanmaheshwari714@gmail.com") {
             window.location.href = "admin-secret.html";
         }
@@ -142,40 +147,80 @@ function updateAuthUI() {
     if (!btn) return;
 
     if (currentUser) {
-        const name =
-            currentUser.user_metadata?.full_name ||
-            currentUser.email.split("@")[0];
+        const name = currentUser.user_metadata?.full_name || currentUser.email.split("@")[0];
         btn.innerText = `Hi, ${name}`;
         btn.onclick = logout;
-
-        // Ensure My Orders is visible
         menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "block");
     } else {
         btn.innerText = "Login";
-        btn.onclick = () =>
-            document.getElementById("authModal")?.classList.add("active");
-
-        // Hide My Orders for logged-out users
+        btn.onclick = openAuth;
         menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "none");
     }
 }
 
+function openAuth() {
+    if (currentUser) return; 
+    const modal = document.getElementById("authModal");
+    if (!modal || modal.classList.contains("active")) return;
+    modal.classList.add("active");
+}
+
+function requireAuth(callback) {
+    if (currentUser) {
+        callback?.();
+        return true;
+    }
+    if (!authInProgress) {
+        authInProgress = true;
+        openAuth();
+    }
+    return false;
+}
+
+async function signUp() {
+    const name = document.getElementById("authName")?.value.trim();
+    const email = document.getElementById("authEmail")?.value.trim();
+    const phone = document.getElementById("authPhone")?.value.trim();
+    const password = document.getElementById("authPassword")?.value;
+
+    if (!name || !email || !password) return;
+
+    const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } }
+    });
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    if (data?.user) {
+        await supabaseClient.from("profiles").insert({
+            id: data.user.id,
+            email,
+            full_name: name,
+            phone: phone || null
+        });
+    }
+    closeAuth();
+}
+
 async function signIn() {
-    const email = document.getElementById("authEmail").value;
-    const password = document.getElementById("authPassword").value;
+    const email = document.getElementById("authEmail")?.value;
+    const password = document.getElementById("authPassword")?.value;
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) return alert(error.message);
+    if (error) alert(error.message);
     closeAuth();
 }
 
 async function forgotPassword() {
     const email = document.getElementById("authEmail").value;
     if (!email) return alert("Enter your email first");
-
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: window.location.origin + "/index.html"
     });
-
     if (error) return alert(error.message);
     alert("Password reset email sent 📧");
 }
@@ -184,6 +229,7 @@ function closeAuth() {
     const modal = document.getElementById("authModal");
     if (!modal) return;
     modal.classList.remove("active");
+    authInProgress = false; 
 }
 
 async function signInWithGoogle() {
@@ -199,6 +245,8 @@ async function logout() {
     await supabaseClient.auth.signOut();
     currentUser = null;
     updateAuthUI();
+    document.getElementById("mobileMenu")?.classList.remove("active");
+    document.getElementById("cartSidebar")?.classList.remove("active");
 }
 
 // ==================================================
@@ -251,9 +299,7 @@ function updateCartUI() {
 
 function changeQty(index, delta) {
     cart[index].qty += delta;
-    if (cart[index].qty <= 0) {
-        cart.splice(index, 1);
-    }
+    if (cart[index].qty <= 0) cart.splice(index, 1);
     saveCart();
     updateCartUI();
 }
@@ -368,23 +414,15 @@ async function placeOrder() {
 }
 
 async function openOrders() {
-  if (!currentUser || !supabaseClient) return;
+    if (!currentUser || !supabaseClient) return;
+    const { data, error } = await supabaseClient
+        .from("orders")
+        .select("*")
+        .eq("email", currentUser.email)
+        .order("created_at", { ascending: false });
 
-  const { data, error } = await supabaseClient
-    .from("orders")
-    .select("*")
-    .eq("email", currentUser.email)
-    .order("created_at", { ascending: false });
-
-  if (error) return alert("Error fetching orders");
-
-  alert(
-    data.length
-      ? data.map(o =>
-          `Order ₹${o.total_amount} — ${o.status.toUpperCase()}`
-        ).join("\n")
-      : "No orders yet"
-  );
+    if (error) return alert("Error fetching orders");
+    alert(data.length ? data.map(o => `Order ₹${o.total_amount} — ${o.status.toUpperCase()}`).join("\n") : "No orders yet");
 }
 
 // ==================================================
@@ -415,9 +453,7 @@ function shareProduct(name) {
 function initScrollReveal() {
     const observer = new IntersectionObserver(entries => {
         entries.forEach(e => {
-            if (e.isIntersecting) {
-                e.target.classList.add("reveal-active");
-            }
+            if (e.isIntersecting) e.target.classList.add("reveal-active");
         });
     }, { threshold: 0.1 });
     document.querySelectorAll(".reveal-hidden").forEach(el => observer.observe(el));
@@ -431,19 +467,16 @@ function setupWhatsApp() {
 function initContactForm() {
     const form = document.getElementById("contactForm");
     const successMsg = document.getElementById("contactSuccess");
-
     if (!form) return;
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
-
         try {
             const response = await fetch("https://formsubmit.co/ajax/empire.official2026@gmail.com", {
                 method: "POST",
                 body: formData
             });
-
             if (response.ok) {
                 form.reset();
                 if (successMsg) {
@@ -460,14 +493,6 @@ function initContactForm() {
     });
 }
 
-function requireAuth() {
-    if (!currentUser) {
-        document.getElementById("authModal")?.classList.add("active");
-        return false;
-    }
-    return true;
-}
-
 // ==================================================
 // 10. IMAGE SLIDER LOGIC
 // ==================================================
@@ -476,7 +501,6 @@ document.querySelectorAll(".slider").forEach(slider => {
     const slides = slider.querySelectorAll(".slide");
     if (slides.length === 0) return;
     let index = 0;
-
     setInterval(() => {
         slides[index].classList.remove("active");
         index = (index + 1) % slides.length;

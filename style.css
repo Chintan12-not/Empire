@@ -115,12 +115,6 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
         display: none;
     }
 }
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    margin-right: 10px;
-    cursor: pointer;
-}
 
 .search-container {
     display: flex;
@@ -517,22 +511,24 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 .auth-modal.active { display: flex; }
 
 .auth-box {
-    width: 350px;
+    width: 420px;
+    max-width: 90vw;
     background: #0b0b0b;
     border: 1px solid var(--gold-main);
-    padding: 30px;
-    border-radius: 12px;
+    padding: 40px;
+    border-radius: 14px;
     text-align: center;
 }
 
+
 .auth-box input {
     width: 100%;
-    padding: 14px;
-    margin-bottom: 12px;
-    background: #000;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #111;
     border: 1px solid #333;
     color: #fff;
-    border-radius: 6px;
+    border-radius: 4px;
 }
 
 .auth-box input:focus { border-color: var(--gold-main); outline: none; }
@@ -625,205 +621,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     position: relative;
 }
 
-/* ================================
-    MOBILE OPTIMIZATION (2026 Edition)
-   ================================ */
-@media (max-width: 768px) {
-  .top-offer-bar {
-    font-size: 11px;
-    padding: 8px 10px;
-    letter-spacing: 1px;
-  }
-
-  .nav {
-    padding: 0 14px;
-    height: 60px;
-    top: 39px;
-  }
-
-  .nav-left {
-    gap: 10px;
-  }
-
-  .brand {
-    font-size: 15px;
-    letter-spacing: 1.5px;
-  }
-
-  .logo-img {
-    width: 36px;
-    height: 36px;
-  }
-
-  .search-container {
-    display: none;
-  }
-
-  #menuToggle {
-    display: block;
-    font-size: 22px;
-  }
-
-  .nav-actions {
-    display: flex; 
-    gap: 12px;
-  }
-
-  .icon-btn {
-    font-size: 22px;
-  }
-
-  #authBtn {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-
-  .hero {
-    min-height: 100vh;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .hero-inner {
-    padding: 0 18px;
-    max-width: 100%;
-  }
-
-  .hero-inner h1 {
-    font-size: 38px;
-    letter-spacing: 4px;
-    margin-bottom: 10px;
-  }
-
-  .hero-inner .subtitle {
-    font-size: 14px;
-    margin-bottom: 22px;
-  }
-
-  .hero-cta .btn {
-    width: 100%;
-    max-width: 260px;
-    margin: 0 auto;
-  }
-
-  .container {
-    padding: 0 16px;
-  }
-
-  .product-card {
-    width: 100%;
-    padding: 18px;
-    flex: 0 0 100%;
-  }
-
-  .product-media {
-    aspect-ratio: 3 / 4;
-  }
-
-  .product-name {
-    font-size: 17px;
-  }
-
-  .product-desc {
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  .price-block {
-    margin-top: 8px;
-  }
-
-  .button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .button-group .btn {
-    width: 100%;
-  }
-
-  .coming-soon-box {
-    aspect-ratio: 1 / 1;
-    font-size: 14px;
-    letter-spacing: 2px;
-  }
-
-  .cart-sidebar {
-    width: 100%;
-    right: -100%;
-  }
-
-  .cart-sidebar.active {
-    right: 0;
-  }
-
-  .luxury-detail-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding: 110px 0 40px;
-  }
-
-  .luxury-info {
-    padding: 24px;
-    max-width: 100%;
-    min-height: auto;
-  }
-
-  .notes-row {
-    grid-template-columns: 1fr;
-  }
-
-  .checkout-layout {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .summary-card {
-    position: static;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .footer-container {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 30px;
-  }
-  .footer-brand img { margin: 0 auto 15px; }
-  
-  .whatsapp-float {
-    left: 15px;
-    bottom: 15px;
-    width: 46px;
-    height: 46px;
-    font-size: 22px;
-  }
-
-  .mobile-menu-overlay { 
-    width: 75%; 
-    padding: 40px 20px;
-  }
-
-  .mobile-menu-overlay a {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-    body { font-size: 14px; }
-    .hero-inner h1 { font-size: 34px; }
-    .hero-inner .subtitle { font-size: 13px; }
-    .btn { padding: 10px 16px; font-size: 13px; }
-    .top-offer-bar { font-size: 11px; padding: 8px 6px; }
-    .mobile-menu-overlay { width: 85%; }
-}
-
-/* ================================
-   PROMO POPUP ANIMATIONS
-================================ */
+/* === PROMO POPUP ANIMATIONS === */
 #promoPopup {
     opacity: 0;
     animation: promoFadeIn 0.45s ease forwards;
@@ -844,23 +642,122 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
     animation: promoZoomOut 0.35s ease forwards;
 }
 
-/* --- KEYFRAMES --- */
-@keyframes promoFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+@keyframes promoFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes promoFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes promoZoomIn { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes promoZoomOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0.88); opacity: 0; } }
+
+
+/* ================================================================
+   MOBILE OVERRIDES (FINAL OPTIMIZATION)
+================================================================ */
+
+@media (max-width: 768px) {
+  /* --- STEP 1: MOBILE ROYAL HERO --- */
+  .hero {
+    height: 100svh;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hero-inner {
+    padding: 0 26px;
+    max-width: 100%;
+    margin-top: 40px;
+  }
+
+  .hero-inner h1 {
+    font-size: clamp(48px, 12vw, 64px);
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+  }
+
+  .hero-inner .subtitle {
+    font-size: 15px;
+    letter-spacing: 1.5px;
+    opacity: 0.85;
+    margin-bottom: 36px;
+  }
+
+  .hero-cta {
+    display: flex;
+    justify-content: center;
+  }
+
+  .hero-cta .btn {
+    width: 100%;
+    max-width: 260px;
+    padding: 16px 0;
+    font-size: 13px;
+    letter-spacing: 3px;
+    border-radius: 2px;
+  }
+
+  #heroVideo {
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .hero::before {
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.65) 0%,
+      rgba(0,0,0,0.45) 40%,
+      rgba(0,0,0,0.85) 100%
+    );
+  }
+
+  /* --- STEP 2: MOBILE NAV PERFECTION --- */
+  .nav {
+    height: 70px;
+    padding: 0 18px;
+    top: 39px;
+  }
+
+  .brand {
+    font-size: 18px;
+    letter-spacing: 2.5px;
+  }
+
+  .logo-img {
+    width: 36px;
+    height: 36px;
+  }
+
+  #cartBtn {
+    font-size: 20px;
+  }
+
+  #authBtn {
+    padding: 8px 14px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  /* --- STEP 3: MOBILE MENU ROYAL PANEL --- */
+  .mobile-menu-overlay {
+    width: 75%;
+    justify-content: center;
+    gap: 32px;
+  }
+
+  .mobile-menu-overlay a {
+    font-size: 22px;
+    letter-spacing: 3px;
+  }
+
+  /* --- ADDITIONAL MOBILE ADJUSTMENTS --- */
+  .top-offer-bar { font-size: 11px; padding: 8px 10px; }
+  .product-scroll { gap: 15px; }
+  .product-card { flex: 0 0 100%; }
+  .luxury-detail-grid { grid-template-columns: 1fr; padding-top: 110px; }
+  .luxury-info { padding: 24px; }
+  .footer-container { grid-template-columns: 1fr; text-align: center; }
+  .notes-row { grid-template-columns: 1fr; }
 }
 
-@keyframes promoFadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
-
-@keyframes promoZoomIn {
-    from { transform: scale(0.88); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes promoZoomOut {
-    from { transform: scale(1); opacity: 1; }
-    to { transform: scale(0.88); opacity: 0; }
+@media (max-width: 480px) {
+  .hero-inner h1 { font-size: 34px; }
+  .mobile-menu-overlay { width: 85%; }
 }

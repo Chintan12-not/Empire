@@ -243,34 +243,54 @@
 
     <div id="authModal" class="auth-modal">
         <div class="auth-box">
-            <h2 class="gold-text">Welcome to E'MPIRE</h2>
-            <p style="color: #888; margin-bottom: 20px; font-size: 0.9rem;">Join the elite circle.</p>
-
-            <input id="authEmail" type="email" placeholder="Email" required>
-            <input id="authPassword" type="password" placeholder="Password" required>
-
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button class="btn primary" onclick="signUp()" style="flex:1;">Sign Up</button>
-                <button class="btn ghost" onclick="signIn()" style="flex:1;">Sign In</button>
-            </div>
-
-            <div style="margin: 20px 0; text-align:center;">
-                <button class="btn ghost small" onclick="forgotPassword()" style="border:none;">
-                    Forgot password?
-                </button>
-            </div>
-
-            <div style="margin: 20px 0; display: flex; align-items: center; color: #444;">
-                <hr style="flex:1; border: 0.5px solid #222;"> 
-                <span style="padding: 0 10px; font-size: 12px;">OR</span> 
-                <hr style="flex:1; border: 0.5px solid #222;">
-            </div>
-
-            <button class="btn google-btn" onclick="signInWithGoogle()" style="width: 100%; background: #fff; color: #000; border: none; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; cursor: pointer;">
-                <i class="fab fa-google"></i> Continue with Google
-            </button>
-
             <button class="close-btn" onclick="closeAuth()">✕</button>
+            
+            <div id="authStepChoice">
+                <h2 class="gold-text">Welcome to E'MPIRE</h2>
+                <p style="color: #888; margin-bottom: 25px; font-size: 0.9rem;">Join the elite circle.</p>
+                
+                <button class="btn primary" style="width:100%; margin-bottom:15px;" onclick="showEmailLogin()">
+                    Sign in with Email
+                </button>
+                
+                <button class="btn google-btn" onclick="signInWithGoogle()" style="width: 100%; background: #fff; color: #000; border: none; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; cursor: pointer;">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+
+                <div style="margin: 20px 0; display: flex; align-items: center; color: #444;">
+                    <hr style="flex:1; border: 0.5px solid #222;"> 
+                    <span style="padding: 0 10px; font-size: 12px;">OR</span> 
+                    <hr style="flex:1; border: 0.5px solid #222;">
+                </div>
+
+                <button class="btn ghost" onclick="showEmailSignUp()" style="width:100%;">Create New Account</button>
+            </div>
+
+            <div id="authStepEmail" style="display:none;">
+                <h3 class="gold-text" style="margin-bottom:20px;">Sign In</h3>
+                <input id="authEmailLogin" type="email" placeholder="Email address" required>
+                <input id="authPasswordLogin" type="password" placeholder="Password" required>
+                
+                <button class="btn primary" style="width:100%; margin-top:10px;" onclick="signIn()">
+                    Sign In
+                </button>
+
+                <p style="margin-top:14px; font-size:13px; cursor:pointer; color:#aaa; text-align:center;" onclick="forgotPassword()">
+                    Forgot password?
+                </p>
+                <button class="btn ghost small" onclick="backToChoice()" style="width:100%; border:none; margin-top:10px;">← Back</button>
+            </div>
+
+            <div id="authStepSignUp" style="display:none;">
+                <h3 class="gold-text" style="margin-bottom:20px;">Create Account</h3>
+                <input id="authName" type="text" placeholder="Full Name" required>
+                <input id="authEmailSign" type="email" placeholder="Email" required>
+                <input id="authPhone" type="tel" placeholder="Phone Number">
+                <input id="authPasswordSign" type="password" placeholder="Password" required>
+                
+                <button type="button" class="btn primary" onclick="signUp()" style="width:100%; margin-top:10px;">Register</button>
+                <button class="btn ghost small" onclick="backToChoice()" style="width:100%; border:none; margin-top:10px;">← Back</button>
+            </div>
         </div>
     </div>
 
@@ -291,10 +311,8 @@
             <p><strong>Email:</strong> empire.official2026@gmail.com</p>
             <p><strong>Phone:</strong> +91 9911261347</p>
             <p class="address">
-              House No. 1, Block 12,<br>
-              Ground Floor (Backside),<br>
-              Spring Field Colony, Sector 31,<br>
-              Faridabad – 121003, Haryana
+                Sector 31,<br>
+                Faridabad – 121003, Haryana
             </p>
           </div>
       
@@ -319,35 +337,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 
-    <div id="promoPopup" style="
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,0.85);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:4000;
-    ">
+    <div id="promoPopup" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:4000;">
         <div class="promo-box" style="position:relative;">
-            <img src="images/Promo.jpeg"
-                 style="max-width:90vw;max-height:85vh;border-radius:12px;" />
-
-            <button onclick="closePromo()"
-                    style="
-                        position:absolute;
-                        top:-14px;
-                        right:-14px;
-                        width:36px;
-                        height:36px;
-                        border-radius:50%;
-                        border:none;
-                        background:#d4af37;
-                        color:#000;
-                        font-size:18px;
-                        cursor:pointer;
-                    ">
-                ✕
-            </button>
+            <img src="images/Promo.jpeg" style="max-width:90vw; max-height:85vh; border-radius:12px;" />
+            <button onclick="closePromo()" style="position:absolute; top:-14px; right:-14px; width:36px; height:36px; border-radius:50%; border:none; background:#d4af37; color:#000; font-size:18px; cursor:pointer;">✕</button>
         </div>
     </div>
 
@@ -355,16 +348,41 @@
         function closePromo() {
             const popup = document.getElementById("promoPopup");
             if (!popup) return;
-
             popup.classList.add("closing");
-
-            // Wait for animation to finish
             setTimeout(() => {
                 popup.style.display = "none";
-
-                // Open login AFTER promo closes
-                document.getElementById("authModal")?.classList.add("active");
+                if (typeof currentUser !== 'undefined' && !currentUser) {
+                    document.getElementById("authModal")?.classList.add("active");
+                } else if (typeof currentUser === 'undefined') {
+                    document.getElementById("authModal")?.classList.add("active");
+                }
             }, 350);
+        }
+
+        // Logic for Switching Auth Steps
+        function showEmailLogin() {
+            document.getElementById('authStepChoice').style.display = 'none';
+            document.getElementById('authStepEmail').style.display = 'block';
+        }
+
+        function showEmailSignUp() {
+            document.getElementById('authStepChoice').style.display = 'none';
+            document.getElementById('authStepSignUp').style.display = 'block';
+        }
+
+        function backToChoice() {
+            document.getElementById('authStepEmail').style.display = 'none';
+            document.getElementById('authStepSignUp').style.display = 'none';
+            document.getElementById('authStepChoice').style.display = 'block';
+        }
+
+        function closeAuth() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+        
+        function openAuth() {
+            document.getElementById('authModal').classList.add('active');
+            backToChoice(); // Reset to initial screen when opening
         }
     </script>
 </body>
