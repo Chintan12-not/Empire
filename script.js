@@ -11,7 +11,8 @@ const supabaseClient = window.supabase
 
 let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
 let currentUser = null;
-let authInProgress = false; // Prevents multiple login popups
+let authInProgress = false; 
+let selectedRating = 0; // New: For review system
 
 // ==================================================
 // 2. LOCAL PRODUCT DATABASE
@@ -65,6 +66,69 @@ const productDatabase = {
         top: "Green Pear • Juicy Berries • Pink Pepper",
         heart: "Peony • Honeysuckle • Soft Floral Accord",
         base: "White Musk • Cedarwood • Light Woods"
+    },
+    crown: {
+        id: "crown",
+        name: "Crown of Dunes",
+        price: 4200,
+        originalPrice: 4200,
+        img: "images/Crown of Dunes 1.jpg",
+        tagline: "Warm • Amber • Spicy • Woody • Luxurious",
+        description: `Crown of Dunes is a warm, luxurious fragrance that blends sweet tonka warmth with rich amber, spices, and deep woody notes. Bold and sensual, it is crafted for evenings and special moments, leaving a long-lasting trail inspired by the mystery and richness of desert nights.`,
+        top: "Bergamot • Saffron",
+        heart: "Tonka Bean • Rose • Oud",
+        base: "Amber • White Musk • Sandalwood • Vanilla"
+    },
+    supermale: {
+        id: "supermale",
+        name: "Supermale",
+        price: 4800,
+        originalPrice: 4800,
+        img: "images/Supermale 1.jpg",
+        tagline: "Fresh • Bold • Modern • Addictive",
+        description: `Supermale is a bold, modern fragrance crafted for confidence and everyday power. Fresh and energetic at the opening, it evolves into warm spices and aromatic depth, settling into a smooth, sensual base that lasts all day.`,
+        top: "Mint • Bergamot • Lemon",
+        heart: "Lavender • Cinnamon • Clary Sage",
+        base: "Vanilla • Amber • Patchouli • Cedarwood"
+    },
+    berryflora: {
+        id: "berryflora",
+        name: "Berry Flora",
+        price: 4200,
+        originalPrice: 4200,
+        img: "images/Berry Flora 1.jpg",
+        tagline: "Soft • Floral • Fruity • Feminine • Elegant",
+        description: `Berry Flora is a soft, radiant fragrance that celebrates femininity through a delicate blend of juicy berries and graceful florals. \n\nFresh and vibrant at the opening, the scent gently unfolds into a floral heart before settling into a smooth, comforting base. Elegant yet playful, Berry Flora is perfect for everyday wear, leaving behind a subtle and irresistible trail. \n\nInspired by a modern floral-fruity classic, this fragrance is designed for women who love freshness with warmth and charm. \n\nA gentle bloom of berries, wrapped in elegance.`,
+        top: "Red Berries • Strawberry • Blackcurrant",
+        heart: "Jasmine • Violet • Peony",
+        base: "Soft Musk • Vanilla • Light Woods"
+    },
+};
+
+const productReviews = {
+    whisky: {
+        rating: 4.7,
+        total: 327,
+        reviews: [
+            { name: "Urvi Khandwala", stars: 5, text: "Amazing fragrance. Long lasting and very premium." },
+            { name: "Nilesh Parmar", stars: 5, text: "Always my favorite. Perfect for evenings." }
+        ]
+    },
+    crown: {
+        rating: 4.8,
+        total: 112,
+        reviews: [
+            { name: "Karthikeyan Nagappan", stars: 5, text: "Rich, warm and luxurious. Smells very expensive." },
+            { name: "Aarav Mehta", stars: 4, text: "Perfect for night wear. Strong but classy." }
+        ]
+    },
+    supermale: {
+        rating: 4.6,
+        total: 189,
+        reviews: [
+            { name: "Rohit Verma", stars: 5, text: "Fresh yet powerful. Works all day." },
+            { name: "Aditya Singh", stars: 4, text: "Great everyday fragrance. Compliment getter." }
+        ]
     }
 };
 
@@ -77,7 +141,12 @@ window.addEventListener("DOMContentLoaded", () => {
     if (productContainer) {
         const params = new URLSearchParams(window.location.search);
         const productId = params.get("id");
-        productId ? renderProductDetail(productId) : renderNotFound(productContainer);
+        if (productId) {
+            renderProductDetail(productId);
+            loadReviews(productId); // New: Load dynamic reviews
+        } else {
+            renderNotFound(productContainer);
+        }
     }
 
     initContactForm();
@@ -85,6 +154,13 @@ window.addEventListener("DOMContentLoaded", () => {
     updateCartUI();
     initScrollReveal();
     setupWhatsApp();
+
+    // Star click handling initialization
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".star-rating span")) return;
+        selectedRating = Number(e.target.dataset.star);
+        updateStars();
+    });
 });
 
 // ==================================================
@@ -118,13 +194,9 @@ if (supabaseClient) {
         updateAuthUI();
 
         if (event === "SIGNED_IN") {
-            authInProgress = false; // Reset lock
+            authInProgress = false; 
             closeAuth();
-            
-            // Open promo logic here if applicable
-            if (typeof openPromoAfterLogin === "function") {
-                openPromoAfterLogin();
-            }
+            if (typeof openPromoAfterLogin === "function") openPromoAfterLogin();
         }
 
         if (event === "SIGNED_IN" && session?.user?.email === "chintanmaheshwari714@gmail.com") {
@@ -143,7 +215,6 @@ async function checkAuth() {
 function updateAuthUI() {
     const btn = document.getElementById("authBtn");
     const menu = document.getElementById("mobileMenu");
-
     if (!btn) return;
 
     if (currentUser) {
@@ -364,6 +435,67 @@ function renderProductDetail(productId) {
                 </div>
             </div>
         </div>
+        ${renderReviews(productId)}
+        ${renderRelatedProducts(productId)}
+    `;
+}
+
+function renderReviews(productId) {
+    const data = productReviews[productId];
+    const stars = data ? "★".repeat(Math.round(data.rating)) + "☆".repeat(5 - Math.round(data.rating)) : "☆☆☆☆☆";
+
+    return `
+    <section style="margin-top:80px;">
+        <h2 style="font-family:'Cinzel'; letter-spacing:3px; margin-bottom:20px;">Customer Reviews</h2>
+        <div style="display:flex; gap:40px; margin-bottom:30px;">
+            <div>
+                <div style="font-size:32px; color:#d4af37;">${data ? data.rating : "0.0"}</div>
+                <div style="color:#d4af37;">${stars}</div>
+                <div style="font-size:13px; color:#aaa;">Based on ${data ? data.total : "0"} reviews</div>
+            </div>
+        </div>
+
+        <div id="reviewsList" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; margin-bottom: 40px;">
+            ${data ? data.reviews.map(r => `
+                <div class="review-item" style="background:#0b0b0b; padding:20px; border:1px solid rgba(212,175,55,0.2); border-radius:10px;">
+                    <div style="color:#d4af37;">${"★".repeat(r.stars)}</div>
+                    <strong>${r.name}</strong>
+                    <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
+                </div>
+            `).join("") : ""}
+        </div>
+
+        <div style="background:#0b0b0b; padding:30px; border-radius:10px; border:1px solid #333;">
+            <h3 style="color:#d4af37; margin-bottom:15px;">Write a Review</h3>
+            <div class="star-rating" style="font-size:24px; color:#444; cursor:pointer; margin-bottom:15px;">
+                <span data-star="1">★</span><span data-star="2">★</span><span data-star="3">★</span><span data-star="4">★</span><span data-star="5">★</span>
+            </div>
+            <input type="text" id="reviewerName" placeholder="Your Name" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:10px; margin-bottom:10px;">
+            <textarea id="reviewText" placeholder="Your experience..." style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:10px; height:100px; margin-bottom:15px;"></textarea>
+            <button class="btn primary" onclick="submitReview()">Submit Review</button>
+        </div>
+    </section>
+    `;
+}
+
+function renderRelatedProducts(currentId) {
+    const products = Object.values(productDatabase).filter(p => p.id !== currentId).slice(0, 3);
+
+    return `
+    <section style="margin-top:100px;">
+        <h2 style="font-family:'Cinzel'; letter-spacing:3px; margin-bottom:30px;">You May Also Like</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:30px;">
+            ${products.map(p => `
+                <div class="product-card" onclick="viewProduct('${p.id}')">
+                    <div class="product-media"><img src="${p.img}"></div>
+                    <div class="product-body neesh-style">
+                        <h3>${p.name}</h3>
+                        <div style="color:#d4af37; font-weight:700;">₹${p.price}</div>
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+    </section>
     `;
 }
 
@@ -426,7 +558,67 @@ async function openOrders() {
 }
 
 // ==================================================
-// 9. UTILITIES & CONTACT FORM
+// 9. NEW REVIEW SYSTEM LOGIC
+// ==================================================
+
+function loadReviews(productId) {
+    const container = document.getElementById("reviewsList");
+    if (!container) return;
+
+    // Get reviews from localStorage (where users post)
+    const localReviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+    
+    // Also include the static reviews from the JS object if they exist
+    const staticData = productReviews[productId]?.reviews || [];
+    const allReviews = [...localReviews, ...staticData];
+
+    if (allReviews.length === 0) {
+        container.innerHTML = `<p style="color:#888;">No reviews yet. Be the first to review.</p>`;
+        return;
+    }
+
+    container.innerHTML = allReviews.map(r => `
+        <div class="review-item" style="background:#0b0b0b; padding:20px; border:1px solid rgba(212,175,55,0.2); border-radius:10px;">
+            <div style="color:#d4af37;">${"★".repeat(r.stars)}</div>
+            <strong>${r.name}</strong>
+            <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
+        </div>
+    `).join("");
+}
+
+function submitReview() {
+    const name = document.getElementById("reviewerName").value.trim();
+    const text = document.getElementById("reviewText").value.trim();
+    if (!name || !text || selectedRating === 0) {
+        alert("Please enter name, rating and review");
+        return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get("id");
+
+    const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+
+    reviews.unshift({ name, stars: selectedRating, text });
+    localStorage.setItem(`reviews_${productId}`, JSON.stringify(reviews));
+
+    document.getElementById("reviewerName").value = "";
+    document.getElementById("reviewText").value = "";
+    selectedRating = 0;
+    updateStars();
+    loadReviews(productId);
+}
+
+function updateStars() {
+    document.querySelectorAll(".star-rating span").forEach(star => {
+        star.classList.toggle("active", Number(star.dataset.star) <= selectedRating);
+        // Direct CSS manipulation to ensure visibility
+        star.style.color = Number(star.dataset.star) <= selectedRating ? "#d4af37" : "#444";
+    });
+}
+
+// ==================================================
+// 10. UTILITIES & CONTACT FORM
 // ==================================================
 
 function shareProduct(name) {
@@ -494,7 +686,7 @@ function initContactForm() {
 }
 
 // ==================================================
-// 10. IMAGE SLIDER LOGIC
+// 11. IMAGE SLIDER LOGIC
 // ==================================================
 
 document.querySelectorAll(".slider").forEach(slider => {
