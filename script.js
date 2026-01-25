@@ -26,7 +26,7 @@ const productDatabase = {
         originalPrice: 2800,
         img: "images/Smoked Whisky.jpg",
         tagline: "Warm • Smoky • Boozy • Luxurious • Powerful",
-        description: `Smoked Whisky is deep, bold, and intoxicating. It opens with a warm smoky accord, like oak barrels kissed by fire, instantly giving a dark and mysterious character. \n\nThe heart is rich and smooth, blending aged whiskey notes with subtle sweetness, creating a luxurious and addictive warmth. \n\nAs it settles, hints of amber, soft woods, and gentle spice linger on the skin, leaving a powerful, masculine, and premium trail. \n\nThis fragrance feels royal, confident, and intense — made for evenings, power moves, and statement moments.`,
+        description: `Smoked Whisky is deep, bold, and intoxicating. It opens with a warm smoky accord, like oak barrels kissed by fire, instantly giving a dark and mysterious character. \n\nThe heart is rich and smooth, blending aged whiskey notes with subtle sweetness, creating a luxurious and addictive warmth. \n\nAs it settles, hints of amber, soft woods, and gentle spice linger on the skin, leaving a powerful, masculine, and premium trail. \n\nThis fragrance feels royal, confident, and intense — made for evenings, power moves, and statement moments. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Smoked Oak • Whiskey Accord • Light Spicy Pepper",
         heart: "Charred Wood • Caramelized Amber • Toasted Vanilla",
         base: "Dark Amber • Leather • Dry Woods • Soft Musk"
@@ -38,7 +38,7 @@ const productDatabase = {
         originalPrice: 2800,
         img: "images/Ocean Aura.jpg",
         tagline: "Fresh • Aquatic • Clean • Elegant • Premium",
-        description: `Ocean Aura is fresh, clean, and effortlessly luxurious. It opens like a cool ocean breeze at dawn — crisp, airy, and energizing. \n\nThe fragrance carries the purity of deep blue waters blended with modern elegance, giving a calm yet confident presence. \n\nAs it evolves, soft aquatic florals and mineral notes add sophistication without sweetness. \n\nThe dry-down is smooth, musky, and slightly woody, leaving a long-lasting, clean trail that feels refined and powerful.`,
+        description: `Ocean Aura is fresh, clean, and effortlessly luxurious. It opens like a cool ocean breeze at dawn — crisp, airy, and energizing. \n\nThe fragrance carries the purity of deep blue waters blended with modern elegance, giving a calm yet confident presence. \n\nAs it evolves, soft aquatic florals and mineral notes add sophistication without sweetness. \n\nThe dry-down is smooth, musky, and slightly woody, leaving a long-lasting, clean trail that feels refined and powerful. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Marine Accord • Bergamot • Lemon Zest",
         heart: "Sea Salt • Water Lily • Lavender",
         base: "White Musk • Driftwood • Ambergris"
@@ -50,19 +50,19 @@ const productDatabase = {
         originalPrice: 2800,
         img: "images/Blush ELIXIR.jpg",
         tagline: "Soft • Floral • Elegant • Feminine • Luxurious",
-        description: `Blush Elixir is soft, sensual, and irresistibly elegant. It opens with a delicate burst of fresh fruits and gentle florals, creating a graceful and luminous first impression. \n\nThe heart blooms with romantic petals and creamy sweetness, giving a refined feminine charm that feels modern and luxurious. \n\nAs it settles, warm musks and smooth woods wrap the fragrance in a subtle, addictive softness that lingers beautifully on the skin.`,
+        description: `Blush Elixir is soft, sensual, and irresistibly elegant. It opens with a delicate burst of fresh fruits and gentle florals, creating a graceful and luminous first impression. \n\nThe heart blooms with romantic petals and creamy sweetness, giving a refined feminine charm that feels modern and luxurious. \n\nAs it settles, warm musks and smooth woods wrap the fragrance in a subtle, addictive softness that lingers beautifully on the skin. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Pink Berries • Lychee • Mandarin Blossom",
         heart: "Rose Petals • Peony • Jasmine",
         base: "White Musk • Vanilla • Sandalwood"
     },
-    fruityforest: {
-        id: "fruityforest",
-        name: "Fruity Forest",
+    "pearforest": {
+        id: "pearforest",
+        name: "Pear Forest",
         price: 4200,
         originalPrice: 4200,
         img: "images/Fruity Forest 1.jpg",
         tagline: "Fresh • Fruity • Floral • Elegant • Modern",
-        description: `A fresh, vibrant fragrance that captures the feeling of effortless elegance and modern femininity. \n\nIt opens with a juicy burst of crisp green fruits and sparkling berries, creating an instantly uplifting and playful impression. As the scent unfolds, soft floral notes bloom gently, adding a delicate and feminine heart. \n\nThe fragrance settles into a clean, smooth base of musks and woods, leaving a light yet lasting trail that feels fresh, confident, and refined. \n\nPerfect for everyday wear — bright, youthful, and irresistibly easy to love.`,
+        description: `A fresh, vibrant fragrance that captures the feeling of effortless elegance and modern femininity. \n\nIt opens with a juicy burst of crisp green fruits and sparkling berries, creating an instantly uplifting and playful impression. As the scent unfolds, soft floral notes bloom gently, adding a delicate and feminine heart. \n\nThe fragrance settles into a clean, smooth base of musks and woods, leaving a light yet lasting trail that feels fresh, confident, and refined. \n\nPerfect for everyday wear — bright, youthful, and irresistibly easy to love. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Green Pear • Juicy Berries • Pink Pepper",
         heart: "Peony • Honeysuckle • Soft Floral Accord",
         base: "White Musk • Cedarwood • Light Woods"
@@ -74,7 +74,7 @@ const productDatabase = {
         originalPrice: 4200,
         img: "images/Crown of Dunes 1.jpg",
         tagline: "Warm • Amber • Spicy • Woody • Luxurious",
-        description: `Crown of Dunes is a warm, luxurious fragrance that blends sweet tonka warmth with rich amber, spices, and deep woody notes. Bold and sensual, it is crafted for evenings and special moments, leaving a long-lasting trail inspired by the mystery and richness of desert nights.`,
+        description: `Crown of Dunes is a warm, luxurious fragrance that blends sweet tonka warmth with rich amber, spices, and deep woody notes. Bold and sensual, it is crafted for evenings and special moments, leaving a long-lasting trail inspired by the mystery and richness of desert nights. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Bergamot • Saffron",
         heart: "Tonka Bean • Rose • Oud",
         base: "Amber • White Musk • Sandalwood • Vanilla"
@@ -86,7 +86,7 @@ const productDatabase = {
         originalPrice: 4800,
         img: "images/Supermale 1.jpg",
         tagline: "Fresh • Bold • Modern • Addictive",
-        description: `Supermale is a bold, modern fragrance crafted for confidence and everyday power. Fresh and energetic at the opening, it evolves into warm spices and aromatic depth, settling into a smooth, sensual base that lasts all day.`,
+        description: `Supermale is a bold, modern fragrance crafted for confidence and everyday power. Fresh and energetic at the opening, it evolves into warm spices and aromatic depth, settling into a smooth, sensual base that lasts all day. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Mint • Bergamot • Lemon",
         heart: "Lavender • Cinnamon • Clary Sage",
         base: "Vanilla • Amber • Patchouli • Cedarwood"
@@ -98,7 +98,7 @@ const productDatabase = {
         originalPrice: 4200,
         img: "images/Berry Flora 1.jpg",
         tagline: "Soft • Floral • Fruity • Feminine • Elegant",
-        description: `Berry Flora is a soft, radiant fragrance that celebrates femininity through a delicate blend of juicy berries and graceful florals. \n\nFresh and vibrant at the opening, the scent gently unfolds into a floral heart before settling into a smooth, comforting base. Elegant yet playful, Berry Flora is perfect for everyday wear, leaving behind a subtle and irresistible trail. \n\nInspired by a modern floral-fruity classic, this fragrance is designed for women who love freshness with warmth and charm. \n\nA gentle bloom of berries, wrapped in elegance.`,
+        description: `Berry Flora is a soft, radiant fragrance that celebrates femininity through a delicate blend of juicy berries and graceful florals. \n\nFresh and vibrant at the opening, the scent gently unfolds into a floral heart before settling into a smooth, comforting base. Elegant yet playful, Berry Flora is perfect for everyday wear, leaving behind a subtle and irresistible trail. \n\nInspired by a modern floral-fruity classic, this fragrance is designed for women who love freshness with warmth and charm. \n\nA gentle bloom of berries, wrapped in elegance. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Red Berries • Strawberry • Blackcurrant",
         heart: "Jasmine • Violet • Peony",
         base: "Soft Musk • Vanilla • Light Woods"
@@ -456,14 +456,7 @@ function renderReviews(productId) {
         </div>
 
         <div id="reviewsList" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; margin-bottom: 40px;">
-            ${data ? data.reviews.map(r => `
-                <div class="review-item" style="background:#0b0b0b; padding:20px; border:1px solid rgba(212,175,55,0.2); border-radius:10px;">
-                    <div style="color:#d4af37;">${"★".repeat(r.stars)}</div>
-                    <strong>${r.name}</strong>
-                    <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
-                </div>
-            `).join("") : ""}
-        </div>
+            </div>
 
         <div style="background:#0b0b0b; padding:30px; border-radius:10px; border:1px solid #333;">
             <h3 style="color:#d4af37; margin-bottom:15px;">Write a Review</h3>
@@ -565,10 +558,7 @@ function loadReviews(productId) {
     const container = document.getElementById("reviewsList");
     if (!container) return;
 
-    // Get reviews from localStorage (where users post)
     const localReviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
-    
-    // Also include the static reviews from the JS object if they exist
     const staticData = productReviews[productId]?.reviews || [];
     const allReviews = [...localReviews, ...staticData];
 
@@ -577,13 +567,35 @@ function loadReviews(productId) {
         return;
     }
 
-    container.innerHTML = allReviews.map(r => `
+    const visibleReviews = allReviews.slice(0, 4);
+    const hiddenReviews = allReviews.slice(4);
+
+    let html = visibleReviews.map(r => `
         <div class="review-item" style="background:#0b0b0b; padding:20px; border:1px solid rgba(212,175,55,0.2); border-radius:10px;">
             <div style="color:#d4af37;">${"★".repeat(r.stars)}</div>
             <strong>${r.name}</strong>
             <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
         </div>
     `).join("");
+
+    if (hiddenReviews.length > 0) {
+        html += hiddenReviews.map(r => `
+            <div class="review-item hidden-review" style="display:none; background:#0b0b0b; padding:20px; border:1px solid rgba(212,175,55,0.2); border-radius:10px;">
+                <div style="color:#d4af37;">${"★".repeat(r.stars)}</div>
+                <strong>${r.name}</strong>
+                <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
+            </div>
+        `).join("");
+        
+        html += `<button id="viewMoreBtn" class="btn ghost small" style="grid-column: 1/-1; margin-top: 10px;" onclick="toggleMoreReviews()">+ View more reviews</button>`;
+    }
+
+    container.innerHTML = html;
+}
+
+function toggleMoreReviews() {
+    document.querySelectorAll(".hidden-review").forEach(r => r.style.display = "block");
+    document.getElementById("viewMoreBtn")?.style.setProperty("display", "none");
 }
 
 function submitReview() {
@@ -612,7 +624,6 @@ function submitReview() {
 function updateStars() {
     document.querySelectorAll(".star-rating span").forEach(star => {
         star.classList.toggle("active", Number(star.dataset.star) <= selectedRating);
-        // Direct CSS manipulation to ensure visibility
         star.style.color = Number(star.dataset.star) <= selectedRating ? "#d4af37" : "#444";
     });
 }

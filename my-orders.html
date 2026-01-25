@@ -73,6 +73,31 @@
     .shipped { background: #2980b9; color: #fff; }
     .processing { background: #555; color: #fff; }
 
+    /* New Order Item Styles */
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .order-item:last-of-type {
+      border-bottom: none;
+    }
+    .order-item img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(212,175,55,0.3);
+    }
+    .order-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
     .order-row {
       display: flex;
       justify-content: space-between;
@@ -133,20 +158,30 @@
   const SUPABASE_KEY = "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L";
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  function getProductImage(productName) {
+    const map = {
+      "Smoked Whisky": "images/Smoked Whisky.jpg",
+      "Ocean Aura": "images/Ocean Aura.jpg",
+      "Blush ELIXIR": "images/Blush ELIXIR.jpg",
+      "Pear Forest": "images/Fruity Forest 1.jpg",
+      "Crown of Dunes": "images/Crown of Dunes 1.jpg",
+      "Supermale": "images/Supermale 1.jpg",
+      "Berry Flora": "images/Berry Flora 1.jpg"
+    };
+    return map[productName] || "images/logo.png";
+  }
+
   async function loadMyOrders() {
     const container = document.getElementById("ordersList");
 
     try {
-      // 1. Get the current logged-in user
       const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
-      // 2. Check if user is authenticated
       if (!user) {
         container.innerHTML = `<p class="empty">Please login to view your orders</p>`;
         return;
       }
 
-      // 3. Fetch orders matching the authenticated user's ID
       const { data, error } = await supabaseClient
         .from("orders")
         .select("*")
@@ -160,17 +195,34 @@
         return;
       }
 
-      // 4. Render the orders
       container.innerHTML = data.map(o => {
-        const statusClass = o.status ? o.status.toLowerCase() : 'confirmed';
+        console.log("ORDER:", o);
+console.log("ITEMS:", o.items);
+        const statusClass = (o.status || 'processing').toLowerCase();
         const statusLabel = o.status || 'Processing';
         
+        // Parse items and handle quantity
+        const items = JSON.parse(o.items || "[]");
+        const itemsHtml = items.map(i => `
+          <div class="order-item">
+            <img src="${getProductImage(i.name)}" alt="${i.name}">
+            <div class="order-item-name">
+              ${i.name} ${i.qty ? `× ${i.qty}` : ''}
+            </div>
+          </div>
+        `).join("");
+
         return `
           <div class="order-card">
             <div class="order-header">
               <span>Order #${o.id.toString().slice(0, 8).toUpperCase()}</span>
               <span class="badge ${statusClass}">${statusLabel}</span>
             </div>
+            
+            <div style="margin-bottom: 20px;">
+              ${itemsHtml}
+            </div>
+
             <div class="order-row">
               <span>Total Amount</span>
               <span style="color: #fff; font-weight: 700;">₹${(o.total_amount || 0).toLocaleString("en-IN")}</span>
@@ -194,7 +246,6 @@
     }
   }
 
-  // Initial load
   loadMyOrders();
 </script>
 

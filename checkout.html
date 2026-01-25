@@ -256,7 +256,7 @@
         let appliedReferral = null;
         let finalPayableAmount = 0;
         const SHIPPING_CHARGE = 120;
-        const referralCodes = ["ANTY07", "AMRIT09", "KRISHV19", "AVNI26", "SANJEEVNI26", "VEDU18"];
+        const referralCodes = ["ANTY07", "AMRIT09", "KRISHV19", "AVANI26", "SANJEEVANI26", "VEDU18"];
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCheckout();
@@ -354,7 +354,7 @@
                     handler: async function (response) {
                         try {
                             const { data: { user } } = await supabaseClient.auth.getUser();
-                            
+                            const cartItems = JSON.parse(localStorage.getItem("empire_cart")) || [];
                             await supabaseClient.from("orders").insert([{
                                 customer_name: orderData.customer_name,
                                 email: orderData.email,
@@ -366,7 +366,8 @@
                                     : null,
                                 status: "paid",
                                 user_id: user ? user.id : null,
-                                razorpay_order_id: response.razorpay_order_id
+                                razorpay_order_id: response.razorpay_order_id,
+                                items: JSON.stringify(cartItems)
                             }]);
 
                             localStorage.setItem("last_order_phone", orderData.phone);
