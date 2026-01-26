@@ -1,4 +1,14 @@
 export default async function handler(req, res) {
+  // ✅ CORS HEADERS (IMPORTANT)
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // ✅ Handle preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -7,7 +17,7 @@ export default async function handler(req, res) {
     const body = req.body;
 
     // Login to Shiprocket
-    const login = await fetch(
+    const loginRes = await fetch(
       "https://apiv2.shiprocket.in/v1/external/auth/login",
       {
         method: "POST",
@@ -19,23 +29,23 @@ export default async function handler(req, res) {
       }
     );
 
-    const loginData = await login.json();
+    const loginData = await loginRes.json();
 
     // Create shipment
-    const order = await fetch(
+    const orderRes = await fetch(
       "https://apiv2.shiprocket.in/v1/external/orders/create/adhoc",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${loginData.token}`
+          Authorization: `Bearer ${loginData.token}`
         },
         body: JSON.stringify({
           order_id: body.order_id,
           order_date: new Date().toISOString(),
           pickup_location: "Primary",
           billing_customer_name: body.name,
-          billing_phone: body.phone,
+          billing_phone: body.phone.replace(/\D/g, "").slice(-10),
           billing_address: body.address,
           billing_city: body.city,
           billing_state: body.state,
@@ -52,10 +62,11 @@ export default async function handler(req, res) {
       }
     );
 
-    const result = await order.json();
-    res.status(200).json(result);
+    const data = await orderRes.json();
+    return res.status(200).json(data);
 
   } catch (err) {
-    res.status(500).json({ error: "Shiprocket failed", message: err.message });
+    console.error(err);
+    return res.status(500).json({ error: "Shipping error", details: err.message });
   }
 }
