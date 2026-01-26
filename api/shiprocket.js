@@ -47,39 +47,41 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${loginData.token}`
         },
-        body: JSON.stringify({
-          order_id: orderId,
-          order_date: new Date().toISOString(),
-          pickup_location: "Home",
+body: JSON.stringify({
+  order_id: orderId,
+  order_date: new Date().toISOString(),
 
-          billing_customer_name: body.name,
-          billing_email: body.email || "orders@empire.com",
-          billing_phone: body.phone.replace(/\D/g, "").slice(-10),
-          billing_address: body.address.replace(/[,|-]/g, " "),
-          billing_city: body.city,
-          billing_state: body.state,
-          billing_pincode: body.pincode,
-          billing_country: "India",
+  // ✅ REQUIRED
+  channel_id: 9572048, // <-- REPLACE WITH YOUR REAL ID
 
-          shipping_is_billing: true,
+  pickup_location: "Home",
 
-          payment_method: "Prepaid",
+  billing_customer_name: body.name,
+  billing_email: body.email || "orders@empire.com",
+  billing_phone: body.phone.replace(/\D/g, "").slice(-10),
+  billing_address: body.address.replace(/[,|-]/g, " "),
+  billing_city: body.city,
+  billing_state: body.state,
+  billing_pincode: body.pincode,
+  billing_country: "India",
 
-order_items: orderItems,
-sub_total: subTotal,
+  shipping_is_billing: true,
 
-// ✅ REQUIRED ZERO FIELDS (CRITICAL)
-shipping_charges: 0,
-giftwrap_charges: 0,
-transaction_charges: 0,
-total_discount: 0,
+  payment_method: "Prepaid",
 
-length: 10,
-breadth: 10,
-height: 5,
-weight: 0.5
+  order_items: orderItems,
+  sub_total: subTotal,
 
-        })
+  shipping_charges: 0,
+  giftwrap_charges: 0,
+  transaction_charges: 0,
+  total_discount: 0,
+
+  length: 10,
+  breadth: 10,
+  height: 5,
+  weight: 0.5
+})
       }
     );
 
