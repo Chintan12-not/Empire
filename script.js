@@ -12,7 +12,7 @@ const supabaseClient = window.supabase
 let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
 let currentUser = null;
 let authInProgress = false; 
-let selectedRating = 0; // New: For review system
+let selectedRating = 0; 
 
 // ==================================================
 // 2. LOCAL PRODUCT DATABASE
@@ -137,30 +137,74 @@ const productReviews = {
 // ==================================================
 
 window.addEventListener("DOMContentLoaded", () => {
+    // Product Detail Setup
     const productContainer = document.getElementById("productDetailContainer");
     if (productContainer) {
         const params = new URLSearchParams(window.location.search);
         const productId = params.get("id");
         if (productId) {
             renderProductDetail(productId);
-            loadReviews(productId); // New: Load dynamic reviews
+            loadReviews(productId); 
         } else {
             renderNotFound(productContainer);
         }
     }
 
+    // Audio Logic
+    const audio = document.getElementById("bgAudio");
+    const audioBtn = document.getElementById("audioToggle");
+    let isPlaying = false;
+    let userInteracted = false;
+
+    function startAudio() {
+        if (!isPlaying && audio) {
+            audio.volume = 0.4;
+            audio.play().catch(() => {});
+            isPlaying = true;
+            if (audioBtn) audioBtn.textContent = "🔊";
+        }
+    }
+
+    // Start music on first interaction
+    document.addEventListener("click", () => {
+        if (!userInteracted) {
+            userInteracted = true;
+            startAudio();
+        }
+    }, { once: true });
+
+    // Audio Toggle button
+    if (audioBtn) {
+        audioBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (isPlaying) {
+                audio.pause();
+                audioBtn.textContent = "🔇";
+            } else {
+                audio.play();
+                audioBtn.textContent = "🔊";
+            }
+            isPlaying = !isPlaying;
+        });
+    }
+
+    // Review Stars Listener
+    document.addEventListener("click", (e) => {
+        const starSpan = e.target.closest(".star-rating span");
+        if (starSpan) {
+            selectedRating = Number(starSpan.dataset.star);
+            updateStars();
+        }
+    });
+
+    // Initialize Global Utilities
     initContactForm();
     if (supabaseClient) checkAuth();
     updateCartUI();
     initScrollReveal();
     setupWhatsApp();
-
-    // Star click handling initialization
-    document.addEventListener("click", (e) => {
-        if (!e.target.closest(".star-rating span")) return;
-        selectedRating = Number(e.target.dataset.star);
-        updateStars();
-    });
+    updateCheckoutTotals(); 
+    initSliders();
 });
 
 // ==================================================
@@ -176,12 +220,17 @@ function toggleMenu() {
 }
 
 document.addEventListener("input", (e) => {
-    if (e.target.id !== "searchInput") return;
-    const term = e.target.value.toLowerCase();
-    document.querySelectorAll(".product-card").forEach(card => {
-        const name = card.querySelector(".product-name")?.innerText.toLowerCase() || "";
-        card.style.display = name.includes(term) ? "block" : "none";
-    });
+    if (e.target.id === "searchInput") {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll(".product-card").forEach(card => {
+            const name = card.querySelector(".product-name")?.innerText.toLowerCase() || "";
+            card.style.display = name.includes(term) ? "block" : "none";
+        });
+    }
+
+    if (e.target.id === "city" || e.target.id === "state") {
+        updateCheckoutTotals();
+    }
 });
 
 // ==================================================
@@ -196,11 +245,9 @@ if (supabaseClient) {
         if (event === "SIGNED_IN") {
             authInProgress = false; 
             closeAuth();
-            if (typeof openPromoAfterLogin === "function") openPromoAfterLogin();
-        }
-
-        if (event === "SIGNED_IN" && session?.user?.email === "chintanmaheshwari714@gmail.com") {
-            window.location.href = "admin-secret.html";
+            if (session?.user?.email === "chintanmaheshwari714@gmail.com") {
+                window.location.href = "admin-secret.html";
+            }
         }
     });
 }
@@ -321,7 +368,7 @@ async function logout() {
 }
 
 // ==================================================
-// 6. CART SYSTEM
+// 6. CART & SHIPPING SYSTEM
 // ==================================================
 
 function saveCart() {
@@ -366,6 +413,7 @@ function updateCartUI() {
     `).join("");
 
     if (totalEl) totalEl.innerText = "₹" + cart.reduce((s, i) => s + i.price * i.qty, 0).toLocaleString();
+    updateCheckoutTotals(); 
 }
 
 function changeQty(index, delta) {
@@ -389,6 +437,24 @@ function toggleCart(force) {
     } else {
         el.classList.toggle("active");
     }
+}
+
+function getShippingCost() {
+    const city = document.getElementById("city")?.value.toLowerCase().trim() || "";
+    const ncrCities = ["delhi", "new delhi", "noida", "greater noida", "gurgaon", "gurugram", "ghaziabad", "faridabad"];
+    return ncrCities.some(c => city.includes(c)) ? 99 : 120;
+}
+
+function updateCheckoutTotals() {
+    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const shipping = getShippingCost();
+    const shipEl = document.getElementById("shippingValue");
+    const subEl = document.getElementById("subtotalValue");
+    const finalEl = document.getElementById("finalTotal");
+
+    if (shipEl) shipEl.innerText = `₹${shipping}`;
+    if (subEl) subEl.innerText = `₹${subtotal.toLocaleString()}`;
+    if (finalEl) finalEl.innerText = `₹${(subtotal + shipping).toLocaleString()}`;
 }
 
 // ==================================================
@@ -435,12 +501,12 @@ function renderProductDetail(productId) {
                 </div>
             </div>
         </div>
-        ${renderReviews(productId)}
+        ${renderReviewsSection(productId)}
         ${renderRelatedProducts(productId)}
     `;
 }
 
-function renderReviews(productId) {
+function renderReviewsSection(productId) {
     const data = productReviews[productId];
     const stars = data ? "★".repeat(Math.round(data.rating)) + "☆".repeat(5 - Math.round(data.rating)) : "☆☆☆☆☆";
 
@@ -454,10 +520,7 @@ function renderReviews(productId) {
                 <div style="font-size:13px; color:#aaa;">Based on ${data ? data.total : "0"} reviews</div>
             </div>
         </div>
-
-        <div id="reviewsList" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; margin-bottom: 40px;">
-            </div>
-
+        <div id="reviewsList" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; margin-bottom: 40px;"></div>
         <div style="background:#0b0b0b; padding:30px; border-radius:10px; border:1px solid #333;">
             <h3 style="color:#d4af37; margin-bottom:15px;">Write a Review</h3>
             <div class="star-rating" style="font-size:24px; color:#444; cursor:pointer; margin-bottom:15px;">
@@ -473,7 +536,6 @@ function renderReviews(productId) {
 
 function renderRelatedProducts(currentId) {
     const products = Object.values(productDatabase).filter(p => p.id !== currentId).slice(0, 3);
-
     return `
     <section style="margin-top:100px;">
         <h2 style="font-family:'Cinzel'; letter-spacing:3px; margin-bottom:30px;">You May Also Like</h2>
@@ -483,7 +545,7 @@ function renderRelatedProducts(currentId) {
                     <div class="product-media"><img src="${p.img}"></div>
                     <div class="product-body neesh-style">
                         <h3>${p.name}</h3>
-                        <div style="color:#d4af37; font-weight:700;">₹${p.price}</div>
+                        <div style="color:#d4af37; font-weight:700;">₹${p.price.toLocaleString()}</div>
                     </div>
                 </div>
             `).join("")}
@@ -512,7 +574,8 @@ async function placeOrder() {
 
     const name = document.getElementById("checkoutName")?.value || "Customer";
     const phone = document.getElementById("checkoutPhone")?.value || "";
-    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const shipping = getShippingCost();
+    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
     const { error } = await supabaseClient
         .from("orders")
@@ -521,7 +584,8 @@ async function placeOrder() {
             phone: phone,
             email: currentUser.email,
             items: cart,
-            total_amount: total,
+            total_amount: subtotal + shipping,
+            shipping_cost: shipping,
             referral_code: localStorage.getItem("applied_referral") || null,
             status: "pending"
         }]);
@@ -538,20 +602,8 @@ async function placeOrder() {
     toggleCart(false);
 }
 
-async function openOrders() {
-    if (!currentUser || !supabaseClient) return;
-    const { data, error } = await supabaseClient
-        .from("orders")
-        .select("*")
-        .eq("email", currentUser.email)
-        .order("created_at", { ascending: false });
-
-    if (error) return alert("Error fetching orders");
-    alert(data.length ? data.map(o => `Order ₹${o.total_amount} — ${o.status.toUpperCase()}`).join("\n") : "No orders yet");
-}
-
 // ==================================================
-// 9. NEW REVIEW SYSTEM LOGIC
+// 9. DYNAMIC REVIEW LOGIC
 // ==================================================
 
 function loadReviews(productId) {
@@ -586,7 +638,6 @@ function loadReviews(productId) {
                 <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
             </div>
         `).join("");
-        
         html += `<button id="viewMoreBtn" class="btn ghost small" style="grid-column: 1/-1; margin-top: 10px;" onclick="toggleMoreReviews()">+ View more reviews</button>`;
     }
 
@@ -608,7 +659,6 @@ function submitReview() {
 
     const params = new URLSearchParams(window.location.search);
     const productId = params.get("id");
-
     const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
 
     reviews.unshift({ name, stars: selectedRating, text });
@@ -700,13 +750,15 @@ function initContactForm() {
 // 11. IMAGE SLIDER LOGIC
 // ==================================================
 
-document.querySelectorAll(".slider").forEach(slider => {
-    const slides = slider.querySelectorAll(".slide");
-    if (slides.length === 0) return;
-    let index = 0;
-    setInterval(() => {
-        slides[index].classList.remove("active");
-        index = (index + 1) % slides.length;
-        slides[index].classList.add("active");
-    }, 2500);
-});
+function initSliders() {
+    document.querySelectorAll(".slider").forEach(slider => {
+        const slides = slider.querySelectorAll(".slide");
+        if (slides.length === 0) return;
+        let index = 0;
+        setInterval(() => {
+            slides[index].classList.remove("active");
+            index = (index + 1) % slides.length;
+            slides[index].classList.add("active");
+        }, 2500);
+    });
+}
