@@ -14,6 +14,9 @@ let currentUser = null;
 let authInProgress = false; 
 let selectedRating = 0; 
 
+const AUDIO_KEY = "empire_audio_state";
+const TIME_KEY = "empire_audio_time";
+
 // ==================================================
 // 2. LOCAL PRODUCT DATABASE
 // ==================================================
@@ -23,7 +26,6 @@ const productDatabase = {
         id: "whisky",
         name: "Smoked Whisky",
         price: 2800,
-        originalPrice: 2800,
         img: "images/Smoked Whisky.jpg",
         tagline: "Warm • Smoky • Boozy • Luxurious • Powerful",
         description: `Smoked Whisky is deep, bold, and intoxicating. It opens with a warm smoky accord, like oak barrels kissed by fire, instantly giving a dark and mysterious character. \n\nThe heart is rich and smooth, blending aged whiskey notes with subtle sweetness, creating a luxurious and addictive warmth. \n\nAs it settles, hints of amber, soft woods, and gentle spice linger on the skin, leaving a powerful, masculine, and premium trail. \n\nThis fragrance feels royal, confident, and intense — made for evenings, power moves, and statement moments. \n\nNatural ingredients may settle down, shake before use.`,
@@ -35,7 +37,6 @@ const productDatabase = {
         id: "ocean",
         name: "Ocean Aura",
         price: 2800,
-        originalPrice: 2800,
         img: "images/Ocean Aura.jpg",
         tagline: "Fresh • Aquatic • Clean • Elegant • Premium",
         description: `Ocean Aura is fresh, clean, and effortlessly luxurious. It opens like a cool ocean breeze at dawn — crisp, airy, and energizing. \n\nThe fragrance carries the purity of deep blue waters blended with modern elegance, giving a calm yet confident presence. \n\nAs it evolves, soft aquatic florals and mineral notes add sophistication without sweetness. \n\nThe dry-down is smooth, musky, and slightly woody, leaving a long-lasting, clean trail that feels refined and powerful. \n\nNatural ingredients may settle down, shake before use.`,
@@ -47,7 +48,6 @@ const productDatabase = {
         id: "blush",
         name: "Blush ELIXIR",
         price: 2800,
-        originalPrice: 2800,
         img: "images/Blush ELIXIR.jpg",
         tagline: "Soft • Floral • Elegant • Feminine • Luxurious",
         description: `Blush Elixir is soft, sensual, and irresistibly elegant. It opens with a delicate burst of fresh fruits and gentle florals, creating a graceful and luminous first impression. \n\nThe heart blooms with romantic petals and creamy sweetness, giving a refined feminine charm that feels modern and luxurious. \n\nAs it settles, warm musks and smooth woods wrap the fragrance in a subtle, addictive softness that lingers beautifully on the skin. \n\nNatural ingredients may settle down, shake before use.`,
@@ -55,11 +55,10 @@ const productDatabase = {
         heart: "Rose Petals • Peony • Jasmine",
         base: "White Musk • Vanilla • Sandalwood"
     },
-    "pearforest": {
+    pearforest: {
         id: "pearforest",
         name: "Pear Forest",
         price: 4200,
-        originalPrice: 4200,
         img: "images/Fruity Forest 1.jpg",
         tagline: "Fresh • Fruity • Floral • Elegant • Modern",
         description: `A fresh, vibrant fragrance that captures the feeling of effortless elegance and modern femininity. \n\nIt opens with a juicy burst of crisp green fruits and sparkling berries, creating an instantly uplifting and playful impression. As the scent unfolds, soft floral notes bloom gently, adding a delicate and feminine heart. \n\nThe fragrance settles into a clean, smooth base of musks and woods, leaving a light yet lasting trail that feels fresh, confident, and refined. \n\nPerfect for everyday wear — bright, youthful, and irresistibly easy to love. \n\nNatural ingredients may settle down, shake before use.`,
@@ -71,7 +70,6 @@ const productDatabase = {
         id: "crown",
         name: "Crown of Dunes",
         price: 4200,
-        originalPrice: 4200,
         img: "images/Crown of Dunes 1.jpg",
         tagline: "Warm • Amber • Spicy • Woody • Luxurious",
         description: `Crown of Dunes is a warm, luxurious fragrance that blends sweet tonka warmth with rich amber, spices, and deep woody notes. Bold and sensual, it is crafted for evenings and special moments, leaving a long-lasting trail inspired by the mystery and richness of desert nights. \n\nNatural ingredients may settle down, shake before use.`,
@@ -83,7 +81,6 @@ const productDatabase = {
         id: "supermale",
         name: "Supermale",
         price: 4800,
-        originalPrice: 4800,
         img: "images/Supermale 1.jpg",
         tagline: "Fresh • Bold • Modern • Addictive",
         description: `Supermale is a bold, modern fragrance crafted for confidence and everyday power. Fresh and energetic at the opening, it evolves into warm spices and aromatic depth, settling into a smooth, sensual base that lasts all day. \n\nNatural ingredients may settle down, shake before use.`,
@@ -95,10 +92,9 @@ const productDatabase = {
         id: "berryflora",
         name: "Berry Flora",
         price: 4200,
-        originalPrice: 4200,
         img: "images/Berry Flora 1.jpg",
         tagline: "Soft • Floral • Fruity • Feminine • Elegant",
-        description: `Berry Flora is a soft, radiant fragrance that celebrates femininity through a delicate blend of juicy berries and graceful florals. \n\nFresh and vibrant at the opening, the scent gently unfolds into a floral heart before settling into a smooth, comforting base. Elegant yet playful, Berry Flora is perfect for everyday wear, leaving behind a subtle and irresistible trail. \n\nInspired by a modern floral-fruity classic, this fragrance is designed for women who love freshness with warmth and charm. \n\nA gentle bloom of berries, wrapped in elegance. \n\nNatural ingredients may settle down, shake before use.`,
+        description: `Berry Flora is a soft, radiant fragrance that celebrates femininity through a delicate blend of juicy berries and graceful florals. \n\nFresh and vibrant at the opening, the scent gently unfolds into a floral heart before settling into a smooth, comforting base. Elegant yet playful, Berry Flora is perfect for everyday wear, leaving behind a subtle and irresistible trail. \n\nNatural ingredients may settle down, shake before use.`,
         top: "Red Berries • Strawberry • Blackcurrant",
         heart: "Jasmine • Violet • Peony",
         base: "Soft Musk • Vanilla • Light Woods"
@@ -106,38 +102,21 @@ const productDatabase = {
 };
 
 const productReviews = {
-    whisky: {
-        rating: 4.7,
-        total: 327,
-        reviews: [
-            { name: "Urvi Khandwala", stars: 5, text: "Amazing fragrance. Long lasting and very premium." },
-            { name: "Nilesh Parmar", stars: 5, text: "Always my favorite. Perfect for evenings." }
-        ]
-    },
-    crown: {
-        rating: 4.8,
-        total: 112,
-        reviews: [
-            { name: "Karthikeyan Nagappan", stars: 5, text: "Rich, warm and luxurious. Smells very expensive." },
-            { name: "Aarav Mehta", stars: 4, text: "Perfect for night wear. Strong but classy." }
-        ]
-    },
-    supermale: {
-        rating: 4.6,
-        total: 189,
-        reviews: [
-            { name: "Rohit Verma", stars: 5, text: "Fresh yet powerful. Works all day." },
-            { name: "Aditya Singh", stars: 4, text: "Great everyday fragrance. Compliment getter." }
-        ]
-    }
+    whisky: { rating: 4.7, total: 327, reviews: [{ name: "Urvi Khandwala", stars: 5, text: "Amazing fragrance. Long lasting and very premium." }, { name: "Nilesh Parmar", stars: 5, text: "Always my favorite. Perfect for evenings." }] },
+    crown: { rating: 4.8, total: 112, reviews: [{ name: "Karthikeyan Nagappan", stars: 5, text: "Rich, warm and luxurious. Smells very expensive." }, { name: "Aarav Mehta", stars: 4, text: "Perfect for night wear. Strong but classy." }] },
+    supermale: { rating: 4.6, total: 189, reviews: [{ name: "Rohit Verma", stars: 5, text: "Fresh yet powerful. Works all day." }, { name: "Aditya Singh", stars: 4, text: "Great everyday fragrance. Compliment getter." }] }
 };
 
 // ==================================================
-// 3. PAGE LOAD HANDLER
+// 3. PAGE LOAD & AUDIO MASTER SYSTEM
 // ==================================================
 
+function isCheckoutPage() {
+    return window.location.pathname.includes("checkout");
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-    // Product Detail Setup
+    // Product Detail Logic
     const productContainer = document.getElementById("productDetailContainer");
     if (productContainer) {
         const params = new URLSearchParams(window.location.search);
@@ -150,42 +129,53 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Audio Logic
-    const audio = document.getElementById("bgAudio");
-    const audioBtn = document.getElementById("audioToggle");
-    let isPlaying = false;
-    let userInteracted = false;
-
-    function startAudio() {
-        if (!isPlaying && audio) {
+    // Audio Master Logic
+    if (!isCheckoutPage()) {
+        const audio = document.getElementById("bgAudio");
+        const btn = document.getElementById("audioToggle");
+        
+        if (audio && btn) {
             audio.volume = 0.4;
-            audio.play().catch(() => {});
-            isPlaying = true;
-            if (audioBtn) audioBtn.textContent = "🔊";
-        }
-    }
+            
+            // Restore timestamp
+            const savedTime = localStorage.getItem(TIME_KEY);
+            if (savedTime) audio.currentTime = parseFloat(savedTime);
 
-    // Start music on first interaction
-    document.addEventListener("click", () => {
-        if (!userInteracted) {
-            userInteracted = true;
-            startAudio();
-        }
-    }, { once: true });
+            // Audio heartbeats for cross-page persistence
+            setInterval(() => {
+                if (!audio.paused) localStorage.setItem(TIME_KEY, audio.currentTime);
+            }, 1000);
 
-    // Audio Toggle button
-    if (audioBtn) {
-        audioBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            if (isPlaying) {
+            const playAudio = () => {
+                audio.play().then(() => {
+                    localStorage.setItem(AUDIO_KEY, "playing");
+                    btn.textContent = "🔊";
+                }).catch(() => {});
+            };
+
+            const pauseAudio = () => {
                 audio.pause();
-                audioBtn.textContent = "🔇";
-            } else {
-                audio.play();
-                audioBtn.textContent = "🔊";
+                localStorage.setItem(AUDIO_KEY, "paused");
+                btn.textContent = "🔇";
+            };
+
+            // Auto-resume if it was playing on the previous page
+            if (localStorage.getItem(AUDIO_KEY) === "playing") {
+                playAudio();
             }
-            isPlaying = !isPlaying;
-        });
+
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                audio.paused ? playAudio() : pauseAudio();
+            });
+
+            // Start on first click if not playing
+            document.addEventListener("click", () => {
+                if (audio.paused && localStorage.getItem(AUDIO_KEY) !== "paused") {
+                    playAudio();
+                }
+            }, { once: true });
+        }
     }
 
     // Review Stars Listener
@@ -197,7 +187,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Initialize Global Utilities
+    // Initialize Components
     initContactForm();
     if (supabaseClient) checkAuth();
     updateCartUI();
@@ -227,7 +217,6 @@ document.addEventListener("input", (e) => {
             card.style.display = name.includes(term) ? "block" : "none";
         });
     }
-
     if (e.target.id === "city" || e.target.id === "state") {
         updateCheckoutTotals();
     }
@@ -241,7 +230,6 @@ if (supabaseClient) {
     supabaseClient.auth.onAuthStateChange((event, session) => {
         currentUser = session?.user || null;
         updateAuthUI();
-
         if (event === "SIGNED_IN") {
             authInProgress = false; 
             closeAuth();
@@ -283,6 +271,13 @@ function openAuth() {
     modal.classList.add("active");
 }
 
+function closeAuth() {
+    const modal = document.getElementById("authModal");
+    if (!modal) return;
+    modal.classList.remove("active");
+    authInProgress = false; 
+}
+
 function requireAuth(callback) {
     if (currentUser) {
         callback?.();
@@ -298,31 +293,16 @@ function requireAuth(callback) {
 async function signUp() {
     const name = document.getElementById("authName")?.value.trim();
     const email = document.getElementById("authEmail")?.value.trim();
-    const phone = document.getElementById("authPhone")?.value.trim();
     const password = document.getElementById("authPassword")?.value;
-
     if (!name || !email || !password) return;
 
-    const { data, error } = await supabaseClient.auth.signUp({
+    const { error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: { data: { full_name: name } }
     });
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    if (data?.user) {
-        await supabaseClient.from("profiles").insert({
-            id: data.user.id,
-            email,
-            full_name: name,
-            phone: phone || null
-        });
-    }
-    closeAuth();
+    if (error) alert(error.message);
+    else closeAuth();
 }
 
 async function signIn() {
@@ -330,41 +310,13 @@ async function signIn() {
     const password = document.getElementById("authPassword")?.value;
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) alert(error.message);
-    closeAuth();
-}
-
-async function forgotPassword() {
-    const email = document.getElementById("authEmail").value;
-    if (!email) return alert("Enter your email first");
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + "/index.html"
-    });
-    if (error) return alert(error.message);
-    alert("Password reset email sent 📧");
-}
-
-function closeAuth() {
-    const modal = document.getElementById("authModal");
-    if (!modal) return;
-    modal.classList.remove("active");
-    authInProgress = false; 
-}
-
-async function signInWithGoogle() {
-    if (!supabaseClient) return alert("Authentication service unavailable");
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin }
-    });
-    if (error) alert(error.message);
+    else closeAuth();
 }
 
 async function logout() {
     await supabaseClient.auth.signOut();
     currentUser = null;
     updateAuthUI();
-    document.getElementById("mobileMenu")?.classList.remove("active");
-    document.getElementById("cartSidebar")?.classList.remove("active");
 }
 
 // ==================================================
@@ -432,11 +384,8 @@ function removeItem(index) {
 function toggleCart(force) {
     const el = document.getElementById("cartSidebar");
     if (!el) return;
-    if (typeof force === "boolean") {
-        force ? el.classList.add("active") : el.classList.remove("active");
-    } else {
-        el.classList.toggle("active");
-    }
+    if (typeof force === "boolean") force ? el.classList.add("active") : el.classList.remove("active");
+    else el.classList.toggle("active");
 }
 
 function getShippingCost() {
@@ -468,15 +417,11 @@ function renderProductDetail(productId) {
 
     container.innerHTML = `
         <div class="luxury-detail-grid">
-            <div class="luxury-image">
-                <img src="${product.img}" alt="${product.name}">
-            </div>
+            <div class="luxury-image"><img src="${product.img}" alt="${product.name}"></div>
             <div class="luxury-info">
                 <h1 class="luxury-title">${product.name}</h1>
                 <p class="luxury-tagline">${product.tagline}</p>
-                <div class="price-block">
-                    <span class="new-price">₹${product.price.toLocaleString()}</span>
-                </div>
+                <div class="price-block"><span class="new-price">₹${product.price.toLocaleString()}</span></div>
                 <p class="luxury-desc" style="white-space: pre-line; line-height: 1.6; margin-bottom: 2rem;">${product.description}</p>
                 <div class="luxury-notes">
                     <h3 style="margin-bottom: 1rem; border-bottom: 1px solid #d4af37; display: inline-block;">Fragrance Notes</h3>
@@ -492,12 +437,8 @@ function renderProductDetail(productId) {
                         <span id="detailQty" style="margin: 0 15px; font-weight: bold;">1</span>
                         <button class="btn ghost" onclick="updateDetailQty(1)">+</button>
                     </div>
-                    <button class="btn primary" onclick="addToCart('${product.name}', ${product.price}, parseInt(document.getElementById('detailQty').innerText))">
-                        Add to Cart
-                    </button>
-                    <button class="btn ghost" onclick="shareProduct('${product.name}')">
-                        <span style="font-size: 1.2rem;">➦</span> Share
-                    </button>
+                    <button class="btn primary" onclick="addToCart('${product.name}', ${product.price}, parseInt(document.getElementById('detailQty').innerText))">Add to Cart</button>
+                    <button class="btn ghost" onclick="shareProduct('${product.name}')">➦ Share</button>
                 </div>
             </div>
         </div>
@@ -509,7 +450,6 @@ function renderProductDetail(productId) {
 function renderReviewsSection(productId) {
     const data = productReviews[productId];
     const stars = data ? "★".repeat(Math.round(data.rating)) + "☆".repeat(5 - Math.round(data.rating)) : "☆☆☆☆☆";
-
     return `
     <section style="margin-top:80px;">
         <h2 style="font-family:'Cinzel'; letter-spacing:3px; margin-bottom:20px;">Customer Reviews</h2>
@@ -560,110 +500,44 @@ function updateDetailQty(change) {
 }
 
 function renderNotFound(container) {
-    container.innerHTML = `<p style="color:#d4af37; text-align:center; letter-spacing:2px; padding: 50px;">PRODUCT NOT FOUND</p>`;
+    container.innerHTML = `<p style="color:#d4af37; text-align:center; padding: 50px;">PRODUCT NOT FOUND</p>`;
 }
 
 // ==================================================
-// 8. ORDER & INVOICE SYSTEM
-// ==================================================
-
-async function placeOrder() {
-    if (!supabaseClient) return alert("Connection error");
-    if (!requireAuth()) return; 
-    if (cart.length === 0) return alert("Cart is empty");
-
-    const name = document.getElementById("checkoutName")?.value || "Customer";
-    const phone = document.getElementById("checkoutPhone")?.value || "";
-    const shipping = getShippingCost();
-    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-
-    const { error } = await supabaseClient
-        .from("orders")
-        .insert([{
-            customer_name: name,
-            phone: phone,
-            email: currentUser.email,
-            items: cart,
-            total_amount: subtotal + shipping,
-            shipping_cost: shipping,
-            referral_code: localStorage.getItem("applied_referral") || null,
-            status: "pending"
-        }]);
-
-    if (error) {
-        alert("Order failed: " + error.message);
-        return;
-    }
-
-    cart = [];
-    saveCart();
-    updateCartUI();
-    alert("Order placed successfully!");
-    toggleCart(false);
-}
-
-// ==================================================
-// 9. DYNAMIC REVIEW LOGIC
+// 8. ORDER & REVIEWS LOGIC
 // ==================================================
 
 function loadReviews(productId) {
     const container = document.getElementById("reviewsList");
     if (!container) return;
-
     const localReviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
     const staticData = productReviews[productId]?.reviews || [];
     const allReviews = [...localReviews, ...staticData];
 
     if (allReviews.length === 0) {
-        container.innerHTML = `<p style="color:#888;">No reviews yet. Be the first to review.</p>`;
+        container.innerHTML = `<p style="color:#888;">No reviews yet.</p>`;
         return;
     }
 
-    const visibleReviews = allReviews.slice(0, 4);
-    const hiddenReviews = allReviews.slice(4);
-
-    let html = visibleReviews.map(r => `
+    container.innerHTML = allReviews.slice(0, 4).map(r => `
         <div class="review-item" style="background:#0b0b0b; padding:20px; border:1px solid rgba(212,175,55,0.2); border-radius:10px;">
             <div style="color:#d4af37;">${"★".repeat(r.stars)}</div>
             <strong>${r.name}</strong>
             <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
         </div>
     `).join("");
-
-    if (hiddenReviews.length > 0) {
-        html += hiddenReviews.map(r => `
-            <div class="review-item hidden-review" style="display:none; background:#0b0b0b; padding:20px; border:1px solid rgba(212,175,55,0.2); border-radius:10px;">
-                <div style="color:#d4af37;">${"★".repeat(r.stars)}</div>
-                <strong>${r.name}</strong>
-                <p style="color:#bbb; font-size:14px; margin-top:8px;">${r.text}</p>
-            </div>
-        `).join("");
-        html += `<button id="viewMoreBtn" class="btn ghost small" style="grid-column: 1/-1; margin-top: 10px;" onclick="toggleMoreReviews()">+ View more reviews</button>`;
-    }
-
-    container.innerHTML = html;
-}
-
-function toggleMoreReviews() {
-    document.querySelectorAll(".hidden-review").forEach(r => r.style.display = "block");
-    document.getElementById("viewMoreBtn")?.style.setProperty("display", "none");
 }
 
 function submitReview() {
     const name = document.getElementById("reviewerName").value.trim();
     const text = document.getElementById("reviewText").value.trim();
-    if (!name || !text || selectedRating === 0) {
-        alert("Please enter name, rating and review");
-        return;
-    }
+    if (!name || !text || selectedRating === 0) return alert("All fields required");
 
-    const params = new URLSearchParams(window.location.search);
-    const productId = params.get("id");
+    const productId = new URLSearchParams(window.location.search).get("id");
     const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
-
     reviews.unshift({ name, stars: selectedRating, text });
     localStorage.setItem(`reviews_${productId}`, JSON.stringify(reviews));
-
+    
     document.getElementById("reviewerName").value = "";
     document.getElementById("reviewText").value = "";
     selectedRating = 0;
@@ -673,43 +547,28 @@ function submitReview() {
 
 function updateStars() {
     document.querySelectorAll(".star-rating span").forEach(star => {
-        star.classList.toggle("active", Number(star.dataset.star) <= selectedRating);
-        star.style.color = Number(star.dataset.star) <= selectedRating ? "#d4af37" : "#444";
+        const val = Number(star.dataset.star);
+        star.style.color = val <= selectedRating ? "#d4af37" : "#444";
     });
 }
 
 // ==================================================
-// 10. UTILITIES & CONTACT FORM
+// 9. UTILITIES & SLIDERS
 // ==================================================
 
 function shareProduct(name) {
-    const productId = name.toLowerCase().replace(/\s/g, "").replace("smoked", "");
-    const url = window.location.origin + "/product-detail.html?id=" + productId;
-    
+    const url = window.location.href;
     if (navigator.share) {
-        navigator.share({
-            title: "E'MPIRE Perfumes",
-            text: `Check out ${name} by E'MPIRE — a signature luxury fragrance.`,
-            url: url
-        }).catch(() => console.log("Share cancelled"));
+        navigator.share({ title: "E'MPIRE Perfumes", text: `Check out ${name}!`, url });
     } else {
-        const tempInput = document.createElement("input");
-        document.body.appendChild(tempInput);
-        tempInput.value = url;
-        tempInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
-        alert("Link copied to clipboard! ✨");
+        navigator.clipboard.writeText(url);
+        alert("Link copied! ✨");
     }
 }
 
 function initScrollReveal() {
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-            if (e.isIntersecting) e.target.classList.add("reveal-active");
-        });
-    }, { threshold: 0.1 });
-    document.querySelectorAll(".reveal-hidden").forEach(el => observer.observe(el));
+    const obs = new IntersectionObserver(ents => ents.forEach(e => e.isIntersecting && e.target.classList.add("reveal-active")));
+    document.querySelectorAll(".reveal-hidden").forEach(el => obs.observe(el));
 }
 
 function setupWhatsApp() {
@@ -719,46 +578,22 @@ function setupWhatsApp() {
 
 function initContactForm() {
     const form = document.getElementById("contactForm");
-    const successMsg = document.getElementById("contactSuccess");
     if (!form) return;
-
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const formData = new FormData(form);
-        try {
-            const response = await fetch("https://formsubmit.co/ajax/empire.official2026@gmail.com", {
-                method: "POST",
-                body: formData
-            });
-            if (response.ok) {
-                form.reset();
-                if (successMsg) {
-                    successMsg.style.display = "block";
-                    setTimeout(() => { successMsg.style.display = "none"; }, 5000);
-                }
-            } else {
-                throw new Error("Form submission failed");
-            }
-        } catch (err) {
-            alert("Something went wrong. Please try again.");
-            console.error(err);
-        }
+        const res = await fetch("https://formsubmit.co/ajax/empire.official2026@gmail.com", { method: "POST", body: new FormData(form) });
+        if (res.ok) { form.reset(); alert("Message sent!"); }
     });
 }
-
-// ==================================================
-// 11. IMAGE SLIDER LOGIC
-// ==================================================
 
 function initSliders() {
     document.querySelectorAll(".slider").forEach(slider => {
         const slides = slider.querySelectorAll(".slide");
-        if (slides.length === 0) return;
-        let index = 0;
-        setInterval(() => {
-            slides[index].classList.remove("active");
-            index = (index + 1) % slides.length;
-            slides[index].classList.add("active");
-        }, 2500);
+        let idx = 0;
+        if (slides.length) setInterval(() => {
+            slides[idx].classList.remove("active");
+            idx = (idx + 1) % slides.length;
+            slides[idx].classList.add("active");
+        }, 3000);
     });
 }
