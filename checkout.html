@@ -63,7 +63,7 @@
 
         .btn.primary { background: var(--gold); color: black; border-radius: 2px; }
         .btn.ghost { border: 1px solid var(--gold); color: var(--gold); background: transparent; }
-        .btn.small { padding: 8px 166px; font-size: 0.8rem; padding: 8px 16px; }
+        .btn.small { padding: 8px 16px; font-size: 0.8rem; }
         .btn:hover { opacity: 0.8; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -91,13 +91,13 @@
         }
 
         .modern-form .form-group { margin-bottom: 25px; }
-        .modern-form label { 
-            display: block; 
-            margin-bottom: 10px; 
-            font-size: 0.75rem; 
-            letter-spacing: 2px; 
-            text-transform: uppercase; 
-            color: #888; 
+        .modern-form label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
         }
         
         .modern-form input, .modern-form textarea {
@@ -133,10 +133,10 @@
         .discount-box input { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 10px; }
 
         .total-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 300; }
-        .total-row.final { 
-            font-size: 1.4rem; 
-            font-family: 'Cinzel', serif; 
-            color: var(--gold); 
+        .total-row.final {
+            font-size: 1.4rem;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
             margin-top: 20px;
             border-top: 1px solid #333;
             padding-top: 20px;
@@ -249,9 +249,6 @@
         const SUPABASE_KEY = "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Ensure session is active
-        supabaseClient.auth.getSession();
-
         let appliedMainCoupon = false;
         let appliedReferral = null;
         let finalPayableAmount = 0;
@@ -309,21 +306,13 @@
                 return;
             }
 
-            // REPLACED PART START
             let discountedSubtotal = subtotal;
-            // Apply joining coupon first (70%)
-            if (appliedMainCoupon) {
-                discountedSubtotal = discountedSubtotal * 0.30;
-            }
-            // Apply referral coupon next (2%)
-            if (appliedReferral) {
-                discountedSubtotal = discountedSubtotal * 0.98;
-            }
+            if (appliedMainCoupon) discountedSubtotal = discountedSubtotal * 0.30;
+            if (appliedReferral) discountedSubtotal = discountedSubtotal * 0.98;
+            
             const final = Math.round(discountedSubtotal) + SHIPPING_CHARGE;
             finalPayableAmount = final;
             document.getElementById("finalTotal").innerText = `₹${final.toLocaleString("en-IN")}`;
-            // REPLACED PART END
-
             alert("Discount applied successfully 🎉");
         }
 
@@ -355,24 +344,23 @@
                         try {
                             const { data: { user } } = await supabaseClient.auth.getUser();
                             const cartItems = JSON.parse(localStorage.getItem("empire_cart")) || [];
+                            
+                            // 1. Log to Supabase
                             await supabaseClient.from("orders").insert([{
                                 customer_name: orderData.customer_name,
                                 email: orderData.email,
                                 phone: orderData.phone,
                                 address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
                                 total_amount: finalPayableAmount,
-                                referral_code: localStorage.getItem("applied_referral")
-                                    ? localStorage.getItem("applied_referral").trim().toUpperCase()
-                                    : null,
+                                referral_code: localStorage.getItem("applied_referral") || null,
                                 status: "paid",
                                 user_id: user ? user.id : null,
                                 razorpay_order_id: response.razorpay_order_id,
                                 items: JSON.stringify(cartItems)
                             }]);
 
-                            localStorage.setItem("last_order_phone", orderData.phone);
-
-                            // Send confirmation email
+                        
+                            // 3. Send confirmation email
                             await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -381,7 +369,7 @@
                                     payment_id: response.razorpay_payment_id,
                                     total: finalAmount,
                                     customer: orderData,
-                                    items: JSON.parse(localStorage.getItem("empire_cart"))
+                                    items: cartItems
                                 })
                             });
 
@@ -391,7 +379,6 @@
                             window.location.href = "index.html";
                         } catch (err) {
                             console.error(err);
-                            alert("Payment successful! Redirecting...");
                             window.location.href = "index.html";
                         }
                     },
@@ -437,11 +424,8 @@
 
         function applyEmpireCoupon() {
             if (appliedMainCoupon) return;
-
-            const input = document.getElementById("discountCode");
-            input.value = "EMPIRE26";
-
-            applyDiscount(); // reuse existing logic
+            document.getElementById("discountCode").value = "EMPIRE26";
+            applyDiscount();
         }
     </script>
 </body>
