@@ -64,13 +64,21 @@ export default async function handler(req, res) {
           shipping_is_billing: true,
 
           payment_method: "Prepaid",
-          order_items: orderItems,
-          sub_total: subTotal,
 
-          length: 10,
-          breadth: 10,
-          height: 5,
-          weight: 0.5
+order_items: orderItems,
+sub_total: subTotal,
+
+// ✅ REQUIRED ZERO FIELDS (CRITICAL)
+shipping_charges: 0,
+giftwrap_charges: 0,
+transaction_charges: 0,
+total_discount: 0,
+
+length: 10,
+breadth: 10,
+height: 5,
+weight: 0.5
+
         })
       }
     );
