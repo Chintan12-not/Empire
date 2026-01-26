@@ -41,24 +41,24 @@ export default async function handler(req, res) {
           Authorization: `Bearer ${loginData.token}`
         },
         body: JSON.stringify({
-          order_id: body.order_id,
-          order_date: new Date().toISOString(),
-          pickup_location: "Primary",
-          billing_customer_name: body.name,
-          billing_phone: body.phone.replace(/\D/g, "").slice(-10),
-          billing_address: body.address.replace(/[,|-]/g, " "),
-          billing_city: body.city.trim(),
-          billing_state: body.state.trim(),
-          billing_pincode: String(body.pincode).replace(/\D/g, "").slice(0, 6),
-          billing_country: "India",
-          payment_method: "Prepaid",
-          order_items: body.items,
-          sub_total: body.total,
-          length: 10,
-          breadth: 10,
-          height: 5,
-          weight: 0.5
-        })
+  order_id: "EMP" + String(body.order_id).replace(/\D/g, "").slice(-8),
+  order_date: new Date().toISOString(),
+  pickup_location: "Primary",
+  billing_customer_name: body.name.trim(),
+  billing_phone: body.phone.replace(/\D/g, "").slice(-10),
+  billing_address: body.address.replace(/[,|-]/g, " "),
+  billing_city: body.city.trim(),
+  billing_state: body.state.trim(),
+  billing_pincode: String(body.pincode).replace(/\D/g, "").slice(0, 6),
+  billing_country: "India",
+  payment_method: "Prepaid",
+  order_items: body.items,
+  sub_total: body.total,
+  length: 10,
+  breadth: 10,
+  height: 5,
+  weight: 0.5
+})
       }
     );
 
