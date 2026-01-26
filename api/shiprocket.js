@@ -75,32 +75,32 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${loginData.token}`
         },
-        body: JSON.stringify({
-          order_id: safeOrderId,
-          order_date: new Date().toISOString(),
+       body: JSON.stringify({
+  order_id: safeOrderId,
+  order_date: new Date().toISOString(),
+  pickup_location: "Home",
 
-          // ⚠️ MUST MATCH PICKUP LOCATION NAME IN DASHBOARD
-          pickup_location: "Home",
+  billing_customer_name: body.name.trim(),
+  billing_email: body.email || "orders@empire.com",
+  billing_phone: body.phone.replace(/\D/g, "").slice(-10),
+  billing_address: body.address.replace(/[,|-]/g, " "),
+  billing_city: body.city.trim(),
+  billing_state: body.state.trim(),
+  billing_pincode: String(body.pincode).replace(/\D/g, "").slice(0, 6),
+  billing_country: "India",
 
-         billing_customer_name: body.name.trim(),
-billing_email: body.email || "orders@empire.com", // ✅ REQUIRED
-billing_phone: body.phone.replace(/\D/g, "").slice(-10),
-billing_address: body.address.replace(/[,|-]/g, " "),
-billing_city: body.city.trim(),
-billing_state: body.state.trim(),
-billing_pincode: String(body.pincode).replace(/\D/g, "").slice(0, 6),
-billing_country: "India",
+  // ✅ THIS IS THE MISSING LINE
+  shipping_is_billing: true,
 
+  payment_method: "Prepaid",
+  order_items: orderItems,
+  sub_total: calculatedTotal,
 
-          payment_method: "Prepaid",
-          order_items: orderItems,
-          sub_total: calculatedTotal,
-
-          length: 10,
-          breadth: 10,
-          height: 5,
-          weight: 0.5
-        })
+  length: 10,
+  breadth: 10,
+  height: 5,
+  weight: 0.5
+})
       }
     );
 
