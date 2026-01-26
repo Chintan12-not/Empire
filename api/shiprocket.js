@@ -1,25 +1,15 @@
 export default async function handler(req, res) {
-  // ===============================
-  // CORS (for local testing)
-  // ===============================
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
     const body = req.body;
 
-    // ===============================
-    // 1. LOGIN TO SHIPROCKET
-    // ===============================
+    // 1. LOGIN
     const loginRes = await fetch(
       "https://apiv2.shiprocket.in/v1/external/auth/login",
       {
@@ -33,17 +23,11 @@ export default async function handler(req, res) {
     );
 
     const loginData = await loginRes.json();
-
-    if (!loginData?.token) {
-      return res.status(500).json({
-        error: "Shiprocket login failed",
-        details: loginData
-      });
+    if (!loginData.token) {
+      return res.status(500).json({ error: "Shiprocket login failed", details: loginData });
     }
 
-    // ===============================
-    // 2. CLEAN ORDER ITEMS (CRITICAL)
-    // ===============================
+    // 2. CLEAN ITEMS
     const orderItems = body.items.map(i => ({
       name: i.name,
       sku: i.sku || i.name.replace(/\s/g, "").toUpperCase(),
@@ -51,81 +35,56 @@ export default async function handler(req, res) {
       selling_price: Number(i.selling_price || i.price)
     }));
 
-    // ===============================
-    // 3. CALCULATE TOTAL (MANDATORY)
-    // ===============================
-    const calculatedTotal = orderItems.reduce(
-      (sum, i) => sum + (i.units * i.selling_price),
-      0
-    );
+    const subTotal = orderItems.reduce((s, i) => s + i.units * i.selling_price, 0);
+    const orderId = "EMP" + Date.now();
 
-    // ===============================
-    // 4. SAFE UNIQUE ORDER ID
-    // ===============================
-    const safeOrderId = "EMP" + Date.now();
-
-    // ===============================
-    // 5. CREATE SHIPMENT
-    // ===============================
+    // 3. CREATE ORDER (NON-ADHOC)
     const orderRes = await fetch(
-      "https://apiv2.shiprocket.in/v1/external/orders/create/adhoc",
+      "https://apiv2.shiprocket.in/v1/external/orders/create",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${loginData.token}`
         },
-       body: JSON.stringify({
-  order_id: safeOrderId,
-  order_date: new Date().toISOString(),
-  pickup_location: "Home",
+        body: JSON.stringify({
+          order_id: orderId,
+          order_date: new Date().toISOString(),
+          pickup_location: "Home",
 
-  billing_customer_name: body.name.trim(),
-  billing_email: body.email || "orders@empire.com",
-  billing_phone: body.phone.replace(/\D/g, "").slice(-10),
-  billing_address: body.address.replace(/[,|-]/g, " "),
-  billing_city: body.city.trim(),
-  billing_state: body.state.trim(),
-  billing_pincode: String(body.pincode).replace(/\D/g, "").slice(0, 6),
-  billing_country: "India",
+          billing_customer_name: body.name,
+          billing_email: body.email || "orders@empire.com",
+          billing_phone: body.phone.replace(/\D/g, "").slice(-10),
+          billing_address: body.address.replace(/[,|-]/g, " "),
+          billing_city: body.city,
+          billing_state: body.state,
+          billing_pincode: body.pincode,
+          billing_country: "India",
 
-  // ✅ THIS IS THE MISSING LINE
-  shipping_is_billing: true,
+          shipping_is_billing: true,
 
-  payment_method: "Prepaid",
-  order_items: orderItems,
-  sub_total: calculatedTotal,
+          payment_method: "Prepaid",
+          order_items: orderItems,
+          sub_total: subTotal,
 
-  length: 10,
-  breadth: 10,
-  height: 5,
-  weight: 0.5
-})
+          length: 10,
+          breadth: 10,
+          height: 5,
+          weight: 0.5
+        })
       }
     );
 
-    const orderData = await orderRes.json();
+    const data = await orderRes.json();
 
-    // ===============================
-    // 6. HANDLE SHIPROCKET ERRORS
-    // ===============================
     if (!orderRes.ok) {
-      return res.status(400).json({
-        error: "Shiprocket failed",
-        details: orderData
-      });
+      return res.status(400).json({ error: "Shiprocket failed", details: data });
     }
 
-    // ===============================
-    // 7. SUCCESS
-    // ===============================
-    return res.status(200).json(orderData);
+    return res.status(200).json(data);
 
   } catch (err) {
-    console.error("Shiprocket ERROR:", err);
-    return res.status(500).json({
-      error: "Shipping error",
-      details: err.message
-    });
+    console.error(err);
+    return res.status(500).json({ error: "Shipping error", details: err.message });
   }
 }
