@@ -80,7 +80,7 @@ export default async function handler(req, res) {
           order_date: new Date().toISOString(),
 
           // ⚠️ MUST MATCH PICKUP LOCATION NAME IN DASHBOARD
-          pickup_location: "Primary",
+          pickup_location: "Home",
 
           billing_customer_name: body.name.trim(),
           billing_phone: body.phone.replace(/\D/g, "").slice(-10),
