@@ -691,13 +691,13 @@ function requireAuth(callback) {
 
 async function signUp() {
 
-    const name = document.getElementById("authName")?.value.trim();
+    const name = document.getElementById("signupName")?.value.trim();
 
-    const email = document.getElementById("authEmail")?.value.trim();
+    const email = document.getElementById("signupEmail")?.value.trim();
 
-    const phone = document.getElementById("authPhone")?.value.trim();
+    const phone = document.getElementById("signupPhone")?.value.trim();
 
-    const password = document.getElementById("authPassword")?.value;
+    const password = document.getElementById("signupPassword")?.value;
 
 
 
@@ -794,6 +794,42 @@ function closeAuth() {
     modal.classList.remove("active");
 
     authInProgress = false; 
+
+}
+
+
+
+function showEmailLogin() {
+
+    document.getElementById("authStepChoice")?.style.setProperty("display", "none");
+
+    document.getElementById("authStepSignUp")?.style.setProperty("display", "none");
+
+    document.getElementById("authStepEmail")?.style.setProperty("display", "block");
+
+}
+
+
+
+function showEmailSignUp() {
+
+    document.getElementById("authStepChoice")?.style.setProperty("display", "none");
+
+    document.getElementById("authStepEmail")?.style.setProperty("display", "none");
+
+    document.getElementById("authStepSignUp")?.style.setProperty("display", "block");
+
+}
+
+
+
+function backToChoice() {
+
+    document.getElementById("authStepEmail")?.style.setProperty("display", "none");
+
+    document.getElementById("authStepSignUp")?.style.setProperty("display", "none");
+
+    document.getElementById("authStepChoice")?.style.setProperty("display", "block");
 
 }
 
