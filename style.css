@@ -1303,15 +1303,15 @@ button, a, .icon-btn {
 
   /* === CONTACT SECTION === */
   .section.contact {
-    padding: 60px 0 100px 0;
-    margin-bottom: 80px;
+    padding: 60px 0 150px 0;
+    margin-bottom: 120px;
     min-height: 100vh;
   }
 
   .contact-grid {
     grid-template-columns: 1fr !important;
     gap: 30px;
-    padding-bottom: 80px;
+    padding-bottom: 120px;
   }
 
   .contact-info {
@@ -1319,7 +1319,7 @@ button, a, .icon-btn {
   }
 
   .contact-form {
-    margin-bottom: 60px;
+    margin-bottom: 100px;
   }
 
   /* === ABOUT/FOUNDERS SECTION === */
