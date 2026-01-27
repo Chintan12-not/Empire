@@ -589,11 +589,25 @@ if (supabaseClient) {
 
             closeAuth();
 
+            
+
+            // Check if admin user
+
             if (session?.user?.email === "chintanmaheshwari714@gmail.com") {
 
                 window.location.href = "admin-secret.html";
 
             }
+
+        }
+
+        
+
+        if (event === "SIGNED_OUT") {
+
+            currentUser = null;
+
+            updateAuthUI();
 
         }
 
@@ -691,35 +705,31 @@ function requireAuth(callback) {
 
 async function signUp() {
 
-    const name = document.getElementById("signupName")?.value.trim();
+    const nameInput = document.getElementById("signupName");
 
-    const email = document.getElementById("signupEmail")?.value.trim();
+    const emailInput = document.getElementById("signupEmail");
 
-    const phone = document.getElementById("signupPhone")?.value.trim();
+    const phoneInput = document.getElementById("signupPhone");
 
-    const password = document.getElementById("signupPassword")?.value;
-
-
-
-    if (!name || !email || !password) return;
+    const passwordInput = document.getElementById("signupPassword");
 
 
 
-    const { data, error } = await supabaseClient.auth.signUp({
+    const name = nameInput?.value.trim();
 
-        email,
+    const email = emailInput?.value.trim();
 
-        password,
+    const phone = phoneInput?.value.trim();
 
-        options: { data: { full_name: name } }
-
-    });
+    const password = passwordInput?.value;
 
 
 
-    if (error) {
+    // Validation
 
-        alert(error.message);
+    if (!name || !email || !password) {
+
+        alert("Please fill in all required fields (Name, Email, Password)");
 
         return;
 
@@ -727,23 +737,167 @@ async function signUp() {
 
 
 
-    if (data?.user) {
+    if (password.length < 6) {
 
-        await supabaseClient.from("profiles").insert({
+        alert("Password must be at least 6 characters long");
 
-            id: data.user.id,
-
-            email,
-
-            full_name: name,
-
-            phone: phone || null
-
-        });
+        return;
 
     }
 
-    closeAuth();
+
+
+    // Get the Register button
+
+    const registerBtn = document.querySelector('#authStepSignUp .btn.primary');
+
+    if (registerBtn) {
+
+        registerBtn.disabled = true;
+
+        registerBtn.innerText = "Creating Account...";
+
+    }
+
+
+
+    try {
+
+        // Sign up the user with email confirmation disabled for auto sign-in
+
+        const { data, error } = await supabaseClient.auth.signUp({
+
+            email,
+
+            password,
+
+            options: {
+
+                data: { full_name: name },
+
+                emailRedirectTo: window.location.origin + "/index.html"
+
+            }
+
+        });
+
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+
+        if (!data?.user) {
+
+            throw new Error("Failed to create account. Please try again.");
+
+        }
+
+
+
+        // Store user profile in the database
+
+        try {
+
+            await supabaseClient.from("profiles").insert({
+
+                id: data.user.id,
+
+                email,
+
+                full_name: name,
+
+                phone: phone || null
+
+            });
+
+        } catch (profileError) {
+
+            // Profile creation failed but account exists, not critical
+
+            console.warn("Profile creation warning:", profileError);
+
+        }
+
+
+
+        // Check if email confirmation is required
+
+        if (data.session) {
+
+            // User is automatically signed in (email confirmation disabled)
+
+            currentUser = data.user;
+
+            updateAuthUI();
+
+            alert(`Welcome to E'MPIRE, ${name}! 👑`);
+
+            
+
+            // Clear form
+
+            if (nameInput) nameInput.value = "";
+
+            if (emailInput) emailInput.value = "";
+
+            if (phoneInput) phoneInput.value = "";
+
+            if (passwordInput) passwordInput.value = "";
+
+            
+
+            closeAuth();
+
+        } else {
+
+            // Email confirmation required
+
+            alert("Account created! Please check your email to verify your account, then sign in.");
+
+            
+
+            // Clear form and go back to login
+
+            if (nameInput) nameInput.value = "";
+
+            if (emailInput) emailInput.value = "";
+
+            if (phoneInput) phoneInput.value = "";
+
+            if (passwordInput) passwordInput.value = "";
+
+            
+
+            showEmailLogin();
+
+        }
+
+
+
+    } catch (err) {
+
+        console.error("Sign up error:", err);
+
+        alert(err.message || "Failed to create account. Please try again.");
+
+    } finally {
+
+        // Re-enable the button
+
+        if (registerBtn) {
+
+            registerBtn.disabled = false;
+
+            registerBtn.innerText = "Register";
+
+        }
+
+    }
 
 }
 
@@ -751,15 +905,103 @@ async function signUp() {
 
 async function signIn() {
 
-    const email = document.getElementById("authEmail")?.value;
+    const emailInput = document.getElementById("authEmail");
 
-    const password = document.getElementById("authPassword")?.value;
+    const passwordInput = document.getElementById("authPassword");
 
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    
 
-    if (error) alert(error.message);
+    const email = emailInput?.value?.trim();
 
-    closeAuth();
+    const password = passwordInput?.value;
+
+
+
+    if (!email || !password) {
+
+        alert("Please enter both email and password");
+
+        return;
+
+    }
+
+
+
+    // Get the Sign In button
+
+    const signInBtn = document.querySelector('#authStepEmail .btn.primary');
+
+    if (signInBtn) {
+
+        signInBtn.disabled = true;
+
+        signInBtn.innerText = "Signing In...";
+
+    }
+
+
+
+    try {
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+
+        if (data?.user) {
+
+            currentUser = data.user;
+
+            updateAuthUI();
+
+            
+
+            const name = data.user.user_metadata?.full_name || data.user.email.split("@")[0];
+
+            alert(`Welcome back, ${name}! 👑`);
+
+            
+
+            // Clear form
+
+            if (emailInput) emailInput.value = "";
+
+            if (passwordInput) passwordInput.value = "";
+
+            
+
+            closeAuth();
+
+        }
+
+
+
+    } catch (err) {
+
+        console.error("Sign in error:", err);
+
+        alert(err.message || "Failed to sign in. Please check your credentials.");
+
+    } finally {
+
+        // Re-enable the button
+
+        if (signInBtn) {
+
+            signInBtn.disabled = false;
+
+            signInBtn.innerText = "Sign In";
+
+        }
+
+    }
 
 }
 
@@ -794,6 +1036,16 @@ function closeAuth() {
     modal.classList.remove("active");
 
     authInProgress = false; 
+
+    
+
+    // Reset modal to initial state after a short delay
+
+    setTimeout(() => {
+
+        backToChoice();
+
+    }, 300);
 
 }
 

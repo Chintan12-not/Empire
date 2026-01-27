@@ -325,11 +325,11 @@
                 <h2 class="gold-text">Welcome to E'MPIRE</h2>
                 <p style="color: #888; margin-bottom: 25px; font-size: 0.9rem;">Join the elite circle.</p>
                 
-                <button class="btn primary" style="width:100%; margin-bottom:15px;" onclick="showEmailLogin()">
+                <button type="button" class="btn primary" style="width:100%; margin-bottom:15px;" onclick="showEmailLogin()">
                     Sign in with Email
                 </button>
                 
-                <button class="btn google-btn" onclick="signInWithGoogle()" style="width: 100%; background: #fff; color: #000; border: none; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; cursor: pointer;">
+                <button type="button" class="btn google-btn" onclick="signInWithGoogle()" style="width: 100%; background: #fff; color: #000; border: none; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; cursor: pointer;">
                     <i class="fab fa-google"></i> Continue with Google
                 </button>
 
@@ -339,7 +339,7 @@
                     <hr style="flex:1; border: 0.5px solid #222;">
                 </div>
 
-                <button class="btn ghost" onclick="showEmailSignUp()" style="width:100%;">Create New Account</button>
+                <button type="button" class="btn ghost" onclick="showEmailSignUp()" style="width:100%;">Create New Account</button>
             </div>
 
             <div id="authStepEmail" style="display:none;">
@@ -347,14 +347,14 @@
                 <input id="authEmail" type="email" placeholder="Email address" required>
                 <input id="authPassword" type="password" placeholder="Password" required>
                 
-                <button class="btn primary" style="width:100%; margin-top:10px;" onclick="signIn()">
+                <button type="button" class="btn primary" style="width:100%; margin-top:10px;" onclick="signIn()">
                     Sign In
                 </button>
 
                 <p style="margin-top:14px; font-size:13px; cursor:pointer; color:#aaa; text-align:center;" onclick="forgotPassword()">
                     Forgot password?
                 </p>
-                <button class="btn ghost small" onclick="backToChoice()" style="width:100%; border:none; margin-top:10px;">← Back</button>
+                <button type="button" class="btn ghost small" onclick="backToChoice()" style="width:100%; border:none; margin-top:10px;">← Back</button>
             </div>
 
             <div id="authStepSignUp" style="display:none;">
@@ -365,7 +365,7 @@
                 <input id="signupPassword" type="password" placeholder="Password" required>
                 
                 <button type="button" class="btn primary" onclick="signUp()" style="width:100%; margin-top:10px;">Register</button>
-                <button class="btn ghost small" onclick="backToChoice()" style="width:100%; border:none; margin-top:10px;">← Back</button>
+                <button type="button" class="btn ghost small" onclick="backToChoice()" style="width:100%; border:none; margin-top:10px;">← Back</button>
             </div>
         </div>
     </div>
