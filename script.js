@@ -575,7 +575,7 @@ document.addEventListener("input", (e) => {
 
 if (supabaseClient) {
 
-    supabaseClient.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
 
         currentUser = session?.user || null;
 
@@ -588,6 +588,12 @@ if (supabaseClient) {
             authInProgress = false; 
 
             closeAuth();
+
+            
+
+            // Load user's cart from database
+
+            await loadUserCart();
 
             
 
@@ -609,6 +615,12 @@ if (supabaseClient) {
 
             updateAuthUI();
 
+            
+
+            // Clear cart on logout
+
+            await clearUserCart();
+
         }
 
     });
@@ -626,6 +638,16 @@ async function checkAuth() {
     currentUser = user;
 
     updateAuthUI();
+
+    
+
+    // Load user's cart if they're logged in
+
+    if (currentUser) {
+
+        await loadUserCart();
+
+    }
 
 }
 
@@ -847,6 +869,14 @@ async function signUp() {
 
             updateAuthUI();
 
+            
+
+            // Load user's cart
+
+            await loadUserCart();
+
+            
+
             alert(`Welcome to E'MPIRE, ${name}! 👑\n\nYour account has been created and you're now signed in.`);
 
             closeAuth();
@@ -882,6 +912,14 @@ async function signUp() {
                     currentUser = signInData.user;
 
                     updateAuthUI();
+
+                    
+
+                    // Load user's cart
+
+                    await loadUserCart();
+
+                    
 
                     alert(`Welcome to E'MPIRE, ${name}! 👑\n\nYour account has been created and you're now signed in.`);
 
@@ -984,6 +1022,12 @@ async function signIn() {
             currentUser = data.user;
 
             updateAuthUI();
+
+            
+
+            // Load user's cart
+
+            await loadUserCart();
 
             
 
@@ -1157,15 +1201,31 @@ async function signInWithGoogle() {
 
 async function logout() {
 
+    // Clear cart first before signing out
+
+    await clearUserCart();
+
+    
+
+    // Sign out from Supabase
+
     await supabaseClient.auth.signOut();
+
+    
 
     currentUser = null;
 
     updateAuthUI();
 
+    
+
     document.getElementById("mobileMenu")?.classList.remove("active");
 
     document.getElementById("cartSidebar")?.classList.remove("active");
+
+    
+
+    alert("You have been logged out. Your cart has been cleared.");
 
 }
 
@@ -1179,9 +1239,149 @@ async function logout() {
 
 
 
-function saveCart() {
+// Save cart to localStorage AND database if user is logged in
+
+async function saveCart() {
+
+    // Always save to localStorage for guest users
 
     localStorage.setItem("empire_cart", JSON.stringify(cart));
+
+
+
+    // If user is logged in, save to database
+
+    if (currentUser && supabaseClient) {
+
+        try {
+
+            const { error } = await supabaseClient
+
+                .from("user_carts")
+
+                .upsert({
+
+                    user_id: currentUser.id,
+
+                    cart_items: cart,
+
+                    updated_at: new Date().toISOString()
+
+                }, { onConflict: "user_id" });
+
+
+
+            if (error) console.error("Cart sync error:", error);
+
+        } catch (err) {
+
+            console.error("Failed to sync cart:", err);
+
+        }
+
+    }
+
+}
+
+
+
+// Load cart from database for logged-in user
+
+async function loadUserCart() {
+
+    if (!currentUser || !supabaseClient) return;
+
+
+
+    try {
+
+        const { data, error } = await supabaseClient
+
+            .from("user_carts")
+
+            .select("cart_items")
+
+            .eq("user_id", currentUser.id)
+
+            .single();
+
+
+
+        if (error) {
+
+            // No cart found, that's okay
+
+            if (error.code === "PGRST116") {
+
+                console.log("No saved cart found for user");
+
+            } else {
+
+                console.error("Load cart error:", error);
+
+            }
+
+            return;
+
+        }
+
+
+
+        if (data?.cart_items) {
+
+            cart = data.cart_items;
+
+            localStorage.setItem("empire_cart", JSON.stringify(cart));
+
+            updateCartUI();
+
+            console.log("Cart loaded from database");
+
+        }
+
+    } catch (err) {
+
+        console.error("Failed to load cart:", err);
+
+    }
+
+}
+
+
+
+// Clear cart from localStorage and database
+
+async function clearUserCart() {
+
+    cart = [];
+
+    localStorage.removeItem("empire_cart");
+
+    updateCartUI();
+
+
+
+    // Clear from database if user was logged in
+
+    if (currentUser && supabaseClient) {
+
+        try {
+
+            await supabaseClient
+
+                .from("user_carts")
+
+                .delete()
+
+                .eq("user_id", currentUser.id);
+
+        } catch (err) {
+
+            console.error("Failed to clear cart from database:", err);
+
+        }
+
+    }
 
 }
 
