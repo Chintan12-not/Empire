@@ -825,6 +825,18 @@ async function signUp() {
 
 
 
+        // Clear form first
+
+        if (nameInput) nameInput.value = "";
+
+        if (emailInput) emailInput.value = "";
+
+        if (phoneInput) phoneInput.value = "";
+
+        if (passwordInput) passwordInput.value = "";
+
+
+
         // Check if email confirmation is required
 
         if (data.session) {
@@ -835,45 +847,57 @@ async function signUp() {
 
             updateAuthUI();
 
-            alert(`Welcome to E'MPIRE, ${name}! 👑`);
-
-            
-
-            // Clear form
-
-            if (nameInput) nameInput.value = "";
-
-            if (emailInput) emailInput.value = "";
-
-            if (phoneInput) phoneInput.value = "";
-
-            if (passwordInput) passwordInput.value = "";
-
-            
+            alert(`Welcome to E'MPIRE, ${name}! 👑\n\nYour account has been created and you're now signed in.`);
 
             closeAuth();
 
         } else {
 
-            // Email confirmation required
+            // Email confirmation is required - try to sign in immediately
 
-            alert("Account created! Please check your email to verify your account, then sign in.");
+            try {
 
-            
+                const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
 
-            // Clear form and go back to login
+                    email,
 
-            if (nameInput) nameInput.value = "";
+                    password
 
-            if (emailInput) emailInput.value = "";
+                });
 
-            if (phoneInput) phoneInput.value = "";
 
-            if (passwordInput) passwordInput.value = "";
 
-            
+                if (signInError) {
 
-            showEmailLogin();
+                    // If sign in fails, account was created but needs verification
+
+                    alert(`Account created successfully!\n\nYou can now sign in with your credentials.`);
+
+                    showEmailLogin();
+
+                } else if (signInData?.user) {
+
+                    // Sign in successful
+
+                    currentUser = signInData.user;
+
+                    updateAuthUI();
+
+                    alert(`Welcome to E'MPIRE, ${name}! 👑\n\nYour account has been created and you're now signed in.`);
+
+                    closeAuth();
+
+                }
+
+            } catch (signInErr) {
+
+                console.error("Auto sign-in error:", signInErr);
+
+                alert(`Account created successfully!\n\nYou can now sign in with your credentials.`);
+
+                showEmailLogin();
+
+            }
 
         }
 
@@ -1082,6 +1106,32 @@ function backToChoice() {
     document.getElementById("authStepSignUp")?.style.setProperty("display", "none");
 
     document.getElementById("authStepChoice")?.style.setProperty("display", "block");
+
+}
+
+
+
+function togglePasswordVisibility(inputId, button) {
+
+    const input = document.getElementById(inputId);
+
+    if (!input) return;
+
+    
+
+    if (input.type === "password") {
+
+        input.type = "text";
+
+        button.innerText = "👁️‍🗨️"; // eye with strike
+
+    } else {
+
+        input.type = "password";
+
+        button.innerText = "👁️"; // eye
+
+    }
 
 }
 

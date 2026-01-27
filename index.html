@@ -345,7 +345,12 @@
             <div id="authStepEmail" style="display:none;">
                 <h3 class="gold-text" style="margin-bottom:20px;">Sign In</h3>
                 <input id="authEmail" type="email" placeholder="Email address" required>
-                <input id="authPassword" type="password" placeholder="Password" required>
+                <div style="position: relative;">
+                    <input id="authPassword" type="password" placeholder="Password" required style="padding-right: 45px;">
+                    <button type="button" onclick="togglePasswordVisibility('authPassword', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #d4af37; cursor: pointer; font-size: 18px; padding: 5px;" title="Toggle password visibility">
+                        👁️
+                    </button>
+                </div>
                 
                 <button type="button" class="btn primary" style="width:100%; margin-top:10px;" onclick="signIn()">
                     Sign In
@@ -362,7 +367,12 @@
                 <input id="signupName" type="text" placeholder="Full Name" required>
                 <input id="signupEmail" type="email" placeholder="Email" required>
                 <input id="signupPhone" type="tel" placeholder="Phone Number">
-                <input id="signupPassword" type="password" placeholder="Password" required>
+                <div style="position: relative;">
+                    <input id="signupPassword" type="password" placeholder="Password" required style="padding-right: 45px;">
+                    <button type="button" onclick="togglePasswordVisibility('signupPassword', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #d4af37; cursor: pointer; font-size: 18px; padding: 5px;" title="Toggle password visibility">
+                        👁️
+                    </button>
+                </div>
                 
                 <button type="button" class="btn primary" onclick="signUp()" style="width:100%; margin-top:10px;">Register</button>
                 <button type="button" class="btn ghost small" onclick="backToChoice()" style="width:100%; border:none; margin-top:10px;">← Back</button>
