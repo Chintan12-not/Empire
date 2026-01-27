@@ -1279,7 +1279,14 @@ button, a, .icon-btn {
   }
 
   .form-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    width: 100% !important;
+    box-sizing: border-box;
   }
 
   /* === CART SIDEBAR === */
