@@ -8,6 +8,7 @@
 
 const AUDIO_KEY = "empire_audio_state";
 const TIME_KEY = "empire_audio_time";
+const PLAYING_KEY = "empire_audio_playing";
 
 function isCheckoutPage() {
     return window.location.pathname.includes("checkout");
@@ -21,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!audio || !btn) return;
 
     let isPlaying = false;
+    let userInteracted = false;
 
     // Restore time
     const savedTime = localStorage.getItem(TIME_KEY);
@@ -28,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Restore state
     const savedState = localStorage.getItem(AUDIO_KEY);
+    const wasPlaying = localStorage.getItem(PLAYING_KEY) === "true";
 
     function playAudio() {
         audio.volume = 0.4;
@@ -35,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         isPlaying = true;
         btn.textContent = "🔊";
         localStorage.setItem(AUDIO_KEY, "on");
+        localStorage.setItem(PLAYING_KEY, "true");
     }
 
     function pauseAudio() {
@@ -42,11 +46,23 @@ document.addEventListener("DOMContentLoaded", () => {
         isPlaying = false;
         btn.textContent = "🔇";
         localStorage.setItem(AUDIO_KEY, "off");
+        localStorage.setItem(PLAYING_KEY, "false");
     }
 
-    // Start on first interaction
+    // Auto-resume if was playing
+    if (wasPlaying && savedState !== "off") {
+        // Try to play after short delay
+        setTimeout(() => {
+            playAudio();
+        }, 100);
+    }
+
+    // Start on first interaction if not already playing
     document.addEventListener("click", () => {
-        if (savedState !== "off") playAudio();
+        if (!userInteracted && !isPlaying && savedState !== "off") {
+            userInteracted = true;
+            playAudio();
+        }
     }, { once: true });
 
     // Toggle button
@@ -57,17 +73,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Save time continuously
     audio.addEventListener("timeupdate", () => {
-        localStorage.setItem(TIME_KEY, audio.currentTime);
+        if (isPlaying) {
+            localStorage.setItem(TIME_KEY, audio.currentTime);
+        }
     });
 
-    // Pause when tab hidden
+    // Pause when tab hidden or window loses focus
     document.addEventListener("visibilitychange", () => {
-        if (document.hidden) pauseAudio();
+        if (document.hidden && isPlaying) {
+            pauseAudio();
+        }
     });
 
-    // Pause on unload
+    window.addEventListener("blur", () => {
+        if (isPlaying) {
+            pauseAudio();
+        }
+    });
+
+    // Save state on unload
     window.addEventListener("beforeunload", () => {
-        localStorage.setItem(TIME_KEY, audio.currentTime);
+        if (isPlaying) {
+            localStorage.setItem(TIME_KEY, audio.currentTime);
+            localStorage.setItem(PLAYING_KEY, "true");
+        } else {
+            localStorage.setItem(PLAYING_KEY, "false");
+        }
     });
 });
 
