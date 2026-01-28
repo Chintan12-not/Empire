@@ -294,7 +294,15 @@
         const SHIPPING_CHARGE = 120;
         const referralCodes = ["ANTY07", "AMRIT09", "KRISHV19", "AVANI26", "SANJEEVANI26", "VEDU18"];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (!session) {
+                alert("Please login to complete your purchase 👑");
+                window.location.href = "index.html?open_auth=true";
+                return;
+            }
+
             renderCheckout();
             setupForm();
         });

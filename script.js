@@ -509,6 +509,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     initSliders();
 
+    // Check for open_auth query param
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('open_auth') === 'true') {
+        setTimeout(() => {
+            openAuth();
+        }, 500); // Slight delay to ensure DOM is ready and any other popups are handled
+    }
 });
 
 
