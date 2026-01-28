@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function playAudio() {
         audio.volume = 0.4;
-        audio.play().catch(() => {});
+        audio.play().catch(() => { });
         isPlaying = true;
         btn.textContent = "🔊";
         localStorage.setItem(AUDIO_KEY, "on");
@@ -121,9 +121,9 @@ let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
 
 let currentUser = null;
 
-let authInProgress = false; 
+let authInProgress = false;
 
-let selectedRating = 0; 
+let selectedRating = 0;
 
 
 
@@ -387,7 +387,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
             renderProductDetail(productId);
 
-            loadReviews(productId); 
+            loadReviews(productId);
 
         } else {
 
@@ -417,7 +417,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
             audio.volume = 0.4;
 
-            audio.play().catch(() => {});
+            audio.play().catch(() => { });
 
             isPlaying = true;
 
@@ -505,7 +505,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     setupWhatsApp();
 
-    updateCheckoutTotals(); 
+    updateCheckoutTotals();
 
     initSliders();
 
@@ -592,17 +592,17 @@ if (supabaseClient) {
 
         if (event === "SIGNED_IN") {
 
-            authInProgress = false; 
+            authInProgress = false;
 
             closeAuth();
 
-            
+
 
             // Load user's cart from database
 
             await loadUserCart();
 
-            
+
 
             // Check if admin user
 
@@ -614,7 +614,7 @@ if (supabaseClient) {
 
         }
 
-        
+
 
         if (event === "SIGNED_OUT") {
 
@@ -622,7 +622,7 @@ if (supabaseClient) {
 
             updateAuthUI();
 
-            
+
 
             // Clear cart on logout
 
@@ -646,7 +646,7 @@ async function checkAuth() {
 
     updateAuthUI();
 
-    
+
 
     // Load user's cart if they're logged in
 
@@ -696,7 +696,7 @@ function updateAuthUI() {
 
 function openAuth() {
 
-    if (currentUser) return; 
+    if (currentUser) return;
 
     const modal = document.getElementById("authModal");
 
@@ -876,13 +876,13 @@ async function signUp() {
 
             updateAuthUI();
 
-            
+
 
             // Load user's cart
 
             await loadUserCart();
 
-            
+
 
             alert(`Welcome to E'MPIRE, ${name}! 👑\n\nYour account has been created and you're now signed in.`);
 
@@ -920,13 +920,13 @@ async function signUp() {
 
                     updateAuthUI();
 
-                    
+
 
                     // Load user's cart
 
                     await loadUserCart();
 
-                    
+
 
                     alert(`Welcome to E'MPIRE, ${name}! 👑\n\nYour account has been created and you're now signed in.`);
 
@@ -978,7 +978,7 @@ async function signIn() {
 
     const passwordInput = document.getElementById("authPassword");
 
-    
+
 
     const email = emailInput?.value?.trim();
 
@@ -1030,19 +1030,19 @@ async function signIn() {
 
             updateAuthUI();
 
-            
+
 
             // Load user's cart
 
             await loadUserCart();
 
-            
+
 
             const name = data.user.user_metadata?.full_name || data.user.email.split("@")[0];
 
             alert(`Welcome back, ${name}! 👑`);
 
-            
+
 
             // Clear form
 
@@ -1050,7 +1050,7 @@ async function signIn() {
 
             if (passwordInput) passwordInput.value = "";
 
-            
+
 
             closeAuth();
 
@@ -1110,9 +1110,9 @@ function closeAuth() {
 
     modal.classList.remove("active");
 
-    authInProgress = false; 
+    authInProgress = false;
 
-    
+
 
     // Reset modal to initial state after a short delay
 
@@ -1168,7 +1168,7 @@ function togglePasswordVisibility(inputId, button) {
 
     if (!input) return;
 
-    
+
 
     if (input.type === "password") {
 
@@ -1212,28 +1212,27 @@ async function logout() {
 
     await clearUserCart();
 
-    
+
 
     // Sign out from Supabase
 
     await supabaseClient.auth.signOut();
 
-    
+
 
     currentUser = null;
 
     updateAuthUI();
 
-    
+
 
     document.getElementById("mobileMenu")?.classList.remove("active");
 
     document.getElementById("cartSidebar")?.classList.remove("active");
 
-    
 
-    alert("You have been logged out. Your cart has been cleared.");
 
+    alert("You have been logged out. Your cart has been saved 🛒");
 }
 
 
@@ -1358,38 +1357,13 @@ async function loadUserCart() {
 
 // Clear cart from localStorage and database
 
+// Clear cart from localStorage (but keep in DB for persistence)
 async function clearUserCart() {
-
     cart = [];
-
     localStorage.removeItem("empire_cart");
-
     updateCartUI();
-
-
-
-    // Clear from database if user was logged in
-
-    if (currentUser && supabaseClient) {
-
-        try {
-
-            await supabaseClient
-
-                .from("user_carts")
-
-                .delete()
-
-                .eq("user_id", currentUser.id);
-
-        } catch (err) {
-
-            console.error("Failed to clear cart from database:", err);
-
-        }
-
-    }
-
+    // We intentionally DO NOT delete from 'user_carts' in DB 
+    // so that the user's cart is restored when they log back in.
 }
 
 
@@ -1488,7 +1462,7 @@ function updateCartUI() {
 
     if (totalEl) totalEl.innerText = "₹" + cart.reduce((s, i) => s + i.price * i.qty, 0).toLocaleString();
 
-    updateCheckoutTotals(); 
+    updateCheckoutTotals();
 
 }
 
@@ -1800,7 +1774,7 @@ async function placeOrder() {
 
     if (!supabaseClient) return alert("Connection error");
 
-    if (!requireAuth()) return; 
+    if (!requireAuth()) return;
 
     if (cart.length === 0) return alert("Cart is empty");
 
@@ -2032,7 +2006,7 @@ function shareProduct(name) {
 
     const url = window.location.origin + "/product-detail.html?id=" + productId;
 
-    
+
 
     if (navigator.share) {
 
