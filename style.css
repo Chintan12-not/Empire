@@ -162,7 +162,7 @@ h1, h2, h3, h4, .brand, .btn, .empire-footer h4 {
 .logo-img { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; }
 .icon-btn { background: none; border: none; color: var(--gold-main); font-size: 24px; cursor: pointer; }
 
-#menuToggle { display: none; }
+#menuToggle { display: flex; }
 
 /* === MOBILE MENU SIDEBAR === */
 .mobile-menu-overlay {

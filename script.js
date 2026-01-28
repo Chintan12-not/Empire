@@ -1207,31 +1207,21 @@ async function signInWithGoogle() {
 
 
 async function logout() {
-
-    // Clear cart first before signing out
-
-    await clearUserCart();
-
-
-
-    // Sign out from Supabase
-
-    await supabaseClient.auth.signOut();
-
-
-
-    currentUser = null;
-
-    updateAuthUI();
-
-
-
+    // 1. Close menus immediately for better UX
     document.getElementById("mobileMenu")?.classList.remove("active");
-
     document.getElementById("cartSidebar")?.classList.remove("active");
 
+    // 2. Sign out (this triggers onAuthStateChange -> clears cart & updates Auth UI)
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+        console.error("Logout error:", error);
+        // Fallback: Force UI update if signOut fails but local session is cleared
+        currentUser = null;
+        updateAuthUI();
+        await clearUserCart();
+    }
 
-
+    // 3. Show confirmation
     alert("You have been logged out. Your cart has been saved 🛒");
 }
 
