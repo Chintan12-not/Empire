@@ -679,6 +679,7 @@ function updateAuthUI() {
         btn.onclick = logout;
 
         menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "block");
+        document.getElementById("mobileLogoutBtn")?.style.setProperty("display", "block");
 
     } else {
 
@@ -687,6 +688,7 @@ function updateAuthUI() {
         btn.onclick = openAuth;
 
         menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "none");
+        document.getElementById("mobileLogoutBtn")?.style.setProperty("display", "none");
 
     }
 
