@@ -560,6 +560,11 @@
                     zip: document.getElementById('zip').value
                 };
 
+                // Dismiss keyboard on mobile to prevent viewport issues with Razorpay
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+
                 startPayment(finalPayableAmount, orderData);
             });
         }

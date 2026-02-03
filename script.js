@@ -1221,8 +1221,10 @@ async function logout() {
         await clearUserCart();
     }
 
-    // 3. Show confirmation
-    alert("You have been logged out. Your cart has been saved 🛒");
+    // 3. Show confirmation (Delayed to allow menu animation to finish)
+    setTimeout(() => {
+        alert("You have been logged out. Your cart has been saved 🛒");
+    }, 300);
 }
 
 
