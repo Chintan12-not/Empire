@@ -367,8 +367,34 @@
                         <div class="total-row"><span>Shipping</span><span id="shippingValue">₹120</span></div>
                         <div class="total-row final"><span>Total</span><span id="finalTotal">₹0</span></div>
                     </div>
+
+                    <!-- PAYMENT METHOD SELECTION -->
+                    <div style="margin: 20px 0; border: 1px solid #333; padding: 15px; border-radius: 8px;">
+                        <h4 style="margin: 0 0 15px 0; color: #d4af37; font-size: 0.9rem;">SELECT PAYMENT METHOD:</h4>
+
+                        <label
+                            style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer; border: 1px solid #333; padding: 10px; border-radius: 4px;">
+                            <input type="radio" name="paymentOption" value="ONLINE" checked
+                                onchange="togglePayment(this.value)">
+                            <div>
+                                <strong style="color: #fff;">Online Payment</strong>
+                                <div style="font-size: 0.75rem; color: #888;">UPI, Cards, Net Banking</div>
+                            </div>
+                        </label>
+
+                        <label
+                            style="display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid #333; padding: 10px; border-radius: 4px;">
+                            <input type="radio" name="paymentOption" value="COD" onchange="togglePayment(this.value)">
+                            <div>
+                                <strong style="color: #fff;">Cash on Delivery (COD)</strong>
+                                <div style="font-size: 0.75rem; color: #888;">Pay cash upon delivery</div>
+                            </div>
+                        </label>
+                    </div>
+
                     <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to
                         Payment</button>
+
                 </div>
             </aside>
         </div>
@@ -398,9 +424,33 @@
                 return;
             }
 
+            if (session) {
+                // Try to load from DB if localStorage is empty
+                if (!localStorage.getItem('empire_cart')) {
+                    await loadUserCart(session.user.id);
+                }
+            }
+
             renderCheckout();
             setupForm();
         });
+
+        async function loadUserCart(userId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from("user_carts")
+                    .select("cart_items")
+                    .eq("user_id", userId)
+                    .single();
+
+                if (data?.cart_items) {
+                    localStorage.setItem("empire_cart", JSON.stringify(data.cart_items));
+                    console.log("Cart synced from DB");
+                }
+            } catch (err) {
+                console.error("Failed to sync cart:", err);
+            }
+        }
 
         function renderCheckout() {
             const container = document.getElementById('checkoutItems');
@@ -501,6 +551,27 @@
                                 items: JSON.stringify(cartItems)
                             }]);
 
+                            // 2. Create Shiprocket Order
+                            try {
+                                await fetch("https://empire-shiprocket.empire-official2026.workers.dev", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        name: orderData.customer_name,
+                                        email: orderData.email,
+                                        phone: orderData.phone,
+                                        address: orderData.address,
+                                        city: orderData.city,
+                                        state: orderData.state,
+                                        pincode: orderData.zip,
+                                        items: cartItems
+                                    })
+                                });
+                            } catch (shipErr) {
+                                console.error("Shiprocket Info:", shipErr);
+                                // Don't block success just because automated shipping failed
+                            }
+
 
                             // 3. Send confirmation email
                             await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
@@ -542,13 +613,23 @@
             btn.innerText = "Proceed to Payment";
         }
 
+        function togglePayment(mode) {
+            const btn = document.getElementById("submitBtn");
+            if (mode === "COD") {
+                btn.innerText = "Place Order (COD)";
+            } else {
+                btn.innerText = "Proceed to Payment";
+            }
+        }
+
         function setupForm() {
             const form = document.getElementById('checkoutForm');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('submitBtn');
                 btn.disabled = true;
-                btn.innerText = "INITIALIZING...";
+                const originalText = btn.innerText;
+                btn.innerText = "PROCESSING...";
 
                 const orderData = {
                     customer_name: document.getElementById('fullName').value,
@@ -560,13 +641,71 @@
                     zip: document.getElementById('zip').value
                 };
 
-                // Dismiss keyboard on mobile to prevent viewport issues with Razorpay
-                if (document.activeElement) {
-                    document.activeElement.blur();
+                const paymentMode = document.querySelector('input[name="paymentOption"]:checked').value;
+
+                // Dismiss keyboard on mobile
+                if (document.activeElement) document.activeElement.blur();
+
+                if (paymentMode === "COD") {
+                    await processCODOrder(finalPayableAmount, orderData);
+                } else {
+                    await startPayment(finalPayableAmount, orderData);
+                }
+            });
+        }
+
+        async function processCODOrder(finalAmount, orderData) {
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                const cartItems = JSON.parse(localStorage.getItem("empire_cart")) || [];
+
+                // 1. Log to Supabase (Status: Pending / COD)
+                await supabaseClient.from("orders").insert([{
+                    customer_name: orderData.customer_name,
+                    email: orderData.email,
+                    phone: orderData.phone,
+                    address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
+                    total_amount: finalPayableAmount,
+                    referral_code: localStorage.getItem("applied_referral") || null,
+                    status: "cod_pending", // Distinguish from paid orders
+                    user_id: user ? user.id : null,
+                    razorpay_order_id: "COD-" + Date.now(), // Fake ID for COD
+                    items: JSON.stringify(cartItems)
+                }]);
+
+                // 2. Create Shiprocket Order (COD)
+                const shipRes = await fetch("https://empire-shiprocket.empire-official2026.workers.dev", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: orderData.customer_name,
+                        email: orderData.email,
+                        phone: orderData.phone,
+                        address: orderData.address,
+                        city: orderData.city,
+                        state: orderData.state,
+                        pincode: orderData.zip,
+                        items: cartItems,
+                        payment_method: "COD" // Tell worker it is COD
+                    })
+                });
+
+                const shipData = await shipRes.json();
+
+                if (shipRes.ok) {
+                    alert("Order Placed Successfully! (COD) 🚚\nTracking ID: " + shipData.order_id);
+                    localStorage.removeItem("empire_cart");
+                    localStorage.removeItem("applied_referral");
+                    window.location.href = "index.html";
+                } else {
+                    throw new Error(shipData.error || "Shiprocket Error");
                 }
 
-                startPayment(finalPayableAmount, orderData);
-            });
+            } catch (err) {
+                console.error(err);
+                alert("Order Failed: " + err.message);
+                resetSubmitBtn();
+            }
         }
 
         function applyEmpireCoupon() {
@@ -574,6 +713,8 @@
             document.getElementById("discountCode").value = "EMPIRE26";
             applyDiscount();
         }
+
+
     </script>
 </body>
 

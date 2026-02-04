@@ -661,37 +661,57 @@ async function checkAuth() {
 
 
 function updateAuthUI() {
-
     const btn = document.getElementById("authBtn");
-
     const menu = document.getElementById("mobileMenu");
+    const mobileLink = document.getElementById("mobileAuthLink");
 
     if (!btn) return;
 
-
-
     if (currentUser) {
-
         const name = currentUser.user_metadata?.full_name || currentUser.email.split("@")[0];
+        const displayText = `Hi, ${name}`;
 
-        btn.innerText = `Hi, ${name}`;
+        // Desktop / Header Button
+        btn.innerHTML = displayText;
+        btn.onclick = (e) => {
+            e.preventDefault();
+            btn.innerText = "Logging out...";
+            console.log("Logout triggered (Desktop)");
+            logout();
+        };
 
-        btn.onclick = logout;
+        // Mobile Menu Link
+        if (mobileLink) {
+            mobileLink.innerText = displayText;
+            mobileLink.style.color = "#d4af37"; // Gold color for profile
+            mobileLink.onclick = (e) => {
+                e.preventDefault();
+                mobileLink.innerText = "Logging out...";
+                console.log("Logout triggered (Mobile)");
+                logout();
+            };
+        }
 
         menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "block");
-        document.getElementById("mobileLogoutBtn")?.style.setProperty("display", "block");
 
     } else {
-
+        // Desktop / Header Button
         btn.innerText = "Login";
-
         btn.onclick = openAuth;
 
+        // Mobile Menu Link
+        if (mobileLink) {
+            mobileLink.innerText = "Login";
+            mobileLink.style.color = "white";
+            mobileLink.onclick = (e) => {
+                e.preventDefault();
+                toggleMenu(); // Close menu
+                openAuth();
+            };
+        }
+
         menu?.querySelector('a[href="my-orders.html"]')?.style.setProperty("display", "none");
-        document.getElementById("mobileLogoutBtn")?.style.setProperty("display", "none");
-
     }
-
 }
 
 
@@ -1209,24 +1229,45 @@ async function signInWithGoogle() {
 
 
 async function logout() {
-    // 1. Close menus immediately for better UX
+    console.log("Logout function called");
+
+    // 1. Close menus immediately
     document.getElementById("mobileMenu")?.classList.remove("active");
     document.getElementById("cartSidebar")?.classList.remove("active");
 
-    // 2. Sign out (this triggers onAuthStateChange -> clears cart & updates Auth UI)
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) {
-        console.error("Logout error:", error);
-        // Fallback: Force UI update if signOut fails but local session is cleared
-        currentUser = null;
-        updateAuthUI();
-        await clearUserCart();
+    // 2. Optimistic feedback provided by button text "Logging out..." (handled in click listener)
+
+    // 3. Robust Sign Out with Timeout
+    // We race the signOut promise against a 2-second timeout to prevent hanging
+    const signOutPromise = supabaseClient.auth.signOut();
+    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 2000));
+
+    try {
+        await Promise.race([signOutPromise, timeoutPromise]);
+    } catch (err) {
+        console.warn("Logout race error:", err);
     }
 
-    // 3. Show confirmation (Delayed to allow menu animation to finish)
+    // 4. Force Local Cleanup (in case signOut didn't fire event or timed out)
+    // Manually ensure UI is updated if onAuthStateChange didn't catch it yet
+    if (supabaseClient.auth.getSession()) {
+        // If mostly likely session is gone or we want to force it
+    }
+
+    // Let's rely on onAuthStateChange, but if that failed to fire, we might want to reload or force update.
+    // However, usually signOut clears localStorage synchronously-ish for the client before network.
+
+    // 5. Show confirmation
     setTimeout(() => {
         alert("You have been logged out. Your cart has been saved 🛒");
-    }, 300);
+
+        // Double check UI is reset
+        if (currentUser) {
+            currentUser = null;
+            updateAuthUI();
+            clearUserCart();
+        }
+    }, 100);
 }
 
 
