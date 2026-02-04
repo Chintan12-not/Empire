@@ -368,28 +368,15 @@
                         <div class="total-row final"><span>Total</span><span id="finalTotal">₹0</span></div>
                     </div>
 
-                    <!-- PAYMENT METHOD SELECTION -->
-                    <div style="margin: 20px 0; border: 1px solid #333; padding: 15px; border-radius: 8px;">
-                        <h4 style="margin: 0 0 15px 0; color: #d4af37; font-size: 0.9rem;">SELECT PAYMENT METHOD:</h4>
-
-                        <label
-                            style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer; border: 1px solid #333; padding: 10px; border-radius: 4px;">
-                            <input type="radio" name="paymentOption" value="ONLINE" checked
-                                onchange="togglePayment(this.value)">
-                            <div>
-                                <strong style="color: #fff;">Online Payment</strong>
-                                <div style="font-size: 0.75rem; color: #888;">UPI, Cards, Net Banking</div>
-                            </div>
-                        </label>
-
-                        <label
-                            style="display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid #333; padding: 10px; border-radius: 4px;">
-                            <input type="radio" name="paymentOption" value="COD" onchange="togglePayment(this.value)">
-                            <div>
-                                <strong style="color: #fff;">Cash on Delivery (COD)</strong>
-                                <div style="font-size: 0.75rem; color: #888;">Pay cash upon delivery</div>
-                            </div>
-                        </label>
+                    <!-- PAYMENT METHOD SELECTION REMOVED (Default: Online) -->
+                    <div
+                        style="margin: 20px 0; border: 1px solid #333; padding: 15px; border-radius: 8px; background: rgba(212, 175, 55, 0.05);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <strong style="color: #fff;">Payment Method</strong>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.9rem; color: #d4af37;">
+                            Secure Online Payment (UPI, Cards, Net Banking)
+                        </div>
                     </div>
 
                     <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to
@@ -613,14 +600,7 @@
             btn.innerText = "Proceed to Payment";
         }
 
-        function togglePayment(mode) {
-            const btn = document.getElementById("submitBtn");
-            if (mode === "COD") {
-                btn.innerText = "Place Order (COD)";
-            } else {
-                btn.innerText = "Proceed to Payment";
-            }
-        }
+
 
         function setupForm() {
             const form = document.getElementById('checkoutForm');
@@ -641,72 +621,16 @@
                     zip: document.getElementById('zip').value
                 };
 
-                const paymentMode = document.querySelector('input[name="paymentOption"]:checked').value;
+                const paymentMode = "ONLINE";
 
                 // Dismiss keyboard on mobile
                 if (document.activeElement) document.activeElement.blur();
 
-                if (paymentMode === "COD") {
-                    await processCODOrder(finalPayableAmount, orderData);
-                } else {
-                    await startPayment(finalPayableAmount, orderData);
-                }
+                await startPayment(finalPayableAmount, orderData);
             });
         }
 
-        async function processCODOrder(finalAmount, orderData) {
-            try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                const cartItems = JSON.parse(localStorage.getItem("empire_cart")) || [];
 
-                // 1. Log to Supabase (Status: Pending / COD)
-                await supabaseClient.from("orders").insert([{
-                    customer_name: orderData.customer_name,
-                    email: orderData.email,
-                    phone: orderData.phone,
-                    address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
-                    total_amount: finalPayableAmount,
-                    referral_code: localStorage.getItem("applied_referral") || null,
-                    status: "cod_pending", // Distinguish from paid orders
-                    user_id: user ? user.id : null,
-                    razorpay_order_id: "COD-" + Date.now(), // Fake ID for COD
-                    items: JSON.stringify(cartItems)
-                }]);
-
-                // 2. Create Shiprocket Order (COD)
-                const shipRes = await fetch("https://empire-shiprocket.empire-official2026.workers.dev", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name: orderData.customer_name,
-                        email: orderData.email,
-                        phone: orderData.phone,
-                        address: orderData.address,
-                        city: orderData.city,
-                        state: orderData.state,
-                        pincode: orderData.zip,
-                        items: cartItems,
-                        payment_method: "COD" // Tell worker it is COD
-                    })
-                });
-
-                const shipData = await shipRes.json();
-
-                if (shipRes.ok) {
-                    alert("Order Placed Successfully! (COD) 🚚\nTracking ID: " + shipData.order_id);
-                    localStorage.removeItem("empire_cart");
-                    localStorage.removeItem("applied_referral");
-                    window.location.href = "index.html";
-                } else {
-                    throw new Error(shipData.error || "Shiprocket Error");
-                }
-
-            } catch (err) {
-                console.error(err);
-                alert("Order Failed: " + err.message);
-                resetSubmitBtn();
-            }
-        }
 
         function applyEmpireCoupon() {
             if (appliedMainCoupon) return;
