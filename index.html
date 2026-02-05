@@ -7,7 +7,29 @@
     <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>E'MPIRE — Noble Fragrances</title>
+    <title>E'MPIRE — Luxury Indian Perfumes & Fragrances</title>
+    <meta name="description"
+        content="Discover E'MPIRE's exclusive collection of premium Indian perfumes. Handcrafted luxury fragrances including Smoked Whisky, Ocean Aura, and more. Shop now." />
+    <meta name="keywords"
+        content="perfume, luxury fragrance, indian perfume, eau de parfum, premium scent, empire perfume, long lasting perfume India" />
+    <meta name="author" content="E'MPIRE Perfumes" />
+    <link rel="canonical" href="https://empireparfum.com/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://empireparfum.com/" />
+    <meta property="og:title" content="E'MPIRE — Luxury Indian Perfumes" />
+    <meta property="og:description"
+        content="Experience the art of noble fragrances. Handcrafted luxury perfumes for men and women." />
+    <meta property="og:image" content="https://empireparfum.com/images/meta-share.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://empireparfum.com/" />
+    <meta property="twitter:title" content="E'MPIRE — Luxury Indian Perfumes" />
+    <meta property="twitter:description"
+        content="Experience the art of noble fragrances. Handcrafted luxury perfumes for men and women." />
+    <meta property="twitter:image" content="https://empireparfum.com/images/meta-share.jpg" />
 
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;600&family=Cinzel:wght@400;700&family=Montserrat:wght@300;500&display=swap"
@@ -15,6 +37,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <link rel="stylesheet" href="style.css" />
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "E'MPIRE Perfumes",
+          "url": "https://empireparfum.com/",
+          "logo": "https://empireparfum.com/images/logo.png",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+91-9911261347",
+            "contactType": "Customer Service"
+          }
+        },
+        {
+          "@type": "Product",
+          "name": "Smoked Whisky",
+          "image": "https://empireparfum.com/images/Smoked%20Whisky.jpg",
+          "description": "Bold, smoky and intense. A rich blend of aged bourbon and charred oak.",
+          "brand": { "@type": "Brand", "name": "E'MPIRE" },
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "INR",
+            "price": "2800",
+            "availability": "https://schema.org/InStock"
+          }
+        },
+        {
+          "@type": "Product",
+          "name": "Ocean Aura",
+          "image": "https://empireparfum.com/images/Ocean%20Aura.jpg",
+          "description": "Fresh aquatic essence. Capturing coastal breezes and Mediterranean salt.",
+          "brand": { "@type": "Brand", "name": "E'MPIRE" },
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "INR",
+            "price": "2800",
+            "availability": "https://schema.org/InStock"
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 
 <body>
@@ -103,7 +170,7 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media" onclick="viewProduct('whisky')">
-                        <img src="images/Smoked Whisky.jpg" alt="Smoked Whisky">
+                        <img src="images/Smoked Whisky.jpg" alt="Smoked Whisky Luxury Perfume Bottle">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Smoked Whisky</h3>
@@ -128,7 +195,7 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media" onclick="viewProduct('ocean')">
-                        <img src="images/Ocean Aura.jpg" alt="Ocean Aura">
+                        <img src="images/Ocean Aura.jpg" alt="Ocean Aura Fresh Aquatic Fragrance">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Ocean Aura</h3>
@@ -153,7 +220,7 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media" onclick="viewProduct('blush')">
-                        <img src="images/Blush ELIXIR.jpg" alt="Blush ELIXIR">
+                        <img src="images/Blush ELIXIR.jpg" alt="Blush Elixir Floral Perfume for Her">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Blush ELIXIR</h3>
@@ -177,9 +244,9 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('pearforest')">
-                        <img src="images/Fruity Forest 1.jpg" class="slide active" alt="Pear Forest">
-                        <img src="images/Fruity Forest 2.jpg" class="slide" alt="Pear Forest">
-                        <img src="images/Fruity Forest 3.jpg" class="slide" alt="Pear Forest">
+                        <img src="images/Fruity Forest 1.jpg" class="slide active" alt="Pear Forest Fruity Perfume">
+                        <img src="images/Fruity Forest 2.jpg" class="slide" alt="Pear Forest Design">
+                        <img src="images/Fruity Forest 3.jpg" class="slide" alt="Pear Forest Packaging">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Pear Forest</h3>
@@ -203,9 +270,10 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('crown')">
-                        <img src="images/Crown of Dunes 1.jpg" class="slide active">
-                        <img src="images/Crown of Dunes 2.jpg" class="slide">
-                        <img src="images/Crown of Dunes 3.jpg" class="slide">
+                        <img src="images/Crown of Dunes 1.jpg" class="slide active"
+                            alt="Crown of Dunes Premium Oud Fragrance">
+                        <img src="images/Crown of Dunes 2.jpg" class="slide" alt="Crown of Dunes Bottle">
+                        <img src="images/Crown of Dunes 3.jpg" class="slide" alt="Crown of Dunes Box">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Crown of Dunes</h3>
@@ -229,8 +297,8 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('supermale')">
-                        <img src="images/Supermale 1.jpg" class="slide active">
-                        <img src="images/Supermale 2.jpg" class="slide">
+                        <img src="images/Supermale 1.jpg" class="slide active" alt="Supermale Bold Men's Perfume">
+                        <img src="images/Supermale 2.jpg" class="slide" alt="Supermale Fragrance Bottle">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Supermale</h3>
@@ -254,11 +322,12 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('berryflora')">
-                        <img src="images/Berry Flora 1.jpg" class="slide active">
-                        <img src="images/Berry Flora 2.jpg" class="slide">
-                        <img src="images/Berry Flora 3.jpg" class="slide">
-                        <img src="images/Berry Flora 4.jpg" class="slide">
-                        <img src="images/Berry Flora 5.jpg" class="slide">
+                        <img src="images/Berry Flora 1.jpg" class="slide active"
+                            alt="Berry Flora Elegant Women's Scent">
+                        <img src="images/Berry Flora 2.jpg" class="slide" alt="Berry Flora Bottle Detail">
+                        <img src="images/Berry Flora 3.jpg" class="slide" alt="Berry Flora Packaging">
+                        <img src="images/Berry Flora 4.jpg" class="slide" alt="Berry Flora Gift Set">
+                        <img src="images/Berry Flora 5.jpg" class="slide" alt="Berry Flora Lifestyle Shot">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Berry Flora</h3>

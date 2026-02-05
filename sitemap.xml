@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
+  <url>
+    <loc>https://empireparfum.com/</loc>
+    <lastmod>2026-02-05</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/index.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/terms.html</loc>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Product Pages -->
+  <url>
+    <loc>https://empireparfum.com/product-detail.html?id=whisky</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/product-detail.html?id=ocean</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/product-detail.html?id=blush</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/product-detail.html?id=pearforest</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/product-detail.html?id=crown</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/product-detail.html?id=supermale</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://empireparfum.com/product-detail.html?id=berryflora</loc>
+    <priority>0.8</priority>
+  </url>
+</urlset>
