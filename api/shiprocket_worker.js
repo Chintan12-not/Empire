@@ -103,7 +103,7 @@ export default {
                         order_items: orderItems,
                         sub_total: subTotal,
 
-                        shipping_charges: 0,
+                        shipping_charges: Number(body.shipping_charges || 0),
                         giftwrap_charges: 0,
                         transaction_charges: 0,
                         total_discount: 0,

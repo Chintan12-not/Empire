@@ -382,6 +382,8 @@
                     <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to
                         Payment</button>
 
+
+
                 </div>
             </aside>
         </div>
@@ -521,65 +523,10 @@
                     theme: { color: "#d4af37" },
                     handler: async function (response) {
                         try {
-                            const { data: { user } } = await supabaseClient.auth.getUser();
-                            const cartItems = JSON.parse(localStorage.getItem("empire_cart")) || [];
-
-                            // 1. Log to Supabase
-                            await supabaseClient.from("orders").insert([{
-                                customer_name: orderData.customer_name,
-                                email: orderData.email,
-                                phone: orderData.phone,
-                                address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
-                                total_amount: finalPayableAmount,
-                                referral_code: localStorage.getItem("applied_referral") || null,
-                                status: "paid",
-                                user_id: user ? user.id : null,
-                                razorpay_order_id: response.razorpay_order_id,
-                                items: JSON.stringify(cartItems)
-                            }]);
-
-                            // 2. Create Shiprocket Order
-                            try {
-                                await fetch("https://empire-shiprocket.empire-official2026.workers.dev", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                        name: orderData.customer_name,
-                                        email: orderData.email,
-                                        phone: orderData.phone,
-                                        address: orderData.address,
-                                        city: orderData.city,
-                                        state: orderData.state,
-                                        pincode: orderData.zip,
-                                        items: cartItems
-                                    })
-                                });
-                            } catch (shipErr) {
-                                console.error("Shiprocket Info:", shipErr);
-                                // Don't block success just because automated shipping failed
-                            }
-
-
-                            // 3. Send confirmation email
-                            await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    order_id: response.razorpay_order_id,
-                                    payment_id: response.razorpay_payment_id,
-                                    total: finalAmount,
-                                    customer: orderData,
-                                    items: cartItems
-                                })
-                            });
-
-                            alert("Order Successful 👑");
-                            localStorage.removeItem("empire_cart");
-                            localStorage.removeItem("applied_referral");
-                            window.location.href = "index.html";
+                            await handlePaymentSuccess(response, orderData, finalPayableAmount);
                         } catch (err) {
                             console.error(err);
-                            window.location.href = "index.html";
+                            alert("Payment Handler Error: " + err.message);
                         }
                     },
                     modal: { ondismiss: () => resetSubmitBtn() }
@@ -593,6 +540,153 @@
                 resetSubmitBtn();
             }
         }
+
+
+        async function handlePaymentSuccess(response, orderData, finalAmount) {
+            // alert("DEBUG: handlePaymentSuccess Started");
+            let customOrderId = response.razorpay_order_id; // Fallback to Razorpay ID
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                // alert("DEBUG: User fetched");
+
+                const cartItems = JSON.parse(localStorage.getItem("empire_cart")) || [];
+
+                // 1. Log to Supabase
+                try {
+                    // alert("DEBUG: Attempting to insert order into Supabase...");
+                    const { data, error } = await supabaseClient.from("orders").insert([{
+                        customer_name: orderData.customer_name,
+                        email: orderData.email,
+                        phone: orderData.phone,
+                        address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
+                        total_amount: finalAmount,
+                        referral_code: localStorage.getItem("applied_referral") || null,
+                        status: "paid",
+                        user_id: user ? user.id : null,
+                        razorpay_order_id: response.razorpay_order_id,
+                        items: JSON.stringify(cartItems)
+                    }]).select().single();
+
+                    if (error) throw error;
+
+                    if (data && data.seq_id) {
+                        customOrderId = "EM2026" + String(data.seq_id).padStart(2, '0');
+                        console.log("Generated Custom Order ID:", customOrderId);
+                    }
+                    // alert("DEBUG: Order Inserted to Supabase Successfully");
+                } catch (dbErr) {
+                    // alert("DEBUG: Supabase Insert Failed: " + dbErr.message + "\nDetails: " + JSON.stringify(dbErr));
+                    console.error("Supabase Error:", dbErr);
+                }
+
+                // 2. Send confirmation email (New Resend Worker) - PRIORITIZED
+                try {
+                    // alert("DEBUG: Attempting to send email via New Worker...");
+                    const emailRes = await fetch("https://emailworker.empire-official2026.workers.dev", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            order_id: customOrderId, // Use Custom ID here
+                            payment_id: response.razorpay_payment_id,
+                            total: finalAmount,
+                            customer: orderData,
+                            items: cartItems
+                        })
+                    });
+
+                    if (!emailRes.ok) {
+                        const errText = await emailRes.text();
+                        console.error("Email Worker Failed! Status: " + emailRes.status + "\nResponse: " + errText);
+                    } else {
+                        const successText = await emailRes.text();
+                        console.log("Email Worker Success! response: " + successText);
+                    }
+                } catch (e) {
+                    console.error("New Email Worker Failed", e);
+                }
+
+                // 3. Send Admin Notification (Original Worker)
+                try {
+                    await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            order_id: response.razorpay_order_id,
+                            payment_id: response.razorpay_payment_id,
+                            total: finalAmount,
+                            customer: orderData,
+                            items: cartItems
+                        })
+                    });
+                } catch (adminErr) {
+                    console.error("Admin Email Failed:", adminErr);
+                }
+
+                // 4. Create Shiprocket Order
+                try {
+                    // alert("DEBUG: Starting Shiprocket Logic...");
+                    // Calculate Discount Logic for Shiprocket
+
+                    const originalCartTotal = cartItems.reduce((s, i) => s + (i.price * (i.units || i.qty)), 0);
+                    const totalPaid = finalAmount; // Amount is in Rupees (passed directly)
+                    const effectiveShipping = SHIPPING_CHARGE;
+                    const paidForProducts = totalPaid - effectiveShipping;
+
+                    // Create adjusted items items list
+                    const shiprocketItems = cartItems.map(item => {
+                        const itemTotalOriginal = item.price * (item.units || item.qty);
+                        const share = itemTotalOriginal / originalCartTotal;
+                        const adjustedTotal = paidForProducts * share;
+                        const adjustedUnit = adjustedTotal / (item.units || item.qty);
+
+                        return {
+                            ...item,
+                            selling_price: Math.floor(adjustedUnit)
+                        };
+                    });
+
+                    // Add a timeout to prevent hanging
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+                    await fetch("https://empire-shiprocket.empire-official2026.workers.dev", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            name: orderData.customer_name,
+                            email: orderData.email,
+                            phone: orderData.phone,
+                            address: orderData.address,
+                            city: orderData.city,
+                            state: orderData.state,
+                            pincode: orderData.zip,
+                            items: shiprocketItems,
+                            shipping_charges: effectiveShipping,
+                            payment_method: "Prepaid"
+                        }),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    alert("DEBUG: Shiprocket Logic Finished Successfully");
+                } catch (shipErr) {
+                    alert("DEBUG: Shiprocket Failed: " + shipErr.message);
+                    console.error("Shiprocket Info:", shipErr);
+                }
+
+
+
+
+                alert("Thank you for ordering 👑\n\nYou will receive shipping details and tracking soon on mail.\n\nWe have received your order and are preparing it with care.");
+                localStorage.removeItem("empire_cart");
+                localStorage.removeItem("applied_referral");
+                window.location.href = "index.html";
+            } catch (err) {
+                console.error("Payment Success Handler Error:", err);
+                window.location.href = "index.html";
+            }
+        }
+
 
         function resetSubmitBtn() {
             const btn = document.getElementById('submitBtn');
