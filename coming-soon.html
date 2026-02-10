@@ -1,36 +1,217 @@
 <!doctype html>
 <html>
+
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <meta name="theme-color" content="#000000" />
   <title>Coming Soon — E'MPIRE</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="apple-touch-icon" href="images/logo.png">
+  <meta name="description"
+    content="Stay tuned for upcoming luxury fragrances from E'MPIRE. New scents are being crafted." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://empireparfum.com/coming-soon.html" />
   <link rel="stylesheet" href="style.css">
 </head>
 <audio id="bgAudio" preload="auto">
-    <source src="audio/empire-audio.mpeg" type="audio/mpeg">
+  <source src="audio/empire-audio.mpeg" type="audio/mpeg">
 </audio>
 
 <button id="audioToggle">🔊</button>
 
 <body>
 
-<header class="nav">
-  <div class="nav-left"><span class="brand">E'MPIRE</span></div>
-  <div class="nav-right">
-    <a href="index.html" class="btn ghost small">← Back</a>
-  </div>
-</header>
+  <header class="nav">
+    <div class="nav-left">
+      <img src="images/logo.png" alt="E'MPIRE Logo" class="logo-img">
+      <span class="brand">E'MPIRE</span>
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="btn ghost small">← Back</a>
+      <button id="cartBtn" class="icon-btn" onclick="toggleCart()">
+        🛒 <span id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
 
-<main class="container" style="padding:160px 0 80px;">
-  <h1 class="gold-text" style="text-align:center;">Coming Soon</h1>
+  <main class="container" style="padding:160px 0 80px;">
+    <h1 class="gold-text" style="text-align:center;">Coming Soon</h1>
 
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;margin-top:60px;">
-    <div class="product-card coming-soon"><div class="coming-soon-box">COMING SOON</div></div>
-    <div class="product-card coming-soon"><div class="coming-soon-box">COMING SOON</div></div>
-    <div class="product-card coming-soon"><div class="coming-soon-box">COMING SOON</div></div>
-    <div class="product-card coming-soon"><div class="coming-soon-box">COMING SOON</div></div>
-    <div class="product-card coming-soon"><div class="coming-soon-box">COMING SOON</div></div>
-    <div class="product-card coming-soon"><div class="coming-soon-box">COMING SOON</div></div>
+    <div id="dynamic-products-grid"
+      style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;margin-top:60px;">
+      <div class="product-card coming-soon">
+        <div class="coming-soon-box">COMING SOON</div>
+      </div>
+      <div class="product-card coming-soon">
+        <div class="coming-soon-box">COMING SOON</div>
+      </div>
+      <div class="product-card coming-soon">
+        <div class="coming-soon-box">COMING SOON</div>
+      </div>
+      <div class="product-card coming-soon">
+        <div class="coming-soon-box">COMING SOON</div>
+      </div>
+      <div class="product-card coming-soon">
+        <div class="coming-soon-box">COMING SOON</div>
+      </div>
+      <div class="product-card coming-soon">
+        <div class="coming-soon-box">COMING SOON</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- CART SIDEBAR -->
+  <div id="cartSidebar" class="cart-sidebar">
+    <div class="cart-sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>Selection</h3>
+      <button class="icon-btn" onclick="toggleCart()">✕</button>
+    </div>
+    <div id="cartItemsContainer" class="cart-items-body" style="flex:1; overflow-y:auto; padding: 20px 0;">
+      <p class="empty-msg">Your selection is empty.</p>
+    </div>
+    <div class="cart-sidebar-footer" style="padding-top: 20px; border-top: 1px solid #222;">
+      <div class="cart-total"
+        style="display:flex; justify-content:space-between; margin-bottom: 20px; font-weight: bold;">
+        <span>Total:</span>
+        <span id="cartTotalValue">₹0</span>
+      </div>
+      <button class="btn primary" style="width:100%;" onclick="location.href='checkout.html'">Checkout</button>
+    </div>
   </div>
-</main>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="auth-modal">
+    <div class="auth-box">
+      <button class="close-btn" onclick="closeAuth()">✕</button>
+
+      <div id="authStepChoice">
+        <h2 class="gold-text">Welcome to E'MPIRE</h2>
+        <p style="color: #888; margin-bottom: 25px; font-size: 0.9rem;">Join the elite circle.</p>
+
+        <button type="button" class="btn primary" style="width:100%; margin-bottom:15px;" onclick="showEmailLogin()">
+          Sign in with Email
+        </button>
+
+        <button type="button" class="btn google-btn" onclick="signInWithGoogle()"
+          style="width: 100%; background: #fff; color: #000; border: none; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; cursor: pointer;">
+          <i class="fab fa-google"></i> Continue with Google
+        </button>
+
+        <div style="margin: 20px 0; display: flex; align-items: center; color: #444;">
+          <hr style="flex:1; border: 0.5px solid #222;">
+          <span style="padding: 0 10px; font-size: 12px;">OR</span>
+          <hr style="flex:1; border: 0.5px solid #222;">
+        </div>
+
+        <button type="button" class="btn ghost" onclick="showEmailSignUp()" style="width:100%;">Create New
+          Account</button>
+      </div>
+
+      <div id="authStepEmail" style="display:none;">
+        <h3 class="gold-text" style="margin-bottom:20px;">Sign In</h3>
+        <input id="authEmail" type="email" placeholder="Email address" required>
+        <div style="position: relative;">
+          <input id="authPassword" type="password" placeholder="Password" required style="padding-right: 45px;">
+          <button type="button" onclick="togglePasswordVisibility('authPassword', this)"
+            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #d4af37; cursor: pointer; font-size: 18px; padding: 5px;"
+            title="Toggle password visibility">
+            👁️
+          </button>
+        </div>
+
+        <button type="button" class="btn primary" style="width:100%; margin-top:10px;" onclick="signIn()">
+          Sign In
+        </button>
+
+        <p style="margin-top:14px; font-size:13px; cursor:pointer; color:#aaa; text-align:center;"
+          onclick="forgotPassword()">
+          Forgot password?
+        </p>
+        <button type="button" class="btn ghost small" onclick="backToChoice()"
+          style="width:100%; border:none; margin-top:10px;">← Back</button>
+      </div>
+
+      <div id="authStepSignUp" style="display:none;">
+        <h3 class="gold-text" style="margin-bottom:20px;">Create Account</h3>
+        <input id="signupName" type="text" placeholder="Full Name" required>
+        <input id="signupEmail" type="email" placeholder="Email" required>
+        <input id="signupPhone" type="tel" placeholder="Phone Number">
+        <div style="position: relative;">
+          <input id="signupPassword" type="password" placeholder="Password" required style="padding-right: 45px;">
+          <button type="button" onclick="togglePasswordVisibility('signupPassword', this)"
+            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #d4af37; cursor: pointer; font-size: 18px; padding: 5px;"
+            title="Toggle password visibility">
+            👁️
+          </button>
+        </div>
+
+        <button type="button" class="btn primary" onclick="signUp()"
+          style="width:100%; margin-top:10px;">Register</button>
+        <button type="button" class="btn ghost small" onclick="backToChoice()"
+          style="width:100%; border:none; margin-top:10px;">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMO POPUP -->
+  <div id="promoPopup"
+    style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:4000;">
+    <div class="promo-box" style="position:relative;">
+      <img src="images/Promo.jpeg" style="max-width:90vw; max-height:85vh; border-radius:12px;" />
+      <button onclick="closePopup()"
+        style="position:absolute; top:-14px; right:-14px; width:36px; height:36px; border-radius:50%; border:none; background:#d4af37; color:#000; font-size:18px; cursor:pointer;">✕</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <script>
+    // --- PROMO & AUTH POPUP LOGIC ---
+    window.onload = function () {
+      // Check Promo First
+      const promoPopup = document.getElementById("promoPopup");
+      const hasSeenPromo = sessionStorage.getItem("hasSeenEmpirePromo");
+
+      if (promoPopup && !hasSeenPromo) {
+        // Show Promo after very short delay
+        setTimeout(() => {
+          promoPopup.style.display = "flex";
+        }, 500);
+      } else {
+        // Promo already seen, proceed to check Auth
+        checkAndShowAuth();
+      }
+    };
+
+    function closePopup() {
+      const popup = document.getElementById("promoPopup");
+      sessionStorage.setItem("hasSeenEmpirePromo", "true");
+
+      if (popup) {
+        popup.classList.add("closing");
+        setTimeout(() => {
+          popup.style.display = "none";
+          checkAndShowAuth();
+        }, 350);
+      }
+    }
+
+    function checkAndShowAuth() {
+      setTimeout(() => {
+        if (!window.currentUser && !sessionStorage.getItem("hasDescidedAuth")) {
+          const authModal = document.getElementById("authModal");
+          if (authModal) {
+            authModal.classList.add("active");
+            sessionStorage.setItem("hasDescidedAuth", "true");
+          }
+        }
+      }, 1000);
+    }
+  </script>
 
 </body>
+
 </html>

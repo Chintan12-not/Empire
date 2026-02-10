@@ -109,11 +109,62 @@ const SUPABASE_KEY = "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L";
 
 
 
-const supabaseClient = window.supabase
+// Initialize lazily to avoid race conditions or ReferenceErrors
+let supabaseClient = null;
 
-    ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+function initSupabase() {
+    if (supabaseClient) return supabaseClient;
 
-    : null;
+    if (window.supabase) {
+        try {
+            // Use window.supabase explicitly with standard config
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true
+                }
+            });
+            console.log("Supabase Client Initialized");
+
+            // --- GLOBAL AUTH LISTENER (Moved Inside Init) ---
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                console.log("Global Auth Event:", event); // DEBUG LOG to confirm it runs
+
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+                    window.currentUser = session?.user || null;
+                    console.log("Auth State Changed: Set User to:", window.currentUser?.email);
+
+                    // Safe call to UI updates
+                    if (typeof updateAuthUI === 'function') updateAuthUI();
+                    if (window.currentUser && typeof loadUserCart === 'function') loadUserCart();
+
+                    if (event === 'SIGNED_IN') {
+                        authInProgress = false;
+                        if (typeof closeAuth === 'function') closeAuth();
+
+                        // Admin Redirect
+                        if (session?.user?.email === "chintanmaheshwari714@gmail.com") {
+                            window.location.href = "admin-secret.html";
+                        }
+                    }
+
+                } else if (event === 'SIGNED_OUT') {
+
+                    console.log("User Signed Out");
+                    window.currentUser = null;
+                    if (typeof updateAuthUI === 'function') updateAuthUI();
+                    if (typeof clearUserCart === 'function') await clearUserCart();
+                }
+            });
+        } catch (e) {
+            console.error("Supabase Init Error:", e);
+        }
+    } else {
+        console.warn("window.supabase not found");
+    }
+    return supabaseClient;
+}
 
 
 
@@ -220,6 +271,7 @@ const productDatabase = {
         originalPrice: 4200,
 
         img: "images/Fruity Forest 1.jpg",
+        images: ["images/Fruity Forest 1.jpg", "images/Fruity Forest 2.jpg", "images/Fruity Forest 3.jpg"],
 
         tagline: "Fresh • Fruity • Floral • Elegant • Modern",
 
@@ -244,6 +296,7 @@ const productDatabase = {
         originalPrice: 4200,
 
         img: "images/Crown of Dunes 1.jpg",
+        images: ["images/Crown of Dunes 1.jpg", "images/Crown of Dunes 2.jpg", "images/Crown of Dunes 3.jpg"],
 
         tagline: "Warm • Amber • Spicy • Woody • Luxurious",
 
@@ -268,6 +321,7 @@ const productDatabase = {
         originalPrice: 4800,
 
         img: "images/Supermale 1.jpg",
+        images: ["images/Supermale 1.jpg", "images/Supermale 2.jpg"],
 
         tagline: "Fresh • Bold • Modern • Addictive",
 
@@ -292,6 +346,7 @@ const productDatabase = {
         originalPrice: 4200,
 
         img: "images/Berry Flora 1.jpg",
+        images: ["images/Berry Flora 1.jpg", "images/Berry Flora 2.jpg", "images/Berry Flora 3.jpg", "images/Berry Flora 4.jpg", "images/Berry Flora 5.jpg"],
 
         tagline: "Soft • Floral • Fruity • Feminine • Elegant",
 
@@ -361,6 +416,153 @@ const productReviews = {
 
 };
 
+// ==================================================
+// DYNAMIC PRODUCT LOGIC
+// ==================================================
+
+async function fetchAndMergeDynamicProducts() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('products')
+            .select('*')
+            .order('created_at', { ascending: false }); // Newest first
+
+        if (error || !data) return;
+
+        data.forEach(p => {
+            // Parse Size from Category (hack)
+            let cat = p.category || "Luxury Fragrance";
+            let size = "50 ml"; // default
+
+            if (cat.includes("|SIZE:")) {
+                const parts = cat.split("|SIZE:");
+                cat = parts[0];
+                size = parts[1];
+            }
+
+            // Add to global database
+            productDatabase[p.id] = {
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                originalPrice: p.price,
+                img: p.images && p.images.length > 0 ? p.images[0] : "images/logo.png",
+                images: p.images || [],
+                tagline: cat,
+                size: size, // New property
+                description: p.description || "No description available.",
+                top: "Signature Blend",
+                heart: "Exotic Notes",
+                base: "Long-lasting Musk"
+            };
+        });
+
+        console.log("Dynamic products loaded:", data.length);
+
+    } catch (err) {
+        console.error("Failed to load dynamic products:", err);
+    }
+}
+
+function renderHomepageLatest() {
+    const dynamicKeys = Object.keys(productDatabase).filter(k => k.length > 20);
+    const container = document.getElementById("homepage-collection-grid");
+
+    if (!container) return;
+
+    // VISUAL SUCCESS DEBUG
+    if (dynamicKeys.length > 0) {
+        // Remove any previous error messages if exists (simple check)
+        // container.innerHTML = ""; // Don't clear hardcoded immediately, append first? 
+        // Logic says append.
+    }
+
+    console.log("Rendering Homepage. Dynamic Keys found:", dynamicKeys.length);
+
+    if (dynamicKeys.length === 0) return;
+
+    // Take ONLY the first 2
+    const latestTwo = dynamicKeys.slice(0, 2);
+
+    latestTwo.forEach(key => {
+        const p = productDatabase[key];
+        const html = generateProductCardHtml(p);
+        container.insertAdjacentHTML('beforeend', html);
+    });
+
+    // Re-init sliders
+    setTimeout(initSliders, 500);
+}
+
+
+function renderComingSoonProducts() {
+    const dynamicKeys = Object.keys(productDatabase).filter(k => k.length > 20);
+    const container = document.getElementById("dynamic-products-grid");
+
+    if (!container) return;
+
+    // User requested "Rest" here, but usually "Show More" implies all.
+    // Based on usability, "Show More" / "Coming Soon" should probably show ALL new items.
+    // Removing the slice limit so you can see your new products here too.
+    const overflowProducts = dynamicKeys.slice(0); // Show ALL
+
+    if (overflowProducts.length === 0) {
+        // If no products, show message
+        container.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:#888;">No new products yet. Check back soon!</p>`;
+        return;
+    }
+
+    // Clear Placeholders
+    container.innerHTML = "";
+
+    overflowProducts.forEach(key => {
+        const p = productDatabase[key];
+        const html = generateProductCardHtml(p);
+        container.insertAdjacentHTML('beforeend', html);
+    });
+
+    setTimeout(initSliders, 500);
+}
+
+function safeQuote(str) {
+    if (!str) return '';
+    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function generateProductCardHtml(p) {
+    let mediaHtml = '';
+    if (p.images && p.images.length > 1) {
+        mediaHtml = `<div class="product-media slider" onclick="viewProduct('${safeQuote(p.id)}')">
+            ${p.images.map((img, i) => `<img src="${img}" class="slide ${i === 0 ? 'active' : ''}" alt="${p.name}">`).join('')}
+        </div>`;
+    } else {
+        mediaHtml = `<div class="product-media" onclick="viewProduct('${safeQuote(p.id)}')">
+            <img src="${p.img}" alt="${p.name}">
+        </div>`;
+    }
+
+    return `
+    <article class="product-card reveal-hidden">
+        ${mediaHtml}
+        <div class="product-body neesh-style">
+            <h3 class="product-name">${p.name}</h3>
+            <div class="product-tag">${p.tagline}</div>
+            <div class="product-meta">${p.size || '50 ml'} • Eau De Parfum</div>
+            <p class="product-desc">${p.description.substring(0, 80)}...</p>
+            <div class="price-block">
+                <span class="new-price">₹${p.price.toLocaleString()}</span>
+            </div>
+            <div class="discount-text">70% OFF WITH CODE: EMPIRE26</div>
+            <div class="button-group" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn primary small" style="flex: 1;" onclick="addToCart('${safeQuote(p.name)}', ${p.price})">Add to Cart</button>
+                <button class="btn ghost small" style="flex: 1;" onclick="buyNow('${safeQuote(p.name)}', ${p.price})">Buy Now</button>
+                <button class="btn ghost small" onclick="shareProduct('${safeQuote(p.name)}')">Share</button>
+            </div>
+        </div>
+    </article>
+    `;
+}
+
 
 
 // ==================================================
@@ -371,30 +573,38 @@ const productReviews = {
 
 
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
+
+    // 1. Fetch Dynamic Products FIRST
+    initSupabase(); // Ensure client is ready
+
+    if (supabaseClient) {
+        await fetchAndMergeDynamicProducts();
+    } else {
+        // No log here
+    }
+
+    // 2. Render on Homepage
+    if (window.location.pathname.endsWith("index.html") || window.location.pathname === "/") {
+        renderHomepageLatest();
+    }
+
+    // 3. Render on Coming Soon Page
+    if (window.location.pathname.includes("coming-soon.html")) {
+        renderComingSoonProducts();
+    }
 
     // Product Detail Setup
-
     const productContainer = document.getElementById("productDetailContainer");
-
     if (productContainer) {
-
         const params = new URLSearchParams(window.location.search);
-
         const productId = params.get("id");
-
         if (productId) {
-
             renderProductDetail(productId);
-
             loadReviews(productId);
-
         } else {
-
             renderNotFound(productContainer);
-
         }
-
     }
 
 
@@ -575,87 +785,21 @@ document.addEventListener("input", (e) => {
 // ==================================================
 
 // 5. AUTHENTICATION (SUPABASE)
-
 // ==================================================
 
-
-
-if (supabaseClient) {
-
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-
-        currentUser = session?.user || null;
-
-        updateAuthUI();
-
-
-
-        if (event === "SIGNED_IN") {
-
-            authInProgress = false;
-
-            closeAuth();
-
-
-
-            // Load user's cart from database
-
-            await loadUserCart();
-
-
-
-            // Check if admin user
-
-            if (session?.user?.email === "chintanmaheshwari714@gmail.com") {
-
-                window.location.href = "admin-secret.html";
-
-            }
-
-        }
-
-
-
-        if (event === "SIGNED_OUT") {
-
-            currentUser = null;
-
-            updateAuthUI();
-
-
-
-            // Clear cart on logout
-
-            await clearUserCart();
-
-        }
-
-    });
-
-}
-
-
+// Try to init immediately for auth listeners (if loaded)
+// Listener moved to initSupabase
 
 async function checkAuth() {
-
     if (!supabaseClient) return;
-
     const { data: { user } } = await supabaseClient.auth.getUser();
-
-    currentUser = user;
-
+    window.currentUser = user;
     updateAuthUI();
 
-
-
     // Load user's cart if they're logged in
-
-    if (currentUser) {
-
+    if (window.currentUser) {
         await loadUserCart();
-
     }
-
 }
 
 
@@ -665,12 +809,18 @@ function updateAuthUI() {
     const menu = document.getElementById("mobileMenu");
     const mobileLink = document.getElementById("mobileAuthLink");
 
-    if (!btn) return;
+    if (!btn) {
+        console.error("Auth Button not found!");
+        return;
+    }
 
-    if (currentUser) {
-        const name = currentUser.user_metadata?.full_name || currentUser.email.split("@")[0];
+    console.log("Updating Auth UI. Current User:", currentUser ? currentUser.email : "None");
+
+    if (window.currentUser) {
+        const name = window.currentUser.user_metadata?.full_name || window.currentUser.email.split("@")[0];
         const displayText = `Hi, ${name}`;
 
+        console.log("Setting button text (Desktop) to:", displayText);
         // Desktop / Header Button
         btn.innerHTML = displayText;
         btn.onclick = (e) => {
@@ -717,8 +867,7 @@ function updateAuthUI() {
 
 
 function openAuth() {
-
-    if (currentUser) return;
+    if (window.currentUser) return;
 
     const modal = document.getElementById("authModal");
 
@@ -731,13 +880,9 @@ function openAuth() {
 
 
 function requireAuth(callback) {
-
-    if (currentUser) {
-
+    if (window.currentUser) {
         callback?.();
-
         return true;
-
     }
 
     if (!authInProgress) {
@@ -893,9 +1038,7 @@ async function signUp() {
         if (data.session) {
 
             // User is automatically signed in (email confirmation disabled)
-
-            currentUser = data.user;
-
+            window.currentUser = data.user;
             updateAuthUI();
 
 
@@ -938,8 +1081,8 @@ async function signUp() {
 
                     // Sign in successful
 
-                    currentUser = signInData.user;
-
+                    // Sign in successful
+                    window.currentUser = signInData.user;
                     updateAuthUI();
 
 
@@ -1047,9 +1190,7 @@ async function signIn() {
 
 
         if (data?.user) {
-
-            currentUser = data.user;
-
+            window.currentUser = data.user;
             updateAuthUI();
 
 
@@ -1237,36 +1378,24 @@ async function logout() {
 
     // 2. Optimistic feedback provided by button text "Logging out..." (handled in click listener)
 
-    // 3. Robust Sign Out with Timeout
-    // We race the signOut promise against a 2-second timeout to prevent hanging
-    const signOutPromise = supabaseClient.auth.signOut();
-    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 2000));
-
+    // 3. Standard Sign Out
     try {
-        await Promise.race([signOutPromise, timeoutPromise]);
+        await supabaseClient.auth.signOut();
+        // The onAuthStateChange listener will handle the rest (clearing user, updating UI)
+        // But for immediate feedback, we can force a UI update here too if desired, 
+        // though it's better to let the listener drive the state.
+        console.log("Sign out successful");
     } catch (err) {
-        console.warn("Logout race error:", err);
+        console.error("Logout error:", err);
+        // Fallback: Force clear if network failed
+        window.currentUser = null;
+        updateAuthUI();
+        clearUserCart();
     }
 
-    // 4. Force Local Cleanup (in case signOut didn't fire event or timed out)
-    // Manually ensure UI is updated if onAuthStateChange didn't catch it yet
-    if (supabaseClient.auth.getSession()) {
-        // If mostly likely session is gone or we want to force it
-    }
-
-    // Let's rely on onAuthStateChange, but if that failed to fire, we might want to reload or force update.
-    // However, usually signOut clears localStorage synchronously-ish for the client before network.
-
-    // 5. Show confirmation
+    // 4. Show confirmation
     setTimeout(() => {
         alert("You have been logged out. Your cart has been saved 🛒");
-
-        // Double check UI is reset
-        if (currentUser) {
-            currentUser = null;
-            updateAuthUI();
-            clearUserCart();
-        }
     }, 100);
 }
 
@@ -1608,9 +1737,22 @@ function renderProductDetail(productId) {
         <div class="luxury-detail-grid">
 
             <div class="luxury-image">
+            <div class="luxury-image">
+                ${(() => {
+            // Normalize images: Use array if valid, else fallback to single img wrapped in array
+            const safeImages = (product.images && Array.isArray(product.images) && product.images.length > 0)
+                ? product.images
+                : (product.img ? [product.img] : ["images/logo.png"]);
 
-                <img src="${product.img}" alt="${product.name}">
-
+            if (safeImages.length > 1) {
+                return `<div class="slider" style="height:100%; border-radius:0;">
+                            ${safeImages.map((img, i) => `<img src="${img}" class="slide ${i === 0 ? 'active' : ''}" alt="${product.name}" style="border-radius:10px;">`).join('')}
+                         </div>`;
+            } else {
+                return `<img src="${safeImages[0]}" alt="${product.name}">`;
+            }
+        })()}
+            </div>
             </div>
 
             <div class="luxury-info">
@@ -1655,13 +1797,13 @@ function renderProductDetail(productId) {
 
                     </div>
 
-                    <button class="btn primary" onclick="addToCart('${product.name}', ${product.price}, parseInt(document.getElementById('detailQty').innerText))">
+                    <button class="btn primary" onclick="addToCart('${safeQuote(product.name)}', ${product.price}, parseInt(document.getElementById('detailQty').innerText))">
 
                         Add to Cart
 
                     </button>
 
-                    <button class="btn ghost" onclick="shareProduct('${product.name}')">
+                    <button class="btn ghost" onclick="shareProduct('${safeQuote(product.name)}')">
 
                         <span style="font-size: 1.2rem;">➦</span> Share
 
@@ -1678,6 +1820,9 @@ function renderProductDetail(productId) {
         ${renderRelatedProducts(productId)}
 
     `;
+
+    // Initialize slider for this specific view
+    setTimeout(initSliders, 500);
 
 }
 
@@ -2172,24 +2317,28 @@ function initContactForm() {
 
 
 function initSliders() {
-
     document.querySelectorAll(".slider").forEach(slider => {
+        // Prevent duplicate initialization
+        if (slider.dataset.sliderInit === "true") return;
 
         const slides = slider.querySelectorAll(".slide");
+        if (slides.length <= 1) return; // No need to slide if 1 or 0 images
 
-        if (slides.length === 0) return;
-
+        slider.dataset.sliderInit = "true";
         let index = 0;
 
+        // Ensure first slide is active if none are
+        if (!slider.querySelector(".slide.active")) {
+            slides[0].classList.add("active");
+        }
+
         setInterval(() => {
-
             slides[index].classList.remove("active");
-
             index = (index + 1) % slides.length;
-
             slides[index].classList.add("active");
-
         }, 2500);
     });
-
 }
+
+// Run immediately for static content (Homepage)
+initSliders();

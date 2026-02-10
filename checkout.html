@@ -379,6 +379,7 @@
                         </div>
                     </div>
 
+
                     <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to
                         Payment</button>
 
@@ -407,11 +408,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
 
-            if (!session) {
-                alert("Please login to complete your purchase 👑");
-                window.location.href = "index.html?open_auth=true";
-                return;
-            }
+            // REMOVED STRICT LOAD CHECK
+            // We allow guests to VIEW, but force login at PAYMENT.
 
             if (session) {
                 // Try to load from DB if localStorage is empty
@@ -700,6 +698,15 @@
             const form = document.getElementById('checkoutForm');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+
+                // 1. CHECK AUTH ON SUBMIT
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    alert("Please login to proceed to payment 👑");
+                    window.location.href = "index.html?open_auth=true";
+                    return;
+                }
+
                 const btn = document.getElementById('submitBtn');
                 btn.disabled = true;
                 const originalText = btn.innerText;
@@ -731,6 +738,7 @@
             document.getElementById("discountCode").value = "EMPIRE26";
             applyDiscount();
         }
+
 
 
     </script>

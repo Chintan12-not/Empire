@@ -8,20 +8,25 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>E'MPIRE — Luxury Indian Perfumes & Fragrances</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="apple-touch-icon" href="images/logo.png">
     <meta name="description"
-        content="Discover E'MPIRE's exclusive collection of premium Indian perfumes. Handcrafted luxury fragrances including Smoked Whisky, Ocean Aura, and more. Shop now." />
+        content="Discover E'MPIRE's exclusive collection of premium Indian perfumes. Handcrafted luxury fragrances for men and women including Smoked Whisky, Ocean Aura, and more. Shop now." />
     <meta name="keywords"
-        content="perfume, luxury fragrance, indian perfume, eau de parfum, premium scent, empire perfume, long lasting perfume India" />
+        content="perfume, luxury fragrance, indian perfume, eau de parfum, premium scent, empire perfume, long lasting perfume India, handcrafted perfume" />
     <meta name="author" content="E'MPIRE Perfumes" />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://empireparfum.com/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://empireparfum.com/" />
+    <meta property="og:site_name" content="E'MPIRE Perfumes" />
     <meta property="og:title" content="E'MPIRE — Luxury Indian Perfumes" />
     <meta property="og:description"
-        content="Experience the art of noble fragrances. Handcrafted luxury perfumes for men and women." />
+        content="Experience the art of noble fragrances. Handcrafted luxury perfumes for men and women. Discover your signature scent." />
     <meta property="og:image" content="https://empireparfum.com/images/meta-share.jpg" />
+    <meta property="og:image:alt" content="E'MPIRE Luxury Perfume Collection" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
@@ -47,11 +52,64 @@
           "name": "E'MPIRE Perfumes",
           "url": "https://empireparfum.com/",
           "logo": "https://empireparfum.com/images/logo.png",
+          "sameAs": [
+            "https://www.instagram.com/empireperfumes.official",
+            "https://wa.me/919911261347"
+          ],
           "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+91-9911261347",
-            "contactType": "Customer Service"
+            "contactType": "Customer Service",
+            "areaServed": "IN",
+            "availableLanguage": "en"
           }
+        },
+        {
+          "@type": "ItemList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Smoked Whisky",
+              "url": "https://empireparfum.com/product-detail.html?id=whisky"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Ocean Aura",
+              "url": "https://empireparfum.com/product-detail.html?id=ocean"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Blush ELIXIR",
+              "url": "https://empireparfum.com/product-detail.html?id=blush"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Pear Forest",
+              "url": "https://empireparfum.com/product-detail.html?id=pearforest"
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "name": "Crown of Dunes",
+              "url": "https://empireparfum.com/product-detail.html?id=crown"
+            },
+            {
+              "@type": "ListItem",
+              "position": 6,
+              "name": "Supermale",
+              "url": "https://empireparfum.com/product-detail.html?id=supermale"
+            },
+            {
+              "@type": "ListItem",
+              "position": 7,
+              "name": "Berry Flora",
+              "url": "https://empireparfum.com/product-detail.html?id=berryflora"
+            }
+          ]
         },
         {
           "@type": "Product",
@@ -63,7 +121,8 @@
             "@type": "Offer",
             "priceCurrency": "INR",
             "price": "2800",
-            "availability": "https://schema.org/InStock"
+            "availability": "https://schema.org/InStock",
+            "url": "https://empireparfum.com/product-detail.html?id=whisky"
           }
         },
         {
@@ -76,7 +135,8 @@
             "@type": "Offer",
             "priceCurrency": "INR",
             "price": "2800",
-            "availability": "https://schema.org/InStock"
+            "availability": "https://schema.org/InStock",
+            "url": "https://empireparfum.com/product-detail.html?id=ocean"
           }
         }
       ]
@@ -153,8 +213,8 @@
         <button id="audioToggle" aria-label="Toggle sound">🔊</button>
 
         <div class="hero-inner reveal-hidden">
-            <h1 class="gold-text">E'MPIRE</h1>
-            <p class="subtitle">Experience Noble Fragrances</p>
+            <h1 class="gold-text">E'MPIRE PERFUMES</h1>
+            <p class="subtitle">Experience India's Finest Luxury Scents</p>
             <div class="hero-cta">
                 <a href="#featured" class="btn primary">Explore Collection</a>
             </div>
@@ -165,12 +225,14 @@
         <div class="container">
             <h2 class="section-title reveal-hidden">The Collection</h2>
 
-            <div
+            <div id="homepage-collection-grid"
                 style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 50px;">
+
+                <!-- SYSTEM STATUS CHECK REMOVED -->
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media" onclick="viewProduct('whisky')">
-                        <img src="images/Smoked Whisky.jpg" alt="Smoked Whisky Luxury Perfume Bottle">
+                        <img src="images/Smoked Whisky.jpg" alt="Smoked Whisky Luxury Perfume Bottle" loading="lazy">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Smoked Whisky</h3>
@@ -195,7 +257,7 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media" onclick="viewProduct('ocean')">
-                        <img src="images/Ocean Aura.jpg" alt="Ocean Aura Fresh Aquatic Fragrance">
+                        <img src="images/Ocean Aura.jpg" alt="Ocean Aura Fresh Aquatic Fragrance" loading="lazy">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Ocean Aura</h3>
@@ -220,7 +282,7 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media" onclick="viewProduct('blush')">
-                        <img src="images/Blush ELIXIR.jpg" alt="Blush Elixir Floral Perfume for Her">
+                        <img src="images/Blush ELIXIR.jpg" alt="Blush Elixir Floral Perfume for Her" loading="lazy">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Blush ELIXIR</h3>
@@ -244,9 +306,10 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('pearforest')">
-                        <img src="images/Fruity Forest 1.jpg" class="slide active" alt="Pear Forest Fruity Perfume">
-                        <img src="images/Fruity Forest 2.jpg" class="slide" alt="Pear Forest Design">
-                        <img src="images/Fruity Forest 3.jpg" class="slide" alt="Pear Forest Packaging">
+                        <img src="images/Fruity Forest 1.jpg" class="slide active" alt="Pear Forest Fruity Perfume"
+                            loading="lazy">
+                        <img src="images/Fruity Forest 2.jpg" class="slide" alt="Pear Forest Design" loading="lazy">
+                        <img src="images/Fruity Forest 3.jpg" class="slide" alt="Pear Forest Packaging" loading="lazy">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Pear Forest</h3>
@@ -271,9 +334,9 @@
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('crown')">
                         <img src="images/Crown of Dunes 1.jpg" class="slide active"
-                            alt="Crown of Dunes Premium Oud Fragrance">
-                        <img src="images/Crown of Dunes 2.jpg" class="slide" alt="Crown of Dunes Bottle">
-                        <img src="images/Crown of Dunes 3.jpg" class="slide" alt="Crown of Dunes Box">
+                            alt="Crown of Dunes Premium Oud Fragrance" loading="lazy">
+                        <img src="images/Crown of Dunes 2.jpg" class="slide" alt="Crown of Dunes Bottle" loading="lazy">
+                        <img src="images/Crown of Dunes 3.jpg" class="slide" alt="Crown of Dunes Box" loading="lazy">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Crown of Dunes</h3>
@@ -297,8 +360,9 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('supermale')">
-                        <img src="images/Supermale 1.jpg" class="slide active" alt="Supermale Bold Men's Perfume">
-                        <img src="images/Supermale 2.jpg" class="slide" alt="Supermale Fragrance Bottle">
+                        <img src="images/Supermale 1.jpg" class="slide active" alt="Supermale Bold Men's Perfume"
+                            loading="lazy">
+                        <img src="images/Supermale 2.jpg" class="slide" alt="Supermale Fragrance Bottle" loading="lazy">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Supermale</h3>
@@ -322,12 +386,14 @@
 
                 <article class="product-card reveal-hidden">
                     <div class="product-media slider" onclick="viewProduct('berryflora')">
-                        <img src="images/Berry Flora 1.jpg" class="slide active"
-                            alt="Berry Flora Elegant Women's Scent">
-                        <img src="images/Berry Flora 2.jpg" class="slide" alt="Berry Flora Bottle Detail">
-                        <img src="images/Berry Flora 3.jpg" class="slide" alt="Berry Flora Packaging">
-                        <img src="images/Berry Flora 4.jpg" class="slide" alt="Berry Flora Gift Set">
-                        <img src="images/Berry Flora 5.jpg" class="slide" alt="Berry Flora Lifestyle Shot">
+                        <img src="images/Berry Flora 1.jpg" class="slide active" alt="Berry Flora Elegant Women's Scent"
+                            loading="lazy">
+                        <img src="images/Berry Flora 2.jpg" class="slide" alt="Berry Flora Bottle Detail"
+                            loading="lazy">
+                        <img src="images/Berry Flora 3.jpg" class="slide" alt="Berry Flora Packaging" loading="lazy">
+                        <img src="images/Berry Flora 4.jpg" class="slide" alt="Berry Flora Gift Set" loading="lazy">
+                        <img src="images/Berry Flora 5.jpg" class="slide" alt="Berry Flora Lifestyle Shot"
+                            loading="lazy">
                     </div>
                     <div class="product-body neesh-style">
                         <h3 class="product-name">Berry Flora</h3>
@@ -554,51 +620,76 @@
     <script src="script.js"></script>
 
     <script>
-        // --- PROMO POPUP LOGIC ---
+        // --- PROMO & AUTH POPUP LOGIC ---
         window.onload = function () {
-            const popup = document.getElementById("promoPopup");
+            // Check for Open Auth request (from checkout redirect)
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('open_auth') === 'true') {
+                // Open Auth Modal immediately
+                setTimeout(() => {
+                    const authModal = document.getElementById("authModal");
+                    if (authModal) {
+                        authModal.classList.add("active");
+                        // Optionally check auth state to switch to login vs signup? Default is choice.
+                    }
+                }, 500);
+                // We skip Promo popup in this case to avoid clutter
+                return;
+            }
 
-            // Check if the user has already seen the promo in this session
+            // Check Promo First
+            const promoPopup = document.getElementById("promoPopup");
             const hasSeenPromo = sessionStorage.getItem("hasSeenEmpirePromo");
 
-            if (popup && !hasSeenPromo) {
-                // Show the popup after 1.5 second delay for luxury feel
+            if (promoPopup && !hasSeenPromo) {
+                // Show Promo after very short delay
                 setTimeout(() => {
-                    popup.style.display = "flex";
-                }, 1500);
+                    promoPopup.style.display = "flex";
+                }, 500);
+            } else {
+                // Promo already seen, proceed to check Auth
+                checkAndShowAuth();
             }
         };
 
         function closePopup() {
             const popup = document.getElementById("promoPopup");
-
-            // Mark as seen so it doesn't open again during this session
             sessionStorage.setItem("hasSeenEmpirePromo", "true");
 
             if (popup) {
                 popup.classList.add("closing");
                 setTimeout(() => {
                     popup.style.display = "none";
-                    // Trigger auth modal if user is not logged in
-                    if (typeof currentUser !== 'undefined' && !currentUser) {
-                        document.getElementById("authModal")?.classList.add("active");
-                    } else if (typeof currentUser === 'undefined') {
-                        // Fallback if currentUser variable isn't initialized yet
-                        document.getElementById("authModal")?.classList.add("active");
-                    }
+                    checkAndShowAuth();
                 }, 350);
             }
         }
 
+        function checkAndShowAuth() {
+            setTimeout(() => {
+                if (!window.currentUser && !sessionStorage.getItem("hasDescidedAuth")) {
+                    const authModal = document.getElementById("authModal");
+                    if (authModal) {
+                        authModal.classList.add("active");
+                        sessionStorage.setItem("hasDescidedAuth", "true");
+                    }
+                }
+            }, 1000);
+        }
+
         // --- AUTH UI LOGIC ---
         function showEmailLogin() {
-            document.getElementById('authStepChoice').style.display = 'none';
-            document.getElementById('authStepEmail').style.display = 'block';
+            const el = document.getElementById('authStepChoice');
+            if (el) el.style.display = 'none';
+            const emailStep = document.getElementById('authStepEmail');
+            if (emailStep) emailStep.style.display = 'block';
         }
 
         function showEmailSignUp() {
-            document.getElementById('authStepChoice').style.display = 'none';
-            document.getElementById('authStepSignUp').style.display = 'block';
+            const el = document.getElementById('authStepChoice');
+            if (el) el.style.display = 'none';
+            const signupStep = document.getElementById('authStepSignUp');
+            if (signupStep) signupStep.style.display = 'block';
         }
 
         function backToChoice() {
