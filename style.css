@@ -119,6 +119,7 @@ h4,
   font-weight: 700;
   background: linear-gradient(90deg, var(--gold-light), var(--gold-main));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -275,6 +276,7 @@ h4,
 .gold-text {
   background: linear-gradient(90deg, var(--gold-light), var(--gold-main));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -383,6 +385,65 @@ h4,
   font-size: 12px;
   letter-spacing: 1px;
   margin-top: 5px;
+}
+
+/* === COMBO CARD SPECIFIC STYLES === */
+.combo-card {
+  grid-column: span 1;
+  /* Default mobile behavior */
+  display: flex;
+  flex-direction: column;
+}
+
+/* On larger screens, make combo card span 2 columns and look like a TV/Box */
+@media (min-width: 768px) {
+  .combo-card {
+    grid-column: span 2;
+    flex-direction: row;
+    align-items: stretch;
+    /* Stretch to fill height */
+    text-align: left;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    /* Ensure it takes full grid height */
+  }
+
+  .combo-card .product-media {
+    width: 45%;
+    /* Slightly less than half for better proportion if very wide */
+    margin-bottom: 0;
+    border-radius: 0;
+    height: auto;
+    /* auto height to fill flex parent via align-items stretch */
+    aspect-ratio: auto;
+    background: #000;
+    /* Dark background for contained image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .combo-card .product-media img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    /* Fit image without cropping */
+    padding: 10px;
+    /* Internal padding so image doesn't touch edges */
+  }
+
+  .combo-card .product-body {
+    width: 55%;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .combo-card .combo-options-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
 /* === COMING SOON CARDS (Compact) === */
@@ -1650,3 +1711,284 @@ h4,
       letter-spacing: 2px;
     }
   }
+
+  /* ================================================================
+   ANIMATIONS & MICRO-INTERACTIONS
+   Added: 2026-02-11
+================================================================ */
+
+  /* --- LIQUID GOLD SHIMMER --- */
+  .gold-text {
+    background: linear-gradient(90deg, #b48a2b 0%, #f6e27a 25%, #d4af37 50%, #f6e27a 75%, #b48a2b 100%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: goldShimmer 4s linear infinite;
+  }
+
+  @keyframes goldShimmer {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+  /* --- PAGE TRANSITION --- */
+  body {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  body.loaded {
+    opacity: 1;
+  }
+
+  /* --- MAGNETIC BUTTONS --- */
+  .btn.primary {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+
+  /* --- SCROLL REVEAL UTILITIES --- */
+  .reveal-hidden {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+  }
+
+  .reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Staggered delays for grid items (if needed, or handled via loop index in JS) */
+  .product-card:nth-child(1) {
+    transition-delay: 0.1s;
+  }
+
+  .product-card:nth-child(2) {
+    transition-delay: 0.2s;
+  }
+
+  .product-card:nth-child(3) {
+    transition-delay: 0.3s;
+  }
+
+  .product-card:nth-child(4) {
+    transition-delay: 0.4s;
+  }
+
+  /* --- HERO ANIMATIONS --- */
+  .hero-inner h1,
+  .hero-inner .subtitle,
+  .hero-cta {
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .hero-inner h1 {
+    animation-delay: 0.2s;
+    transform: translateY(30px);
+  }
+
+  .hero-inner .subtitle {
+    animation-delay: 0.4s;
+    transform: translateY(20px);
+  }
+
+  .hero-cta {
+    animation-delay: 0.6s;
+    transform: translateY(20px);
+  }
+
+  @keyframes fadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* --- BUTTON SHINE EFFECT --- */
+  .btn.primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+    pointer-events: none;
+  }
+
+  .btn.primary:hover::after {
+    left: 100%;
+  }
+
+  /* --- MICRO-INTERACTIONS --- */
+  #cartBtn:hover {
+    transform: scale(1.1);
+    color: #fff;
+  }
+
+  .icon-btn {
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .icon-btn:hover {
+    transform: scale(1.1);
+    color: white;
+  }
+
+  /* Smooth Image Hover in Product Detail */
+  .luxury-image img {
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+
+  .luxury-image:hover img {
+    transform: scale(1.02);
+  }
+
+  /* === COMBO OFFER CARD STYLES === */
+  .combo-card {
+    border: 1px solid var(--gold-main);
+    background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Standard Card Layout */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .combo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15);
+  }
+
+  .combo-card .product-media {
+    width: 100%;
+    height: 220px;
+    /* Reduced height */
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+
+  .combo-card .product-media img {
+    object-fit: contain;
+    background: #000;
+  }
+
+  .combo-card .product-body {
+    width: 100%;
+    padding: 15px;
+    /* Reduced padding */
+    text-align: center;
+  }
+
+  /* Specific adjustments for the combo text */
+  .combo-card .product-name {
+    text-align: center;
+    margin-bottom: 5px;
+    font-size: 1.2rem !important;
+    /* Slightly smaller title */
+  }
+
+  .combo-card .product-desc {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+  }
+
+  .combo-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    /* Tighter grid */
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .combo-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #ccc;
+    user-select: none;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 10px;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+  }
+
+  .combo-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Custom Checkbox */
+  .combo-option input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    position: relative;
+    height: 18px;
+    width: 18px;
+    background-color: #222;
+    border: 1px solid #555;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .combo-option input:checked~.checkmark {
+    background-color: var(--gold-main);
+    border-color: var(--gold-main);
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  .combo-option input:checked~.checkmark:after {
+    display: block;
+  }
+
+  .combo-option .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 4px;
+    height: 9px;
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* Disabled state */
+  .combo-option input:disabled~.checkmark {
+    background-color: #111;
+    border-color: #333;
+    cursor: not-allowed;
+  }
+
+  .combo-option input:disabled~span {
+    color: #555;
+  }
+
+  @media (max-width: 600px) {
+    .combo-options-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}

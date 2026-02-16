@@ -490,8 +490,11 @@ function renderHomepageLatest() {
         container.insertAdjacentHTML('beforeend', html);
     });
 
-    // Re-init sliders
-    setTimeout(initSliders, 500);
+    // Re-init sliders AND ScrollReveal for new items
+    setTimeout(() => {
+        initSliders();
+        initScrollReveal();
+    }, 500);
 }
 
 
@@ -521,7 +524,10 @@ function renderComingSoonProducts() {
         container.insertAdjacentHTML('beforeend', html);
     });
 
-    setTimeout(initSliders, 500);
+    setTimeout(() => {
+        initSliders();
+        initScrollReveal();
+    }, 500);
 }
 
 function safeQuote(str) {
@@ -726,6 +732,11 @@ window.addEventListener("DOMContentLoaded", async () => {
             openAuth();
         }, 500); // Slight delay to ensure DOM is ready and any other popups are handled
     }
+
+    // --- PREMIUM ANIMATIONS INIT ---
+    initPageTransition();
+    initMagneticButtons();
+    initParallax();
 });
 
 
@@ -1821,8 +1832,11 @@ function renderProductDetail(productId) {
 
     `;
 
-    // Initialize slider for this specific view
-    setTimeout(initSliders, 500);
+    // Initialize slider and scroll reveal for this specific view
+    setTimeout(() => {
+        initSliders();
+        initScrollReveal();
+    }, 500);
 
 }
 
@@ -2222,28 +2236,92 @@ function shareProduct(name) {
 
 
 
+
+let scrollObserver = null;
+
 function initScrollReveal() {
 
-    const observer = new IntersectionObserver(entries => {
+    if (scrollObserver) {
+        scrollObserver.disconnect();
+    }
+
+    scrollObserver = new IntersectionObserver(entries => {
 
         entries.forEach(e => {
 
-            if (e.isIntersecting) e.target.classList.add("reveal-active");
+            if (e.isIntersecting) {
+                e.target.classList.add("reveal-active");
+                // Optional: Stop observing once revealed to save resources
+                scrollObserver.unobserve(e.target);
+            }
 
         });
 
     }, { threshold: 0.1 });
-
-    document.querySelectorAll(".reveal-hidden").forEach(el => observer.observe(el));
-
+    document.querySelectorAll(".reveal-hidden").forEach(el => scrollObserver.observe(el));
 }
 
+// ==================================================
+// PREMIUM ANIMATIONS LOGIC
+// ==================================================
+
+function initPageTransition() {
+    document.body.classList.add('loaded');
+}
+
+function initMagneticButtons() {
+    const buttons = document.querySelectorAll('.btn.primary');
+
+    if (window.matchMedia("(pointer: coarse)").matches) return; // Disable on touch
+
+    buttons.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+
+            // Magnetic pull strength
+            btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = 'translate(0, 0)';
+        });
+    });
+}
+
+function initParallax() {
+    if (window.matchMedia("(min-width: 769px)").matches) {
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+
+            // Parallax Hero Video
+            const heroVid = document.getElementById('heroVideo');
+            if (heroVid) {
+                heroVid.style.transform = `translate(-50%, calc(-50% + ${scrolled * 0.5}px))`;
+            }
+
+            // Parallax Founders Image (if exists) or other elements
+            const products = document.querySelectorAll('.product-media img');
+            products.forEach(img => {
+                const speed = 0.05;
+                const rect = img.getBoundingClientRect();
+                // Only animate if in view
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const offset = (window.innerHeight - rect.top) * speed;
+                    // subtle vertical shift
+                    // img.style.transform = `scale(1.0) translateY(${offset}px)`; 
+                    // Avoiding conflict with hover scale, so let's stick to Hero Parallax only for now to be safe
+                }
+            });
+        });
+    }
+}
 
 
 function setupWhatsApp() {
 
     const wa = document.querySelector(".whatsapp-float");
-
     if (wa) wa.href = "https://wa.me/919911261347";
 
 }
@@ -2342,3 +2420,87 @@ function initSliders() {
 
 // Run immediately for static content (Homepage)
 initSliders();
+
+// ==================================================
+// 7. COMBO BUY LOGIC (NEW)
+// ==================================================
+
+function validateComboSelection(checkbox) {
+    const checkboxes = document.querySelectorAll('.combo-option input[type="checkbox"]');
+    const checked = Array.from(checkboxes).filter(c => c.checked);
+    const errorMsg = document.getElementById("combo-error");
+
+    // Reset error
+    if (errorMsg) errorMsg.style.display = "none";
+
+    if (checked.length > 2) {
+        // Prevent selection
+        checkbox.checked = false;
+        if (errorMsg) {
+            errorMsg.innerText = "You can only select 2 perfumes for this offer.";
+            errorMsg.style.display = "block";
+        }
+        return;
+    }
+
+    // Optional: Visual feedback for max reached?
+    const parentLabels = document.querySelectorAll('.combo-option');
+    if (checked.length === 2) {
+        parentLabels.forEach(label => {
+            const input = label.querySelector('input');
+            if (!input.checked) {
+                // label.style.opacity = "0.5"; // Optional styling
+            }
+        });
+    } else {
+        parentLabels.forEach(l => l.style.opacity = "1");
+    }
+}
+
+function addComboToCart() {
+    const checkboxes = document.querySelectorAll('.combo-option input[type="checkbox"]');
+    const checked = Array.from(checkboxes).filter(c => c.checked);
+    const errorMsg = document.getElementById("combo-error");
+
+    if (checked.length !== 2) {
+        if (errorMsg) {
+            errorMsg.innerText = "Please select strictly 2 perfumes to proceed.";
+            errorMsg.style.display = "block";
+        }
+        return;
+    }
+
+    const perfume1 = checked[0].value;
+    const perfume2 = checked[1].value;
+
+    // Create unique name
+    const comboName = `Custom Combo: ${perfume1} + ${perfume2}`;
+    const comboPrice = 1999;
+
+    // Add Special Item
+    // We add a specific 'isPromo' flag to exclude from coupons later
+    const item = {
+        name: comboName,
+        price: comboPrice,
+        qty: 1,
+        isPromo: true,
+        img: "images/IMG_4043.PNG" // Thumbnail for cart
+    };
+
+    // Push to cart
+    // Check if exactly this combo exists? 
+    const existing = cart.find(i => i.name === comboName);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push(item);
+    }
+
+    saveCart();
+    updateCartUI();
+    toggleCart(true);
+
+    // Reset selection?
+    checkboxes.forEach(c => c.checked = false);
+    // alert(`Success! ${comboName} added to your cart.`);
+}
