@@ -509,11 +509,11 @@
             }
 
             let discountedAmount = discountableSubtotal;
-            if (appliedMainCoupon) discountedAmount = discountedAmount * 0.70; // 30% discount? Original code said * 0.30 which is 70% OFF. Wait..
-            // Original code: if (appliedMainCoupon) discountedSubtotal = discountedSubtotal * 0.30;
-            // "Save 70% with EMPIRE26". So price becomes 30% of original.
 
-            if (appliedMainCoupon) discountedAmount = discountedAmount * 0.30;
+            // Apply 70% Discount (Price becomes 30%)
+            if (appliedMainCoupon) {
+                discountedAmount = discountedAmount * 0.30;
+            }
 
             if (appliedReferral) discountedAmount = discountedAmount * 0.98; // 2% off additional?
 
