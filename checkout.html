@@ -644,7 +644,7 @@
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            order_id: response.razorpay_order_id,
+                            order_id: customOrderId, // UPDATED: Use Custom ID for Admin too
                             payment_id: response.razorpay_payment_id,
                             total: finalAmount,
                             customer: orderData,
