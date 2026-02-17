@@ -1733,9 +1733,48 @@ function updateCheckoutTotals() {
 
 
 
+function updatePageSEO(product) {
+    if (!product) return;
+
+    // 1. Update Title
+    document.title = `${product.name} — E'MPIRE Luxury Perfumes`;
+
+    // 2. Update Meta Description
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+        metaDesc.setAttribute("content", product.description.substring(0, 160) + "...");
+    }
+
+    // 3. Update Open Graph Tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute("content", `${product.name} — E'MPIRE`);
+
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute("content", product.description.substring(0, 100) + "...");
+
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage) ogImage.setAttribute("content", window.location.origin + "/" + product.img);
+
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute("content", window.location.href);
+
+    // 4. Update Canonical Link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonical);
+    }
+    // Ensure we use the clean URL format preferred by Google
+    canonical.setAttribute("href", `${window.location.origin}/product-detail.html?id=${product.id}`);
+}
+
 function renderProductDetail(productId) {
 
     const product = productDatabase[productId];
+
+    // SEO UPDATE
+    updatePageSEO(product);
 
     const container = document.getElementById("productDetailContainer");
 

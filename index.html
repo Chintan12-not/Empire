@@ -8,8 +8,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>E'MPIRE — Luxury Indian Perfumes & Fragrances</title>
-    <link rel="icon" type="image/png" href="images/logo.png">
-    <link rel="apple-touch-icon" href="images/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon.png">
+    <link rel="apple-touch-icon" href="images/icon.png">
     <meta name="description"
         content="Discover E'MPIRE's exclusive collection of premium Indian perfumes. Handcrafted luxury fragrances for men and women including Smoked Whisky, Ocean Aura, and more. Shop now." />
     <meta name="keywords"
@@ -51,7 +52,12 @@
           "@type": "Organization",
           "name": "E'MPIRE Perfumes",
           "url": "https://empireparfum.com/",
-          "logo": "https://empireparfum.com/images/logo.png",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://empireparfum.com/images/logo.png",
+            "width": 600,
+            "height": 60
+          },
           "sameAs": [
             "https://www.instagram.com/empireperfumes.official",
             "https://wa.me/919911261347"
