@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/admin-secret.html",
+      "destination": "/admin-secret.html"
+    }
+  ]
+}
