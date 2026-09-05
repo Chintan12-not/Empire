@@ -228,17 +228,19 @@ export default function AdminDashboardPage() {
   // Auth Gate
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="bg-charcoal-900 border border-gold-500/40 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden">
-          <div className="w-16 h-16 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 flex items-center justify-center mx-auto mb-4">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-950/20 via-black to-black flex items-center justify-center p-4">
+        <div className="bg-charcoal-900/90 border border-gold-500/40 rounded-2xl p-8 sm:p-10 max-w-md w-full shadow-2xl text-center relative overflow-hidden backdrop-blur-xl shadow-gold-500/10">
+          <div className="w-16 h-16 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-gold-500/20">
             <Crown className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-serif font-bold text-white mb-2">E'MPIRE Admin</h1>
-          <p className="text-xs text-gray-400 mb-6">Enter admin credentials to access panel</p>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white mb-1 tracking-wide">
+            E'MPIRE Admin
+          </h1>
+          <p className="text-xs text-gray-400 mb-6">Secure Gateway for Management</p>
 
           {loginError && (
-            <div className="mb-4 p-2.5 rounded bg-red-950/80 border border-red-500/50 text-red-300 text-xs">
-              {loginError}
+            <div className="mb-4 p-3 rounded-lg bg-red-950/80 border border-red-500/50 text-red-300 text-xs flex items-center justify-center gap-2">
+              <span>{loginError}</span>
             </div>
           )}
 
@@ -246,18 +248,18 @@ export default function AdminDashboardPage() {
             <div>
               <input
                 type="email"
-                placeholder="Admin Email"
+                placeholder="Enter Admin Email"
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
-                className="w-full bg-black border border-gray-800 focus:border-gold-400 rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition"
+                className="w-full bg-black/80 border border-gray-800 focus:border-gold-400 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition duration-300 placeholder:text-gray-600"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-gold-500 hover:bg-gold-400 text-charcoal-950 font-semibold py-3 rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-gold-500 via-gold-400 to-amber-500 hover:from-gold-400 hover:to-gold-300 text-charcoal-950 font-bold py-3.5 rounded-xl text-sm uppercase tracking-wider transition-all duration-300 shadow-lg shadow-gold-500/25 flex items-center justify-center gap-2 active:scale-98"
             >
-              <Lock className="w-4 h-4" /> Enter Panel
+              <Lock className="w-4 h-4" /> Enter Panel 🔒
             </button>
           </form>
         </div>
