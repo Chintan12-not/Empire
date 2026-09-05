@@ -289,43 +289,8 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
-        {/* 1. NEW SALES PERFORMANCE & SUMMARY SECTION */}
+        {/* 1. SALES PERFORMANCE & SUMMARY SECTION */}
         <SalesPerformanceSection />
-
-        {/* 2. OVERALL STATS CARDS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-charcoal-800/80 border border-gray-800 rounded-xl p-5">
-            <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Orders</div>
-            <div className="text-2xl font-bold text-white">{totalOrders}</div>
-          </div>
-
-          <div className="bg-charcoal-800/80 border border-gray-800 rounded-xl p-5">
-            <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Pending Orders</div>
-            <div className="text-2xl font-bold text-amber-400">{pendingOrders}</div>
-          </div>
-
-          <div className="bg-charcoal-800/80 border border-gray-800 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-1">
-              <div className="text-xs text-gray-400 uppercase tracking-wider">Monthly Sales</div>
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-black border border-gold-500/40 text-white text-xs rounded px-2 py-0.5"
-              />
-            </div>
-            <div className="text-2xl font-bold text-gold-400">
-              ₹{monthlySales.toLocaleString('en-IN')}
-            </div>
-          </div>
-
-          <div className="bg-charcoal-800/80 border border-gray-800 rounded-xl p-5">
-            <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Overall Sales</div>
-            <div className="text-2xl font-bold text-emerald-400">
-              ₹{totalSales.toLocaleString('en-IN')}
-            </div>
-          </div>
-        </div>
 
         {/* 3. REFERRAL CODE STATS & ORDERS */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
