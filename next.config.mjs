@@ -5,11 +5,17 @@ const nextConfig = {
     unoptimized: true,
     domains: ['localhost', 'wolxccbehsbafyirgvgp.supabase.co'],
   },
-  async rewrites() {
+  async redirects() {
     return [
       {
         source: '/admin-secret.html',
         destination: '/admin',
+        permanent: false,
+      },
+      {
+        source: '/admin-secret',
+        destination: '/admin',
+        permanent: false,
       },
     ];
   },
