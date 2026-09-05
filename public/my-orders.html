@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders — E'MPIRE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
+
+  <audio id="bgAudio" preload="auto">
+    <source src="audio/empire-audio.mpeg" type="audio/mpeg">
+</audio>
+
+<button id="audioToggle">🔊</button>
+
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+    }
+    .nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      box-sizing: border-box;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+    .brand {
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #d4af37;
+      font-size: 1.2rem;
+    }
+    .orders-container {
+      max-width: 900px;
+      margin: 140px auto 60px;
+      padding: 0 20px;
+    }
+    .order-card {
+      background: #0b0b0b;
+      border: 1px solid rgba(212, 175, 55, .25);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .order-card:hover {
+      border-color: rgba(212, 175, 55, 0.5);
+      transform: translateY(-2px);
+    }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    .badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    /* Status Colors */
+    .paid { background: #27ae60; color: #fff; }
+    .confirmed { background: #d4af37; color: #000; }
+    .shipped { background: #2980b9; color: #fff; }
+    .processing { background: #555; color: #fff; }
+
+    /* New Order Item Styles */
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .order-item:last-of-type {
+      border-bottom: none;
+    }
+    .order-item img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(212,175,55,0.3);
+    }
+    .order-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #ccc;
+    }
+    .gold-text {
+      color: #d4af37;
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+    .empty {
+      text-align: center;
+      color: #888;
+      margin-top: 60px;
+      font-style: italic;
+    }
+    .btn.ghost.small {
+      border: 1px solid #d4af37;
+      color: #d4af37;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+    .btn.ghost.small:hover {
+      background: #d4af37;
+      color: #000;
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="nav">
+  <div class="nav-left" style="display:flex; align-items:center; gap:12px;">
+    <img src="images/logo.png" alt="E'MPIRE" style="height:36px;">
+    <span class="brand">E'MPIRE</span>
+  </div>
+  
+  <div class="nav-right">
+    <a href="index.html" class="btn ghost small">← Back</a>
+  </div>
+</header>
+
+<div class="orders-container">
+  <h1 class="gold-text">My Orders</h1>
+  <div id="ordersList">
+    <p class="empty">Loading orders...</p>
+  </div>
+</div>
+
+<script>
+  // Configuration
+  const SUPABASE_URL = "https://wolxccbehsbafyirgvgp.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function getProductImage(productName) {
+    const map = {
+      "Smoked Whisky": "images/Smoked Whisky.jpg",
+      "Ocean Aura": "images/Ocean Aura.jpg",
+      "Blush ELIXIR": "images/Blush ELIXIR.jpg",
+      "Pear Forest": "images/Fruity Forest 1.jpg",
+      "Crown of Dunes": "images/Crown of Dunes 1.jpg",
+      "Supermale": "images/Supermale 1.jpg",
+      "Berry Flora": "images/Berry Flora 1.jpg"
+    };
+    return map[productName] || "images/logo.png";
+  }
+
+  async function loadMyOrders() {
+    const container = document.getElementById("ordersList");
+
+    try {
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+
+      if (!user) {
+        container.innerHTML = `<p class="empty">Please login to view your orders</p>`;
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p class="empty">No orders yet</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(o => {
+        console.log("ORDER:", o);
+console.log("ITEMS:", o.items);
+        const statusClass = (o.status || 'processing').toLowerCase();
+        const statusLabel = o.status || 'Processing';
+        
+        // Parse items and handle quantity
+        const items = JSON.parse(o.items || "[]");
+        const itemsHtml = items.map(i => `
+          <div class="order-item">
+            <img src="${getProductImage(i.name)}" alt="${i.name}">
+            <div class="order-item-name">
+              ${i.name} ${i.qty ? `× ${i.qty}` : ''}
+            </div>
+          </div>
+        `).join("");
+
+        return `
+          <div class="order-card">
+            <div class="order-header">
+              <span>Order #${o.id.toString().slice(0, 8).toUpperCase()}</span>
+              <span class="badge ${statusClass}">${statusLabel}</span>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              ${itemsHtml}
+            </div>
+
+            <div class="order-row">
+              <span>Total Amount</span>
+              <span style="color: #fff; font-weight: 700;">₹${(o.total_amount || 0).toLocaleString("en-IN")}</span>
+            </div>
+            <div class="order-row">
+              <span>Order Date</span>
+              <span>${new Date(o.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </div>
+            ${o.referral_code ? `
+            <div class="order-row">
+              <span>Referral Used</span>
+              <span style="color: #d4af37;">${o.referral_code}</span>
+            </div>` : ''}
+          </div>
+        `;
+      }).join("");
+
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      container.innerHTML = `<p class="empty">Error loading orders. Please try again.</p>`;
+    }
+  }
+
+  loadMyOrders();
+</script>
+
+</body>
+</html>

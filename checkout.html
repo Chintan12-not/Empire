@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Secure Checkout — E'MPIRE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(15, 15, 15, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, #111 0%, #000 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+        }
+
+        .gold-text {
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn.primary {
+            background: var(--gold);
+            color: black;
+            border-radius: 2px;
+        }
+
+        .btn.ghost {
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 6px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--gold);
+        }
+
+        .checkout-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .modern-form .form-group {
+            margin-bottom: 25px;
+        }
+
+        .modern-form label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+        }
+
+        .modern-form input,
+        .modern-form textarea {
+            width: 100%;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .modern-form input:focus {
+            border-color: var(--gold);
+            outline: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .summary-card {
+            position: sticky;
+            top: 120px;
+            background: #0f0f0f;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 30px;
+        }
+
+        .checkout-item-mini {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .discount-box {
+            display: flex;
+            gap: 10px;
+            margin: 25px 0;
+        }
+
+        .discount-box input {
+            flex: 1;
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .total-row.final {
+            font-size: 1.4rem;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+
+        .full-width {
+            width: 100%;
+            margin-top: 25px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .terms-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .terms-row input {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .terms-row label {
+            margin: 0;
+            text-transform: none;
+            color: #888;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 96px;
+                /* Match header height */
+            }
+
+            .checkout-layout {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                margin-top: 30px;
+            }
+
+            .checkout-section {
+                padding: 22px;
+            }
+
+            .summary-card {
+                position: relative;
+                top: unset;
+                padding: 22px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 26px;
+                letter-spacing: 3px;
+            }
+
+            main.container {
+                margin-top: 0 !important;
+                padding-bottom: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav">
+        <div class="nav-left">
+            <img src="images/logo.png" alt="E'MPIRE Logo" class="logo-img">
+            <span class="brand gold-text">E'MPIRE</span>
+        </div>
+        <div class="nav-right">
+            <a href="index.html" class="btn ghost small">← Return to Boutique</a>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: 150px; padding-bottom: 100px;">
+        <h1 class="section-title">SECURE CHECKOUT</h1>
+
+        <div class="checkout-layout">
+            <div class="checkout-main">
+                <section class="checkout-section">
+                    <h3 style="font-family: 'Cinzel', serif; margin-bottom: 30px;">1. Shipping Information</h3>
+
+                    <form id="checkoutForm" class="modern-form">
+                        <div class="form-group">
+                            <label>Full name *</label>
+                            <input type="text" id="fullName" placeholder="Alexander Hamilton" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email address *</label>
+                            <input type="email" id="email" placeholder="client@empire-boutique.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone number *</label>
+                            <input type="tel" id="phone" placeholder="+91 00000 00000" required maxlength="10"
+                                pattern="\d{10}" title="Please enter exactly 10 digits"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
+                        </div>
+
+                        <div id="addressFields">
+                            <div class="form-group">
+                                <label>Address *</label>
+                                <textarea id="address" placeholder="Street, Building, Apartment" rows="3"
+                                    required></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>City</label><input type="text" id="city" required></div>
+                                <div class="form-group"><label>State</label><input type="text" id="state" required>
+                                </div>
+                                <div class="form-group"><label>ZIP Code</label><input type="text" id="zip" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="terms-row">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms">I agree to the <a href="terms.html" target="_blank"
+                                    style="color:var(--gold)">Terms & Conditions</a>.</label>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <aside class="checkout-sidebar">
+                <div class="summary-card">
+                    <h3
+                        style="font-family: 'Cinzel', serif; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0;">
+                        Order Summary</h3>
+                    <div id="checkoutItems"></div>
+
+                    <div id="autoCoupon" style="display:flex;align-items:center;justify-content:space-between;
+                                padding:14px 16px;border:1px dashed #d4af37;
+                                border-radius:10px;margin:20px 0;cursor:pointer;" onclick="applyEmpireCoupon()">
+                        <div>
+                            <strong style="color:#d4af37;">Save 70% with "EMPIRE26"</strong><br>
+                            <span style="font-size:12px;color:#aaa;">Click apply to auto-apply coupon</span>
+                        </div>
+                        <button class="btn ghost small" type="button">Apply</button>
+                    </div>
+
+                    <div class="discount-box">
+                        <input type="text" id="discountCode" placeholder="GIFT CARD OR CODE">
+                        <button type="button" class="btn ghost small" onclick="applyDiscount()">Apply</button>
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="total-row"><span>Subtotal</span><span id="subtotalValue">₹0</span></div>
+                        <div class="total-row"><span>Shipping</span><span id="shippingValue">₹120</span></div>
+                        <div class="total-row final"><span>Total</span><span id="finalTotal">₹0</span></div>
+                    </div>
+
+                    <!-- PAYMENT METHOD SELECTION REMOVED (Default: Online) -->
+                    <div
+                        style="margin: 20px 0; border: 1px solid #333; padding: 15px; border-radius: 8px; background: rgba(212, 175, 55, 0.05);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <strong style="color: #fff;">Payment Method</strong>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.9rem; color: #d4af37;">
+                            Secure Online Payment (UPI, Cards, Net Banking)
+                        </div>
+                    </div>
+
+
+                    <button type="submit" id="submitBtn" form="checkoutForm" class="btn primary full-width">Proceed to
+                        Payment</button>
+
+
+
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        /* --- SUPABASE INITIALIZATION --- */
+        const SUPABASE_URL = "https://wolxccbehsbafyirgvgp.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_1NCRxQCEEOEnr0jJ6H-ASg_JQxgdr3L";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let appliedMainCoupon = false;
+        let appliedReferral = null;
+        let finalPayableAmount = 0;
+        const SHIPPING_CHARGE = 120;
+        const referralCodes = ["ANTY07", "AMRIT09", "KRISHV19", "AVANI26", "SANJEEVANI26", "VEDU18"];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+
+            // REMOVED STRICT LOAD CHECK
+            // We allow guests to VIEW, but force login at PAYMENT.
+
+            if (session) {
+                // Try to load from DB if localStorage is empty
+                if (!localStorage.getItem('empire_cart')) {
+                    await loadUserCart(session.user.id);
+                }
+            }
+
+            renderCheckout();
+            setupForm();
+        });
+
+        async function loadUserCart(userId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from("user_carts")
+                    .select("cart_items")
+                    .eq("user_id", userId)
+                    .single();
+
+                if (data?.cart_items) {
+                    localStorage.setItem("empire_cart", JSON.stringify(data.cart_items));
+                    console.log("Cart synced from DB");
+                }
+            } catch (err) {
+                console.error("Failed to sync cart:", err);
+            }
+        }
+
+        function renderCheckout() {
+            const container = document.getElementById('checkoutItems');
+            const totalEl = document.getElementById('finalTotal');
+            const subtotalEl = document.getElementById('subtotalValue');
+            let cart = JSON.parse(localStorage.getItem('empire_cart')) || [];
+
+            if (cart.length === 0) {
+                container.innerHTML = "<p style='padding: 30px 0; opacity: 0.5; text-align: center;'>Boutique bag is empty.</p>";
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="checkout-item-mini">
+                    <div>
+                        <div style="font-weight: 600; text-transform: uppercase; font-size: 0.9rem;">${item.name}</div>
+                        <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">QTY: ${item.qty}</div>
+                    </div>
+                    <div>₹${(item.price * item.qty).toLocaleString()}</div>
+                </div>
+            `).join('');
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const total = subtotal + SHIPPING_CHARGE;
+            finalPayableAmount = total;
+
+            subtotalEl.innerText = `₹${subtotal.toLocaleString()}`;
+            totalEl.innerText = `₹${total.toLocaleString()}`;
+        }
+
+        function applyDiscount() {
+            const code = document.getElementById("discountCode").value.trim().toUpperCase();
+            let cart = JSON.parse(localStorage.getItem("empire_cart")) || [];
+
+            // Split cart into discountable and non-discountable
+            let discountableSubtotal = 0;
+            let nonDiscountableSubtotal = 0;
+
+            cart.forEach(item => {
+                if (item.isPromo) {
+                    nonDiscountableSubtotal += (item.price * item.qty);
+                } else {
+                    discountableSubtotal += (item.price * item.qty);
+                }
+            });
+
+            // If no discountable items, but we proceed
+            if (discountableSubtotal === 0 && nonDiscountableSubtotal === 0) return;
+
+            if (code === "EMPIRE26" && !appliedMainCoupon) {
+                if (discountableSubtotal === 0) {
+                    alert("Coupon code EMPIRE26 is not applicable on Combo Offers.");
+                    return;
+                }
+                appliedMainCoupon = true;
+            } else if (referralCodes.includes(code) && !appliedReferral) {
+                if (discountableSubtotal === 0) {
+                    alert("Referral codes are not applicable on Combo Offers.");
+                    return;
+                }
+                appliedReferral = code;
+                localStorage.setItem("applied_referral", code);
+            } else {
+                // Allow "EMPIRE26" re-entry if already applied? Logic says "&& !appliedMainCoupon" prevents duplicate
+                if (code !== "EMPIRE26" && !referralCodes.includes(code)) {
+                    alert("Invalid or already applied code");
+                    return;
+                }
+            }
+
+            let discountedAmount = discountableSubtotal;
+
+            // Apply 70% Discount (Price becomes 30%)
+            if (appliedMainCoupon) {
+                discountedAmount = discountedAmount * 0.30;
+            }
+
+            if (appliedReferral) discountedAmount = discountedAmount * 0.98; // 2% off additional?
+
+            // Final Total calculation
+            const finalSubtotal = discountedAmount + nonDiscountableSubtotal;
+            const final = Math.round(finalSubtotal) + SHIPPING_CHARGE;
+
+            finalPayableAmount = final;
+            document.getElementById("finalTotal").innerText = `₹${final.toLocaleString("en-IN")}`;
+
+            if (appliedMainCoupon || appliedReferral) {
+                alert("Discount applied successfully on applicable items 🎉");
+            }
+        }
+
+        async function startPayment(finalAmount, orderData) {
+            try {
+                const res = await fetch("https://empire-razorpay.empire-official2026.workers.dev", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: finalAmount, receipt: "empire_checkout" }),
+                });
+
+                const order = await res.json();
+                if (!order?.id) throw new Error("Order creation failed");
+
+                const options = {
+                    key: "rzp_live_S8a98UUiR1ZxAl",
+                    amount: order.amount,
+                    currency: "INR",
+                    name: "E'MPIRE",
+                    description: "Luxury Fragrance Purchase",
+                    order_id: order.id,
+                    prefill: {
+                        name: orderData.customer_name,
+                        email: orderData.email,
+                        contact: orderData.phone,
+                    },
+                    theme: { color: "#d4af37" },
+                    handler: async function (response) {
+                        try {
+                            await handlePaymentSuccess(response, orderData, finalPayableAmount);
+                        } catch (err) {
+                            console.error(err);
+                            alert("Payment Handler Error: " + err.message);
+                        }
+                    },
+                    modal: { ondismiss: () => resetSubmitBtn() }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (err) {
+                alert("Payment system error");
+                resetSubmitBtn();
+            }
+        }
+
+
+        async function handlePaymentSuccess(response, orderData, finalAmount) {
+            // alert("DEBUG: handlePaymentSuccess Started");
+            let customOrderId = response.razorpay_order_id; // Fallback to Razorpay ID
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                // alert("DEBUG: User fetched");
+
+                const cartItems = JSON.parse(localStorage.getItem("empire_cart")) || [];
+
+                // 1. Log to Supabase
+                try {
+                    // alert("DEBUG: Attempting to insert order into Supabase...");
+                    const { data, error } = await supabaseClient.from("orders").insert([{
+                        customer_name: orderData.customer_name,
+                        email: orderData.email,
+                        phone: orderData.phone,
+                        address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.zip}`,
+                        total_amount: finalAmount,
+                        referral_code: localStorage.getItem("applied_referral") || null,
+                        status: "paid",
+                        user_id: user ? user.id : null,
+                        razorpay_order_id: response.razorpay_order_id,
+                        items: JSON.stringify(cartItems)
+                    }]).select().single();
+
+                    if (error) throw error;
+
+                    if (data && data.seq_id) {
+                        customOrderId = "EM2026" + String(data.seq_id).padStart(2, '0');
+                        console.log("Generated Custom Order ID:", customOrderId);
+                    }
+                    // alert("DEBUG: Order Inserted to Supabase Successfully");
+                } catch (dbErr) {
+                    // alert("DEBUG: Supabase Insert Failed: " + dbErr.message + "\nDetails: " + JSON.stringify(dbErr));
+                    console.error("Supabase Error:", dbErr);
+                }
+
+                // 2. Send confirmation email (New Resend Worker) - PRIORITIZED
+                try {
+                    // alert("DEBUG: Attempting to send email via New Worker...");
+                    const emailRes = await fetch("https://emailworker.empire-official2026.workers.dev", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            order_id: customOrderId, // Use Custom ID here
+                            payment_id: response.razorpay_payment_id,
+                            total: finalAmount,
+                            customer: orderData,
+                            items: cartItems
+                        })
+                    });
+
+                    if (!emailRes.ok) {
+                        const errText = await emailRes.text();
+                        console.error("Email Worker Failed! Status: " + emailRes.status + "\nResponse: " + errText);
+                    } else {
+                        const successText = await emailRes.text();
+                        console.log("Email Worker Success! response: " + successText);
+                    }
+                } catch (e) {
+                    console.error("New Email Worker Failed", e);
+                }
+
+                // 3. Send Admin Notification (Original Worker)
+                try {
+                    await fetch("https://empire-razorpay.empire-official2026.workers.dev/send-order-email", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            order_id: customOrderId, // UPDATED: Use Custom ID for Admin too
+                            payment_id: response.razorpay_payment_id,
+                            total: finalAmount,
+                            customer: orderData,
+                            items: cartItems
+                        })
+                    });
+                } catch (adminErr) {
+                    console.error("Admin Email Failed:", adminErr);
+                }
+
+                // 4. Create Shiprocket Order
+                try {
+                    // alert("DEBUG: Starting Shiprocket Logic...");
+                    // Calculate Discount Logic for Shiprocket
+
+                    const originalCartTotal = cartItems.reduce((s, i) => s + (i.price * (i.units || i.qty)), 0);
+                    const totalPaid = finalAmount; // Amount is in Rupees (passed directly)
+                    const effectiveShipping = SHIPPING_CHARGE;
+                    const paidForProducts = totalPaid - effectiveShipping;
+
+                    // Create adjusted items items list
+                    const shiprocketItems = cartItems.map(item => {
+                        const itemTotalOriginal = item.price * (item.units || item.qty);
+                        const share = itemTotalOriginal / originalCartTotal;
+                        const adjustedTotal = paidForProducts * share;
+                        const adjustedUnit = adjustedTotal / (item.units || item.qty);
+
+                        return {
+                            ...item,
+                            selling_price: Math.floor(adjustedUnit)
+                        };
+                    });
+
+                    // Add a timeout to prevent hanging
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+                    await fetch("https://empire-shiprocket.empire-official2026.workers.dev", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            name: orderData.customer_name,
+                            email: orderData.email,
+                            phone: orderData.phone,
+                            address: orderData.address,
+                            city: orderData.city,
+                            state: orderData.state,
+                            pincode: orderData.zip,
+                            items: shiprocketItems,
+                            shipping_charges: effectiveShipping,
+                            payment_method: "Prepaid"
+                        }),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    alert("DEBUG: Shiprocket Logic Finished Successfully");
+                } catch (shipErr) {
+                    alert("DEBUG: Shiprocket Failed: " + shipErr.message);
+                    console.error("Shiprocket Info:", shipErr);
+                }
+
+
+
+
+                alert("Thank you for ordering 👑\n\nYou will receive shipping details and tracking soon on mail.\n\nWe have received your order and are preparing it with care.");
+                localStorage.removeItem("empire_cart");
+                localStorage.removeItem("applied_referral");
+                window.location.href = "index.html";
+            } catch (err) {
+                console.error("Payment Success Handler Error:", err);
+                window.location.href = "index.html";
+            }
+        }
+
+
+        function resetSubmitBtn() {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = false;
+            btn.innerText = "Proceed to Payment";
+        }
+
+
+
+        function setupForm() {
+            const form = document.getElementById('checkoutForm');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // 1. CHECK AUTH ON SUBMIT
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    alert("Please login to proceed to payment 👑");
+                    window.location.href = "index.html?open_auth=true";
+                    return;
+                }
+
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = true;
+                const originalText = btn.innerText;
+                btn.innerText = "PROCESSING...";
+
+                const orderData = {
+                    customer_name: document.getElementById('fullName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zip').value
+                };
+
+                const paymentMode = "ONLINE";
+
+                // Dismiss keyboard on mobile
+                if (document.activeElement) document.activeElement.blur();
+
+                await startPayment(finalPayableAmount, orderData);
+            });
+        }
+
+
+
+        function applyEmpireCoupon() {
+            if (appliedMainCoupon) return;
+            document.getElementById("discountCode").value = "EMPIRE26";
+            applyDiscount();
+        }
+
+
+
+    </script>
+</body>
+
+</html>
