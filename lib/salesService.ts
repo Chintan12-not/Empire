@@ -22,7 +22,7 @@ const STORAGE_KEY = 'empire_sales_performance_v1';
 
 export const DEFAULT_SALES_PERFORMANCE: SalesPerformanceInput = {
   salesPeriodMonths: 3,
-  totalBottlesSold: 3500,
+  totalBottlesSold: 1500,
   pricePerBottle: 1170,
 };
 

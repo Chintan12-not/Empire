@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS sales_performance (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     sales_period_months INT NOT NULL DEFAULT 3 CHECK (sales_period_months > 0),
-    total_bottles_sold INT NOT NULL DEFAULT 3500 CHECK (total_bottles_sold >= 0),
+    total_bottles_sold INT NOT NULL DEFAULT 1500 CHECK (total_bottles_sold >= 0),
     price_per_bottle NUMERIC(10, 2) NOT NULL DEFAULT 1170.00 CHECK (price_per_bottle >= 0),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -36,7 +36,7 @@ CREATE POLICY "Allow write access to sales performance"
 
 -- Seed initial row if table is empty
 INSERT INTO sales_performance (sales_period_months, total_bottles_sold, price_per_bottle)
-SELECT 3, 3500, 1170.00
+SELECT 3, 1500, 1170.00
 WHERE NOT EXISTS (SELECT 1 FROM sales_performance);
 
 -- Function to update updated_at timestamp
